@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: PhotonServerSettings
   m_EditorClassIdentifier: 
   AppSettings:
-    AppIdRealtime: 099d4b25-09b2-428f-a344-dfe00654fe51
+    AppIdRealtime: 
     AppIdFusion: 
     AppIdChat: 
     AppIdVoice: 
     AppVersion: 
-    UseNameServer: 1
+    UseNameServer: 0
     FixedRegion: 
-    Server: 
-    Port: 0
+    Server: 192.168.75.81
+    Port: 5055
     ProxyServer: 
     Protocol: 0
     EnableProtocolFallback: 1
@@ -29,13 +29,14 @@ MonoBehaviour:
     EnableLobbyStatistics: 0
     NetworkLogging: 1
   DevRegion: kr
-  PunLogging: 0
+  PunLogging: 2
   EnableSupportLogger: 0
   RunInBackground: 1
   StartInOfflineMode: 0
   RpcList:
   - ClickRpc
   - DestroyRpc
+  - SendTest
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
