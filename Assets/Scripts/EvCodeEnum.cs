@@ -21,7 +21,7 @@ namespace KWY
         PlayerSkill3 = 23,
 
         // TurnReady에 대한 res 값 data: [ userId: string, ok: bool, startSimul: bool, simulData: Dictionary<int, int> ];
-        // if startSimul is false, there is not simulData
+        // if startSimul is false, there is no simulData
         ResTurnReady = 111, 
         ResSimulEnd = 112, // SimulEnd에 대한 res 값 data: null
         ResGameEnd = 113, // GameEnd에 대한 res 값 data: winnerId: string
