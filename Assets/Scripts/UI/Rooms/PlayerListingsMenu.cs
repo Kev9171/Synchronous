@@ -20,14 +20,13 @@ public class PlayerListingsMenu : MonoBehaviourPunCallbacks
 
     private void Awake()
     {
-        
+        GetCurrentRoomPlayers();
     }
 
     public override void OnEnable()
     {
         base.OnEnable();
         SetReadyUp(false);
-        GetCurrentRoomPlayers();
     }
 
     public override void OnDisable()
@@ -50,11 +49,11 @@ public class PlayerListingsMenu : MonoBehaviourPunCallbacks
         _ready = state;
         if (_ready)
         {
-            _readyUpText.text = "R";
+            _readyUpText.text = "준비 완료";
         }
         else
         {
-            _readyUpText.text = "N";
+            _readyUpText.text = "준비";
         }
     }
 
@@ -95,7 +94,7 @@ public class PlayerListingsMenu : MonoBehaviourPunCallbacks
 
     public override void OnMasterClientSwitched(Player newMasterClient)
     {
-        //_roomsCanvases.CurrentRoomCanvas.LeaveRoomMenu.OnClick_LeaveRoom();
+        _roomsCanvases.CurrentRoomCanvas.LeaveRoomMenu.OnClick_LeaveRoom();
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
@@ -117,10 +116,41 @@ public class PlayerListingsMenu : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.IsMasterClient) // 방 생성자만 게임 시작 버튼 누를 수 있게
         {
+            for(int i = 0; i < _listings.Count; i++)
+            {
+                if (_listings[i].Player != PhotonNetwork.LocalPlayer)
+                {
+                    if (!_listings[i].Ready)
+                    {
+                        return;
+                    }
+                }
+            }
             PhotonNetwork.CurrentRoom.IsOpen = false;
             PhotonNetwork.CurrentRoom.IsVisible = false;
             // 게임 시작 시 방 목록에서 사라짐
             PhotonNetwork.LoadLevel(1);
+        }
+    }
+
+    public void OnClick_ReadyUp()
+    {
+        if (!PhotonNetwork.IsMasterClient)
+        {
+            SetReadyUp(!_ready);
+            base.photonView.RPC("RPC_ChangeReadyState", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer, _ready);
+            // base.photonView.RpcSecure("RPC_ChangeReadyState", RpcTarget.MasterClient, true, PhotonNetwork.LocalPlayer, _ready);
+            // PhotonNetwork.RemoveRPCs()
+        }
+    }
+
+    [PunRPC]
+    private void RPC_ChangeReadyState(Player player, bool ready)
+    {
+        int index = _listings.FindIndex(x => x.Player == player);
+        if (index != -1)
+        {
+            _listings[index].Ready = ready;
         }
     }
 
