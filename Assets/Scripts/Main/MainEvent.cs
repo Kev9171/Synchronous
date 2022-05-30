@@ -45,11 +45,11 @@ namespace KWY
         #region Public Methods
 
         /// <summary>
-        /// Send to 'ready signal to start simulation' to the Server; content: actionData: Dictionary(int, int)
+        /// Send to 'ready signal to start simulation' to the Server; content: actionData: Dictionary(int, string)
         /// </summary>
         public void RaiseEventTurnReady()
         {
-            Dictionary<int, int> actionData = new Dictionary<int, int>(); // temp
+            Dictionary<int, string> actionData = new Dictionary<int, string>(); // temp
 
             byte evCode = (byte)EvCode.TurnReady;
 
@@ -251,7 +251,7 @@ namespace KWY
         }
 
         /// <summary>
-        /// Method when the server responses at client's TurnReady event; data: [userId: string, resOk: bool, startSimul: bool, data?: Dictionary(int, int)]
+        /// Method when the server responses at client's TurnReady event; data: [userId: string, resOk: bool, startSimul: bool, data?: Dictionary(int, string)]
         /// </summary>
         /// <param name="eventData">Received data from the server</param>
         private void OnEventTurnReady(EventData eventData)
@@ -279,7 +279,7 @@ namespace KWY
                 // 아직 테스트 하지 못하였음!!!!!!!!
                 if (PhotonNetwork.IsMasterClient)
                 {
-                    Simulation((Dictionary<int, int>)data[3]); // Note: if data[2] is false, there is not data[3]
+                    Simulation((Dictionary<int, string>)data[3]); // Note: if data[2] is false, there is not data[3]
                 }
             }
         }
@@ -288,7 +288,7 @@ namespace KWY
         /// Executing simulation; It should be called only on MASTER CLIENT
         /// </summary>
         /// <param name="actionData">Data to simulate characters and actions</param>
-        private void Simulation(Dictionary<int, int> actionData)
+        private void Simulation(Dictionary<int, string> actionData)
         {
             // ㅠㅠ 
         }
