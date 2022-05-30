@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class Night : MonoBehaviour
+public class Knight : MonoBehaviour
 {
     public CharacterData characterData;
     public Tilemap tilemap;
@@ -14,6 +14,7 @@ public class Night : MonoBehaviour
     private int armor;
     private int na_time;
     private int sa_time;
+    private Color[,] tile_color = new Color[10, 12];
 
     public void PrintCharacterData()
     {
@@ -47,25 +48,27 @@ public class Night : MonoBehaviour
 
     public int NormalAttack()
     {
+        ResetTile();
         int damage = 10;
         Debug.Log("일반공격 시전, " + damage + "의 데미지");
-        highlight(1, 0);
+        AttackHighlight(1, 0);
         return damage;
     }
 
     public void SpecialAttack()
     {
+        ResetTile();
         Debug.Log("특수공격 시전, 아군에게 " + armor + "% 데미지 감소 버프");
         for (int i = -2; i < 3; i++)
         {
             for (int j = -2; j < 3; j++)
             {
-                highlight(i, j);
+                BuffHighlight(j, i);
             }
         }
     }
 
-    public void highlight(int x, int y)
+    public void AttackHighlight(int x, int y)
     {
         Vector3 pos;
         pos = this.transform.position;
@@ -78,5 +81,37 @@ public class Night : MonoBehaviour
 
         this.tilemap.SetTileFlags(range, TileFlags.None);
         this.tilemap.SetColor(range, Color.red);
+    }
+
+    public void BuffHighlight(int x, int y)
+    {
+        Vector3 pos;
+        pos = this.transform.position;
+
+        Vector3Int range = tilemap.WorldToCell(pos);
+        range.x += x;
+        range.y += y;
+
+        Debug.Log(range);
+
+        this.tilemap.SetTileFlags(range, TileFlags.None);
+        this.tilemap.SetColor(range, Color.blue);
+    }
+
+    public void ResetTile()
+    {
+        Vector3 pos = new Vector3(0, 0, 0);
+        Vector3Int range;
+        for (float i = -4; i < 5; i += 0.5f)
+        {
+            for (float j = -6; j < 6; j += 0.9f)
+            {
+                pos.x = j;
+                pos.y = i;
+                range = tilemap.WorldToCell(pos);
+                this.tilemap.SetTileFlags(range, TileFlags.None);
+                this.tilemap.SetColor(range, Color.white);
+            }
+        }
     }
 }

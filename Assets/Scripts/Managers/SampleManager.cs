@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class SampleManager : MonoBehaviour
 {
-    public Night night;
+    public Knight knight;
 
     public void NA_clicked()
     {
-        night.NormalAttack();
+        knight.NormalAttack();
     }
 
     public void SA_clicked()
     {
-        night.SpecialAttack();
+        knight.SpecialAttack();
     }
 }
