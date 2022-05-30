@@ -1,5 +1,7 @@
 using Photon.Pun;
-
+using System;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
 using UnityEngine;
 
 namespace KWY
@@ -15,9 +17,15 @@ namespace KWY
 
         float YCorrectionValue { get; }
 
+        Dictionary<int, string> Moves { get; set; }
+
+        int moveCnt { get;set; }
+
         public void Damage(float damage);
         public void MoveTo(int row, int col);
         public void CastSkill();
+
+        //public void OnClick();
     }
 
     // The claases of characters that are unique
