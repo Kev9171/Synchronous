@@ -11,7 +11,6 @@ namespace KWY {
 
         public Text logText;
         public GameObject chara;
-        public Button readyBtn;
 
         public void OnEnable()
         {
@@ -62,29 +61,6 @@ namespace KWY {
                 Debug.LogFormat("OnEvent: " + data[1] + ", " + data[2]);
                 logText.text += "\nOnEvent: " + data[1] + ", " + data[2];
                 chara.GetComponent<ICharacter>().MoveTo((int)data[1], (int)data[2]);
-            }
-
-            else if (evCode == 110)
-            {
-                object[] data = (object[])photonEvent.CustomData;
-
-                foreach(object o in data)
-                {
-                    Debug.Log("data: "  + o.ToString());
-                }
-
-                if (PhotonNetwork.AuthValues.UserId == (string)data[0])
-                {
-                    readyBtn.GetComponent<Image>().color = Color.blue;
-                }
-
-                if ((bool)data[2])
-                {
-                    Debug.Log("start game");
-
-                    // ¾À º¯°æ 
-                    //PhotonNetwork.LoadLevel("");
-                }
             }
         }
     }

@@ -15,35 +15,9 @@ namespace KWY {
         {
         }
 
-        public void SendTest() {
-            byte evCode = (byte)EvCode.LobbyReady;
-            object content = true;
-
-            RaiseEventOptions raiseEventOptions = new RaiseEventOptions
-            {
-                Receivers = ReceiverGroup.All
-            };
-
-            SendOptions sendOptions = new SendOptions { Reliability = true };
-            PhotonNetwork.RaiseEvent(evCode, content, raiseEventOptions, sendOptions);
-
-            Debug.Log(string.Format("RaiseEventReady"));
-        }
-
-        public void RaiseEventReady()
-        {
-            byte evCode = 10;
-            object[] content = new object[] { true };
-
-            RaiseEventOptions raiseEventOptions = new RaiseEventOptions
-            {
-                Receivers = ReceiverGroup.All
-            };
-
-            SendOptions sendOptions = new SendOptions { Reliability = true };
-            PhotonNetwork.RaiseEvent(evCode, content, raiseEventOptions, sendOptions);
-
-            Debug.Log(string.Format("RaiseEventReady"));
+        [PunRPC]
+        public void SendTest(string msg) {
+            Debug.Log(string.Format("Msg: {0}", msg));
         }
 
 

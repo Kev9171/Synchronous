@@ -7,7 +7,7 @@ using UnityEngine.Tilemaps;
 
 namespace KWY
 {
-    public class CFlappy_Sample : MonoBehaviourPunCallbacks, ICharacter, IPunObservable
+    public class CFlappy2_sample : MonoBehaviourPunCallbacks, ICharacter, IPunObservable
     {
         # region Const Fields
         [Tooltip("Initial Health Points")]
@@ -18,6 +18,7 @@ namespace KWY
         const CClass _CLASS = CClass.Class_A;
 
         const int _MOVECNT = 3;
+
         #endregion
 
         #region Tilemap Fields
@@ -26,7 +27,7 @@ namespace KWY
         [SerializeField] CharacterManager CManager;
 
         [SerializeField] private float movementSpeed;
-        private Vector2 destination;
+        private Vector2 destination = new Vector2(1,1);
         #endregion
 
         #region ICharacter Implementation
@@ -65,6 +66,7 @@ namespace KWY
             Debug.LogFormat("CastSkill: ");
         }
 
+
         #endregion
 
 
@@ -75,7 +77,7 @@ namespace KWY
         #region Public Fields
         #endregion
 
-        
+
         #region  IPunObservable implementation
         public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
@@ -83,7 +85,8 @@ namespace KWY
             {
                 // We own this player: send the others our data
             }
-            else{
+            else
+            {
                 // Network player, receive data
             }
         }
@@ -93,9 +96,8 @@ namespace KWY
 
         void Awake()
         {
-            // ì˜¤ë¸Œì íŠ¸ê°€ íƒ€ì¼ ìœ„ì— ìžˆëŠ” ê²ƒì²˜ëŸ¼ ë³´ì´ë„ë¡ yì¶• ê°’ì„ ë³´ì •í•´ì£¼ëŠ” ê°’
-            this.YCorrectionValue = transform.localScale.y/2;
-            
+            // ¿ÀºêÁ§Æ®°¡ Å¸ÀÏ À§¿¡ ÀÖ´Â °ÍÃ³·³ º¸ÀÌµµ·Ï yÃà °ªÀ» º¸Á¤ÇØÁÖ´Â °ª
+            this.YCorrectionValue = transform.localScale.y / 2;
 
         }
 
@@ -107,10 +109,11 @@ namespace KWY
         void Update()
         {
 
+
             if (Vector2.Distance(transform.position, destination) > 0)
             {
                 transform.position = Vector2.MoveTowards(
-                    transform.position, 
+                    transform.position,
                     destination,
                     movementSpeed * Time.deltaTime);
             }

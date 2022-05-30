@@ -81,8 +81,6 @@ namespace KWY
             // #Critical
             // Load the Room Level.
             PhotonNetwork.LoadLevel(nextLevel);
-
-            Debug.Log("user id: " + PhotonNetwork.AuthValues.UserId);
         }
 
 

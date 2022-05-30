@@ -14,15 +14,6 @@ namespace KWY
 
         private int vx = Int32.MinValue, vy = Int32.MinValue;
 
-        public void SendTest()
-        {
-            e.SendTest();
-        }
-
-        public void SendReady()
-        {
-            e.RaiseEventReady();
-        }
         public void SendMsg()
         {
             if (!string.IsNullOrEmpty(InputMsg.text))
