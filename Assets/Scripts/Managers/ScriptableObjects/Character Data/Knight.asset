@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f2c0c5867f26d94b8f2a59e1cab3a49, type: 3}
   m_Name: Knight
   m_EditorClassIdentifier: 
-  characterName: Night
+  characterName: Knight
   hp: 150
   mp: 50
   armor: 0
