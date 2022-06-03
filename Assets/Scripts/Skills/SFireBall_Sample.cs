@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace KWY
 {
-    public class SFireBall : ISkill
+    public class SFireBall_Sample : ISkill
     {
         #region Constant Fields
-        const string _SkillName = "FireBall";
-        const float _Cost = 1;
+        readonly static string _SkillName = "FireBall";
+        readonly static float _Cost = 1;
 
         #endregion
 
