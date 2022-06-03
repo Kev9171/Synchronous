@@ -17,9 +17,9 @@ namespace KWY
 
         float YCorrectionValue { get; }
 
-        Dictionary<int, string> Moves { get; set; }
+        Dictionary<int, object[]> Moves { get; set; }
 
-        int moveCnt { get;set; }
+        Vector2 position { get;set; }
 
         public void Damage(float damage);
         public void MoveTo(int row, int col);

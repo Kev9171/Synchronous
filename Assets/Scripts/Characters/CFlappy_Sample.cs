@@ -38,9 +38,9 @@ namespace KWY
         public float HP { get; private set; } = _HP;
 
         public float YCorrectionValue { get; private set; }
-        public Dictionary<int, string> Moves { get; set; } = new Dictionary<int, string> { };
+        public Dictionary<int, object[]> Moves { get; set; } = new Dictionary<int, object[]> { };
 
-        public int moveCnt { get; set; } = _MOVECNT;
+        public Vector2 position { get; set; }
 
         public void Damage(float damage)
         {
@@ -95,8 +95,8 @@ namespace KWY
         {
             // 오브젝트가 타일 위에 있는 것처럼 보이도록 y축 값을 보정해주는 값
             this.YCorrectionValue = transform.localScale.y/2;
-            
 
+            this.position = destination;
         }
 
         void Start()

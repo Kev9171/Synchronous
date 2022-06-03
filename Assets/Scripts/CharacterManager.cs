@@ -28,7 +28,7 @@ namespace KWY
 
         #region Private Fields
         public ICharacter character;
-        private bool state = true;
+        private bool moveState, atkState = true;
         private int selOption = 1;
         //private int index = 0; 
         //private Vector3 destination;
@@ -57,23 +57,58 @@ namespace KWY
 
         public void MoveSelectBtn()
         {
-            
-            //CharMoveSelect();
-            if (!state)
-            {
-                mouseInput.Mouse.MouseClick.performed -= CharMoveSelect;
-                mouseInput.Mouse.MouseClick.performed += OnClick;
-                state = !state;
-                character = null;
-                Debug.Log("onclick :");
-            }
-            else
+            if(character != null)
             {
                 mouseInput.Mouse.MouseClick.performed -= OnClick;
                 mouseInput.Mouse.MouseClick.performed += CharMoveSelect;
-                state = !state;
-                Debug.Log("movesel :");
+                Debug.Log("movesel");
             }
+            else
+                Debug.Log("no character selected");
+
+
+            //if (!moveState)
+            //{
+            //    mouseInput.Mouse.MouseClick.performed -= CharMoveSelect;
+            //    mouseInput.Mouse.MouseClick.performed += OnClick;
+            //    moveState = !moveState;
+            //    character = null;
+            //    Debug.Log("onclick :");
+            //}
+            //else
+            //{
+            //    mouseInput.Mouse.MouseClick.performed -= OnClick;
+            //    mouseInput.Mouse.MouseClick.performed += CharMoveSelect;
+            //    moveState = !moveState;
+
+            //}
+        }
+
+        public void AttackSelectBtn()
+        {
+            if(character != null)
+            {
+                mouseInput.Mouse.MouseClick.performed -= OnClick;
+                mouseInput.Mouse.MouseClick.performed += CharAttackSelect;
+                Debug.Log("atksel");
+            }
+            else
+                Debug.Log("no character selected");
+            
+
+            //if (!atkState)
+            //{
+            //    mouseInput.Mouse.MouseClick.performed -= CharAttackSelect;
+            //    mouseInput.Mouse.MouseClick.performed += OnClick;
+            //    atkState = !atkState;
+            //    character = null;
+            //}
+            //else
+            //{
+            //    mouseInput.Mouse.MouseClick.performed -= OnClick;
+            //    mouseInput.Mouse.MouseClick.performed += CharAttackSelect;
+            //    atkState = !atkState;
+            //}
         }
 
         public void OnClick(InputAction.CallbackContext context)
@@ -86,9 +121,8 @@ namespace KWY
             {
                 character = hit.collider.gameObject.GetComponent<ICharacter>();
 
-                //CManager.character = this;
                 Debug.Log("Character :" + character);
-                Debug.Log("moves :" + character.Moves.Count);
+                //Debug.Log("moves :" + character.Moves.Count);
                 //Debug.Log("Target Name: " + hit.collider.gameObject.name);
             }
             //Debug.Log("click");
@@ -106,53 +140,87 @@ namespace KWY
 
         void CharMoveSelect(InputAction.CallbackContext context)
         {
-            int loop = 6;
-            //while (loop != 0)
-            //{
 
-
-            switch (selOption)
+            Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
+            mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
+            Vector3Int gridPosition = map.WorldToCell(mousePosition);
+            //Debug.Log("map :" + map.HasTile(gridPosition));
+            //Debug.Log("moves :" + character.Moves.Count);
+            if (map.HasTile(gridPosition) && character.Moves.Count < 3)
             {
-                case 0:
-                    Debug.Log("nothing selected");
-                    break;
-                case 1:
-                    Debug.Log("movement selected");
-
-                    Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
-                    mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
-                    Vector3Int gridPosition = map.WorldToCell(mousePosition);
-                    //Debug.Log("map :" + map.HasTile(gridPosition));
-                    //Debug.Log("moves :" + character.Moves.Count);
-                    if (map.HasTile(gridPosition) && character.Moves.Count < 3)
-                    {
-                        character.Moves.Add(character.Moves.Count, gridPosition.ToString());
-                        Debug.Log("tile selected");
-                        //character.moveCnt--;
-                    }
-                    else if(!map.HasTile(gridPosition))
-                        Debug.Log("no tile selected");
-                    else
-                    {
-                        foreach (KeyValuePair<int, string> item in character.Moves)
-                        {
-                            Debug.Log(item.Key +", " +item.Value);
-                        }
-                    }
-
-                    break;
-                case 2:
-                    Debug.Log("skill seleceted");
-                    break;
+                Vector2 deltaXY = ((Vector2Int)gridPosition) - character.position;
+                object[] arr = { "move", deltaXY.x, deltaXY.y };
+                //Debug.Log(arr[1] + ", " + arr[2]);
+                character.Moves.Add(character.Moves.Count, arr);
+                character.position = (Vector2Int)gridPosition;
+                Debug.Log("tile selected");
             }
+            else if (!map.HasTile(gridPosition))
+                Debug.Log("no tile selected");
+            else
+            {
+                foreach (KeyValuePair<int, object[]> item in character.Moves)
+                {
+                    Debug.Log(item.Key + ", " +item.Value[0] + ", " + item.Value[1] + ", " + item.Value[2]);
+                }
+            }
+
+
+            //switch (selOption)
+            //{
+            //    case 0:
+            //        Debug.Log("nothing selected");
+            //        break;
+            //    case 1:
+            //        Debug.Log("movement selected");
+
+                    
+
+            //        break;
+            //    case 2:
+            //        Debug.Log("skill selected");
+            //        break;
+            //}
             //}
             
+        }
+
+        void CharAttackSelect(InputAction.CallbackContext context)
+        {
+            Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
+            mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
+            Vector3Int gridPosition = map.WorldToCell(mousePosition);
+            //Debug.Log("map :" + map.HasTile(gridPosition));
+            //Debug.Log("moves :" + character.Moves.Count);
+            Vector2 deltaXY = ((Vector2Int)gridPosition) - character.position;
+            if (map.HasTile(gridPosition) && deltaXY.sqrMagnitude <= 2 && character.Moves.Count < 3)
+            {
+                object[] arr = { "skill", deltaXY.x, deltaXY.y, selOption };
+                //Debug.Log(arr[1] + ", " + arr[2]);
+                character.Moves.Add(character.Moves.Count, arr);
+                //character.position = (Vector2Int)gridPosition;
+                Debug.Log("attack selected");
+            }
+            else if (deltaXY.sqrMagnitude > 2)
+                Debug.Log("outside the atk range");
+            else
+            {
+                foreach (KeyValuePair<int, object[]> item in character.Moves)
+                {
+                    Debug.Log(item.Key + ", " + item.Value[0] + ", " + item.Value[1] + ", " + item.Value[2]);
+                }
+            }
         }
 
 
         void Update()
         {
-
+            if (mouseInput.Mouse.MouseClick.IsPressed())
+            {
+                mouseInput.Mouse.MouseClick.performed -= CharMoveSelect;
+                mouseInput.Mouse.MouseClick.performed -= CharAttackSelect;
+                mouseInput.Mouse.MouseClick.performed += OnClick;
+            }
         }
     }
 }
