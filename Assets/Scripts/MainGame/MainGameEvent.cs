@@ -11,21 +11,27 @@ using UnityEngine.UI;
 
 namespace KWY
 {
-    public class MainEvent : MonoBehaviourPun
+    public class MainGameEvent : MonoBehaviourPun
     {
         #region Private Serializable Fields
 
         [Tooltip("The button to send ready to start simulation to server")]
-        [SerializeField] private Button ReadyBtn;
+        [SerializeField] private Button readyBtn;
 
         [Tooltip("The panel to prepare the turn: choosing characters and actions...")]
-        [SerializeField] private GameObject TurnReadyPanel;
+        [SerializeField] private GameObject turnReadyPanel;
 
         [Tooltip("The panel to show 'You win'")]
-        [SerializeField] private GameObject WinPanel;
+        [SerializeField] private GameObject winPanel;
 
         [Tooltip("The panel to show 'You lose'")]
-        [SerializeField] private GameObject LosePanel;
+        [SerializeField] private GameObject losePanel;
+
+        [Tooltip("Gameobject that contains TurnReadyBtn functions")]
+        [SerializeField] private GameObject turnReady;
+
+        [SerializeField]
+        private GameManager gameManager;
 
         #endregion
 
@@ -37,8 +43,7 @@ namespace KWY
         [Tooltip("Unique user id that the server determined")]
         private string UserId;
 
-        [Tooltip("True: this user is on ready state with the SERVER; False: opposite")]
-        bool readyTurn = false;
+       
 
         #endregion
 
@@ -261,10 +266,7 @@ namespace KWY
             if (UserId == (string)data[0] && (bool) data[1])
             {
                 // 서버로 부터 ready에 대한 ok 사인이 왔을 때 변경함
-                readyTurn = true; // 준비 완료 상태로 변경 -> 더 이상 준비 완료 버튼 못누르게 하기
-
-                // 임시로 ready 완료 되면 버튼 blue로 변경
-                ReadyBtn.GetComponent<Image>().color = Color.blue;
+                turnReady.GetComponent<TurnReadyBtn>().SetReady((bool)data[1]);
             }
 
             // check ' start simulation' through data[2]
@@ -273,13 +275,16 @@ namespace KWY
                 Debug.Log("Start Simulation");
 
                 // When simulation starts, hide the TurnReadyPanel
-                TurnReadyPanel.SetActive(false);
+                turnReadyPanel.SetActive(false);
+
+                // 카메라 시뮬레이션 위치로
+                gameManager.SetCameraOnSimul();
 
                 // simulation을 master client일 경우만 실행 -> master client에서 object 액션 -> Photon 동기화 -> 다른 client에서도 똑같이 실행
                 // 아직 테스트 하지 못하였음!!!!!!!!
                 if (PhotonNetwork.IsMasterClient)
                 {
-                    Simulation((Dictionary<int, string>)data[3]); // Note: if data[2] is false, there is not data[3]
+                    Simulation((Dictionary<int, string>)data[3]); // Note: if data[2] is false, there is no data[3]
                 }
             }
         }
@@ -300,10 +305,13 @@ namespace KWY
         private void OnEventSimulEnd(EventData eventData)
         {
             // 시뮬레이션 종료 후, 다시 TurnReadyPanel 보이기
-            TurnReadyPanel.SetActive(true);
+            turnReadyPanel.SetActive(true);
 
-            // 준비 상태 다시 false로 초기화
-            readyTurn = false;
+            // 준비 상태 다시 초기화
+            turnReady.GetComponent<TurnReadyBtn>().ResetReady();
+
+            // 카메라 턴 준비 상태 위치로
+            gameManager.SetCameraOnTurnReady();
         }
 
         /// <summary>
@@ -323,12 +331,12 @@ namespace KWY
             // 이겻을 경우
             if ((string)data == this.UserId)
             {
-                WinPanel.SetActive(true);
+                winPanel.SetActive(true);
             }
             // 졌을 경우
             else
             {
-                LosePanel.SetActive(true);
+                losePanel.SetActive(true);
             }
 
             // 게임 종료 후 할 내용들 작성
