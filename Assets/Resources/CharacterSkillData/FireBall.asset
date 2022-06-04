@@ -19,3 +19,6 @@ MonoBehaviour:
   area:
   - {x: 0, y: 0}
   - {x: 1, y: 0}
+  casters: 01000000
+  skillExplanation: Throw a fireball.
+  skillExImg: {fileID: 0}

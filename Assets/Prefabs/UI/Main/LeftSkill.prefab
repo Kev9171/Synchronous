@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3557878336971675861}
   - component: {fileID: 4512298881879054297}
   - component: {fileID: 8499924080123758424}
+  - component: {fileID: 4693276456108069649}
   m_Layer: 5
   m_Name: LeftSkill
   m_TagString: Untagged
@@ -73,6 +74,20 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &4693276456108069649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 513928742411483695}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68bd82868d993b640a1240fbcd8dcc26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  charaIcon: {fileID: 4905737308555113836}
+  skillNameLabel: {fileID: 1433922898012707653}
 --- !u!1 &3638149300398476305
 GameObject:
   m_ObjectHideFlags: 0

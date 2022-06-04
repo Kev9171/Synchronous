@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-
 namespace KWY
 {
     // attach this at CharaSkillPanel Prefab
@@ -13,11 +12,32 @@ namespace KWY
         public TMP_Text costText;
         public TMP_Text orderText;
 
-        public void SetValue(Sprite sprite, int cost, int order)
+        GameObject skillInfoPanel;
+
+        [Tooltip("Info 띄우는데 필요한 최소 클릭 시간; move 일 경우 없음")]
+        public float minClickTime = 1;
+
+        #region Private Fields
+
+        private float clickTime;
+        private bool isClick;
+
+        private ActionBase ab;
+        
+        #endregion
+
+        public void SetValue(ActionBase ab, int order)
         {
-            image.sprite = sprite;
-            costText.text = cost.ToString();
+            image.sprite = ab.icon;
+            costText.text = ab.cost.ToString();
             SetOrder(order);
+
+            this.ab = ab;
+        }
+
+        public void SetPanelRef(GameObject skillInfoPanel)
+        {
+            this.skillInfoPanel = skillInfoPanel;
         }
 
         public void SetOrder(int order)
@@ -30,6 +50,38 @@ namespace KWY
             {
                 orderText.text = order.ToString();
             }
+        }
+
+        public void OnClickSetOrder()
+        {
+            Debug.Log("OnClickSetOrder");
+        }
+
+        public void ButtonDown()
+        {
+            isClick = true;
+        }
+        public void ButtonUp()
+        {
+            isClick = false;
+
+            if (ab is SkillBase @base && clickTime >= minClickTime)
+            {
+                skillInfoPanel.GetComponent<SkillInfoPanel>().SetData(@base);
+                skillInfoPanel.SetActive(true);
+            }
+            else
+            {
+                OnClickSetOrder();
+            }
+        }
+
+        private void Update()
+        {
+            if (isClick)
+                clickTime += Time.deltaTime;
+            else
+                clickTime = 0;
         }
     }
 }

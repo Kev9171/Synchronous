@@ -11,7 +11,7 @@ namespace KWY
 
         private Dictionary<BID, BuffBase> _buffData = new Dictionary<BID, BuffBase>();
 
-        public static Dictionary<BID, BuffBase> BuffData = new Dictionary<BID, BuffBase>();
+        public static Dictionary<BID, BuffBase> BuffData { get { return Instance._buffData; } }
         public static BuffBase GetData(BID bid)
         {
             if (BuffData.TryGetValue(bid, out var value))

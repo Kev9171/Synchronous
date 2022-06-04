@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 using System.Collections.Generic;
+using System.Collections;
 
 using TMPro;
 
@@ -16,15 +17,15 @@ namespace KWY
 
         [Tooltip("Setting button")]
         [SerializeField]
-        private Button SettingBtn;
+        private Button settingBtn;
 
         [Tooltip("The whole panel of skill selection; the length is equal to initial number of characters = 3")]
         [SerializeField]
-        private GameObject[] SelSkillPanel;
+        private GameObject[] selSkillPanel;
 
         [Tooltip("Ready button")]
         [SerializeField]
-        private Button ReadyBtn;
+        private Button readyBtn;
 
         [Tooltip("Time remaining to ready a turn")]
         [SerializeField]
@@ -32,15 +33,27 @@ namespace KWY
 
         [Tooltip("Player Status Panel - image, mp bar and mp")]
         [SerializeField]
-        private GameObject PlayerMPPanel;
+        private GameObject playerMPPanel;
 
         [Tooltip("Panel to show information of a character")]
         [SerializeField]
-        private GameObject CharacterInfoPanel;
+        private GameObject characterInfoPanel;
 
         [Tooltip("Panel to show information of a skill")]
         [SerializeField]
-        private GameObject SkillInfoPanel;
+        private GameObject skillInfoPanel;
+
+        [SerializeField]
+        private GameObject[] characterPanels;
+
+        [SerializeField]
+        private GameObject buffInfoPanel;
+
+        [SerializeField]
+        private GameObject settingPanel;
+
+        [SerializeField]
+        private MainGameEvent gameEvent;
 
         #endregion
 
@@ -56,6 +69,7 @@ namespace KWY
         [Tooltip("턴 준비 시간 제한")]
         private readonly float startTime = 60f;
         private float time;
+        private bool timesup = false;
 
         [Tooltip("맵에 있는 자신의 캐릭터(key)에 대한 스킬 정보를 갖고 있는 자료구조")]
         private Dictionary<CID, List<SkillBase>> charaSkills = new Dictionary<CID, List<SkillBase>>();
@@ -81,9 +95,9 @@ namespace KWY
             // 해당 액션(action) 아이콘의 좌측 상단에 있는 숫자를 order로 바꾸기
         }
 
-        public void OnClickTest()
+        public void OnClickTurnReady()
         {
-            SelSkillPanel[0].SetActive(true);
+
         }
 
         #endregion
@@ -104,7 +118,6 @@ namespace KWY
                     if (t != null)
                     {
                         bases.Add(t);
-                        Debug.Log(t);
                     }
                 }
 
@@ -117,10 +130,31 @@ namespace KWY
             int idx = 0;
             foreach(CharacterBase cb in data.CharacterData)
             {
-                SelSkillPanel[idx].GetComponent<SelSkillPanel>().SetCharaterName(cb.name);
-                SelSkillPanel[idx].GetComponent<SelSkillPanel>().AddSkillPanels(charaSkills[cb.cid]);
+                selSkillPanel[idx].GetComponent<SelSkillPanel>().SetCharaterName(cb.name);
+                selSkillPanel[idx].GetComponent<SelSkillPanel>().AddSkillPanels(charaSkills[cb.cid]);
                 idx++;
             }
+        }
+
+        private void LoadCharacters()
+        {
+            int idx = 0;
+            foreach (CharacterBase cb in data.CharacterData)
+            {
+                // SetPanelRef 를 먼저 호출해야됨
+                characterPanels[idx].GetComponent<CharacterPanel>().SetPanelRef(characterInfoPanel, buffInfoPanel);
+                characterPanels[idx].GetComponent<CharacterPanel>().SetData(cb, data.CharaBuffList(cb.cid));
+                idx++;
+            }
+        }
+
+        private void SendReadyState()
+        {
+            Debug.Log("Time is Up!!!");
+
+            /// action 랜덤으로 선택 한 후 aminGameEvent에 넘겨주기
+
+            gameEvent.RaiseEventTurnReady(); // ready 상태 전송 with actiondata
         }
 
         #endregion
@@ -140,14 +174,17 @@ namespace KWY
 
         private void Start()
         {
+
+            LoadCharacters();
             LoadSkills();
-            Debug.Log(charaSkills.Count); // 1
             SetSkillsOnPanel();
 
-            CharacterInfoPanel.SetActive(false);
-            SkillInfoPanel.SetActive(false);
+            characterInfoPanel.SetActive(false);
+            skillInfoPanel.SetActive(false);
+            buffInfoPanel.SetActive(false);
+            settingPanel.SetActive(false);
 
-            foreach(var p in SelSkillPanel)
+            foreach(var p in selSkillPanel)
             {
                 p.SetActive(false);
             }
@@ -157,11 +194,17 @@ namespace KWY
 
         private void Update()
         {
-            if (actTimer && time > 0)
+            if (actTimer)
             {
                 time -= Time.deltaTime;
             }
-            timeText.text = Mathf.Ceil(time).ToString();
+            if (time > 0)
+                timeText.text = Mathf.Ceil(time).ToString();
+            else if (!timesup)
+            {
+                timesup = true;
+                SendReadyState();
+            }
         }
 
         #endregion

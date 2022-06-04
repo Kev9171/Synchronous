@@ -9,5 +9,10 @@ namespace KWY
         public string buffName;
         public Sprite icon;
         public string explanation;
+
+        public override string ToString()
+        {
+            return string.Format("bid: {0}, buffName: {1}", bid, buffName);
+        }
     }
 }

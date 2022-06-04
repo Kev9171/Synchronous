@@ -4,11 +4,6 @@ using UnityEngine;
 
 namespace KWY
 {
-    public enum PlayerSkill : int
-    {
-        // temp
-        LightingVolt = 1,
-    }
 
     public enum AID : int
     {
@@ -32,4 +27,8 @@ namespace KWY
         Burn = 1,
     }
 
+    public enum PSID : int
+    {
+        Flash = 1,
+    }
 }

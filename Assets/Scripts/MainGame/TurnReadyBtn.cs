@@ -8,9 +8,10 @@ namespace KWY
     [RequireComponent(typeof(Button))]
     public class TurnReadyBtn : MonoBehaviour
     {
+        [SerializeField]
         MainGameEvent mainGameEvent;
 
-        Button ReadyBtn;
+        [SerializeField]
         TMP_Text ReadyText;
 
         Color IsReadyColor = new Color(210, 210, 210);
@@ -23,7 +24,7 @@ namespace KWY
             mainGameEvent.RaiseEventTurnReady();
 
             // ready 버튼 이미지 변경 or 텍스트 변경
-            ReadyBtn.GetComponent<Image>().color = IsReadyColor;
+            this.GetComponent<Image>().color = IsReadyColor;
         }
 
         public void SetReady(bool state)
@@ -32,7 +33,7 @@ namespace KWY
             if (state)
             {
                 // 버튼 더 이상 누르지 못하도록
-                ReadyBtn.interactable = false;
+                this.GetComponent<Button>().interactable = false;
 
                 // cancel 로 텍스트 바꾸기
                 ReadyText.text = "Cancel";
@@ -40,25 +41,15 @@ namespace KWY
             else
             {
                 // 다시 원래대로
-                ReadyBtn.GetComponent<Image>().color = Color.white;
+                this.GetComponent<Image>().color = Color.white;
             }
         }
 
         public void ResetReady()
         {
             // 다시 원래대로
-            ReadyBtn.GetComponent<Image>().color = Color.white;
-            ReadyBtn.interactable = true;
+            this.GetComponent<Image>().color = Color.white;
+            this.GetComponent<Button>().interactable = true;
         }
-
-        #region MonoBehaviour CallBacks
-
-        private void OnEnable()
-        {
-            ReadyBtn.onClick.RemoveAllListeners();
-            ReadyBtn.onClick.AddListener(SendReadyState);
-        }
-
-        #endregion
     }
 }

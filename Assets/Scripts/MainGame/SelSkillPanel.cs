@@ -16,6 +16,9 @@ namespace KWY
         [SerializeField]
         private MoveBase move;
 
+        [SerializeField]
+        private GameObject skillInfoPanel;
+
 
         #region Private Fields
 
@@ -44,13 +47,15 @@ namespace KWY
         {
             // add move
             GameObject movePanel = Instantiate(charaSkillPanelPrefab, skillPanel.transform);
-            movePanel.GetComponent<CharaSkillPanel>().SetValue(move.icon, move.cost, -1);
+            movePanel.GetComponent<CharaSkillPanel>().SetValue(move, -1);
+            movePanel.GetComponent<CharaSkillPanel>().SetPanelRef(skillInfoPanel);
             skillPanelList.Add(movePanel);
 
             foreach(SkillBase sb in list)
             {
                 GameObject iconPanel = Instantiate(charaSkillPanelPrefab, skillPanel.transform);
-                iconPanel.GetComponent<CharaSkillPanel>().SetValue(sb.icon, sb.cost, -1);
+                iconPanel.GetComponent<CharaSkillPanel>().SetValue(sb, -1);
+                iconPanel.GetComponent<CharaSkillPanel>().SetPanelRef(skillInfoPanel);
                 skillPanelList.Add(iconPanel);
             }
         }

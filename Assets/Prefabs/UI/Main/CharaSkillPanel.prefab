@@ -278,7 +278,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2236503119333409643}
   - component: {fileID: 6334918426026082255}
-  - component: {fileID: 2690541116469475765}
+  - component: {fileID: 1805670270732856377}
+  - component: {fileID: 3137679971407750605}
   m_Layer: 5
   m_Name: CharaSkillPanel
   m_TagString: Untagged
@@ -316,7 +317,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7295696074676761102}
   m_CullTransparentMesh: 1
---- !u!114 &2690541116469475765
+--- !u!114 &1805670270732856377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7295696074676761102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 3
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 3137679971407750605}
+          m_TargetAssemblyTypeName: KWY.CharaSkillPanel, Assembly-CSharp
+          m_MethodName: ButtonUp
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 2
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 3137679971407750605}
+          m_TargetAssemblyTypeName: KWY.CharaSkillPanel, Assembly-CSharp
+          m_MethodName: ButtonDown
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+--- !u!114 &3137679971407750605
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -331,6 +377,7 @@ MonoBehaviour:
   image: {fileID: 2400142357473253359}
   costText: {fileID: 5427089215277478827}
   orderText: {fileID: 2359394574821712384}
+  minClickTime: 1
 --- !u!1 &8230917929485102472
 GameObject:
   m_ObjectHideFlags: 0

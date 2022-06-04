@@ -29,6 +29,9 @@ namespace KWY
         [SerializeField]
         TMP_Text passiveExLabel;
 
+        [SerializeField]
+        GameObject containerPanel;
+
         public void SetData(CharacterBase cb)
         {
             icon.sprite = cb.icon;
@@ -41,9 +44,10 @@ namespace KWY
             passiveExLabel.text = cb.passiveEx;
         }
 
-        private void Start()
+        
+        public void OnClickSetInvisible()
         {
-            //this.GetComponent<Button>().onClick
+            containerPanel.SetActive(false);
         }
     }
 }

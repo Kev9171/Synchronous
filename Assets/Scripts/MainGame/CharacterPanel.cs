@@ -11,7 +11,7 @@ namespace KWY
         #region Prefabs
 
         [SerializeField]
-        GameObject buffImgPrefab;
+        GameObject buffPanelPrefab;
 
         #endregion
 
@@ -38,18 +38,22 @@ namespace KWY
         Button charaInfoBtn;
 
         [SerializeField]
-        GameObject buffInfoPanel;
+        GameObject showingSkillManager;
 
+        [Tooltip("0 ~ 2 (위에서 부터)")]
         [SerializeField]
-        Image[] selectedActionImages;
+        int nthCharacter;
 
-        [SerializeField]
-        GameObject characterInfoPanel;
+        private GameObject buffInfoPanel;
+
+        private Image[] selectedActionImages;
+
+        private GameObject characterInfoPanel;
 
         #region Private Fields
 
         private CharacterBase cb;
-        private List<GameObject> buffList = new List<GameObject>();
+        private List<GameObject> buffPanelLists = new List<GameObject>();
 
         #endregion
 
@@ -59,7 +63,7 @@ namespace KWY
         /// 처음 데이터를 넣는 함수; 한번만 호출 할 수 있도록
         /// </summary>
         /// <param name="cb">Chacter Base Data</param>
-        public void SetData(CharacterBase cb)
+        public void SetData(CharacterBase cb, List<Buff> buffList)
         {
             nameLabel.text = cb.characterName;
             UpdateHP(cb.hp);
@@ -70,7 +74,17 @@ namespace KWY
 
             charaImg.sprite = cb.icon;
 
+            LoadBuffs(buffList);
+
             this.cb = cb;
+        }
+
+        public void SetPanelRef(GameObject charaInfo, GameObject buffInfo)
+        {
+            buffInfoPanel = buffInfo;
+            characterInfoPanel = charaInfo;
+            buffInfoPanel.SetActive(false);
+            characterInfoPanel.SetActive(false);
         }
 
         public void UpdateHP(float hp)
@@ -85,21 +99,22 @@ namespace KWY
             mpLabel.text = mp.ToString();
         }
 
-        public void AddBuffImg(BuffBase bb, int nTurn)
+
+        public void AddBuff(BuffBase bb, int nTurn)
         {
-            GameObject bPanel = Instantiate(buffImgPrefab, buffPanel.transform);
+            GameObject bPanel = Instantiate(buffPanelPrefab, buffPanel.transform);
             bPanel.GetComponent<BuffPanel>().SetData(bb, nTurn, buffInfoPanel);
-            buffList.Add(bPanel);
+            buffPanelLists.Add(bPanel);
         }
 
         public void ReduceTurn(int nTurn)
         {
-            foreach(GameObject buff in buffList)
+            foreach(GameObject buff in buffPanelLists)
             {
                 // test 필요 loop 중에 요소 삭제하고 있어서 어떻게 되는지 모름
                 if (!buff.GetComponent<BuffPanel>().ReduceBuffTurnText(nTurn))
                 {
-                    buffList.Remove(buff);
+                    buffPanelLists.Remove(buff);
                     Destroy(buff);
                 }
             }
@@ -114,9 +129,43 @@ namespace KWY
             characterInfoPanel.SetActive(true);
         }
 
+        public void SetSelActionImg(int nth, Sprite icon)
+        {
+            if (nth >=0 && nth <3)
+                selectedActionImages[nth].sprite = icon;
+            else
+            {
+                selectedActionImages[0].sprite = null;
+                selectedActionImages[1].sprite = null;
+                selectedActionImages[2].sprite = null;
+            }
+        }
+
+        public void ResetSelActionImg()
+        {
+            selectedActionImages[0].sprite = null;
+            selectedActionImages[1].sprite = null;
+            selectedActionImages[2].sprite = null;
+        }
+
+        public void OnClickShowSkillPanel()
+        {
+            showingSkillManager.GetComponent<ManageShowingSkills>().ShowSkillPanel(nthCharacter);
+        }
+
         #endregion
 
         #region Private Methods
+
+        private void LoadBuffs(List<Buff> buffs)
+        {
+            foreach (Buff bf in buffs)
+            {
+                //ReduceTurn(10); // temp
+                AddBuff(bf.bb, bf.turn);
+            }
+        }
+
 
 
         #endregion
@@ -126,10 +175,11 @@ namespace KWY
 
         private void Start()
         {
-            characterInfoPanel.SetActive(false);
-            buffInfoPanel.SetActive(false);
+            
         }
 
         #endregion
+
+        
     }
 }

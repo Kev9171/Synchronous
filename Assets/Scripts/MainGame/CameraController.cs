@@ -25,9 +25,6 @@ namespace KWY
 
         public void Start()
         {
-            des = SimulDes;
-            // test code
-            des = TurnReadyDes;
         }
 
         private void Update()

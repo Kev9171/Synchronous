@@ -14,7 +14,7 @@ namespace KWY
         TMP_Text turnLabel;
 
         [Tooltip("buff 정보를 띄우는 UI Panel; Character Panel 로부터 값 할당 받아서 사용")]
-        GameObject BuffInfoPanel;
+        GameObject buffInfoPanel;
 
         private int turn;
         private BuffBase buffBase;
@@ -25,7 +25,7 @@ namespace KWY
             turnLabel.text = turn.ToString();
             this.turn = turn;
 
-            BuffInfoPanel = infoPanel;
+            buffInfoPanel = infoPanel;
 
             buffBase = bb;
         }
@@ -49,37 +49,24 @@ namespace KWY
             return true;
         }
 
+        public void ButtonUp()
+        {
+            buffInfoPanel.SetActive(false);
+        }
+
+        public void ButtonDown()
+        {
+            buffInfoPanel.GetComponent<BuffInfoPanel>().SetText(buffBase.explanation);
+            buffInfoPanel.SetActive(true);
+        }
+
         #region MonoBehaviour CallBacks
 
         private void Start()
         {
-            BuffInfoPanel.SetActive(false);
+            buffInfoPanel.SetActive(false);
         }
 
         #endregion
-
-        #region MouseEventBase
-
-        // 마우스 클릭 중일 때만 설명 보이게 하기
-
-        /// <summary>
-        /// 마우스 클릭 했을 때
-        /// </summary>
-        private void OnMouseDown()
-        {
-            BuffInfoPanel.GetComponent<BuffInfoPanel>().SetText(buffBase.explanation);
-            BuffInfoPanel.SetActive(true);
-        }
-
-        /// <summary>
-        /// 마우스 클릭이 취소되었을 때
-        /// </summary>
-        private void OnMouseUp()
-        {
-            BuffInfoPanel.SetActive(false);
-        }
-
-        #endregion
-
     }
 }
