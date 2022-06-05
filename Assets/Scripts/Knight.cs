@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,7 @@ public class Knight : MonoBehaviour
     public CharacterData characterData;
     public Tilemap tilemap;
     public Tilemap HL_tilemap;
+    public Knight opponent;
 
     private string characterName;
     private int hp;
@@ -30,7 +32,7 @@ public class Knight : MonoBehaviour
 
     void Start()
     {
-        characterName = characterData.CharacterName;
+        characterName = this.name;  //나중에 characterName.CharacterName으로 변경
         hp = characterData.HP;
         mp = characterData.MP;
         armor = characterData.Armor;
@@ -49,18 +51,26 @@ public class Knight : MonoBehaviour
         Debug.Log("패시브 발동중, "+ armor + "% 데미지 감소");
     }
 
-    public int NormalAttack()
+    public void NormalAttack()
     {
         ResetTile();
         int damage = 10;
+        int range_x = 1;
+        int range_y = 0;
         Debug.Log("일반공격 시전, " + damage + "의 데미지");
-        AttackHighlight(1, 0);
-        return damage;
+        AttackHighlight(range_x, range_y);
+        if(Mathf.Abs(this.transform.position.x - opponent.transform.position.x) <= range_x && 
+            Mathf.Abs(this.transform.position.y - opponent.transform.position.y) <= range_y)
+        {
+            opponent.Damaged(damage);
+        }
     }
 
     public void SpecialAttack()
     {
         ResetTile();
+        int range_x = 2;
+        int range_y = 2;
         Debug.Log("특수공격 시전, 아군에게 " + armor + "% 데미지 감소 버프");
         for (int i = -2; i < 3; i++)
         {
@@ -68,6 +78,11 @@ public class Knight : MonoBehaviour
             {
                 BuffHighlight(j, i);
             }
+        }
+        if (Mathf.Abs(this.transform.position.x - opponent.transform.position.x) <= range_x &&
+            Mathf.Abs(this.transform.position.y - opponent.transform.position.y) <= range_y)
+        {
+            opponent.Buffed("armor", ref armor, armor);
         }
     }
 
@@ -119,5 +134,17 @@ public class Knight : MonoBehaviour
                 this.HL_tilemap.SetColor(range, color);
             }
         }
+    }
+
+    public void Damaged(int x)
+    {
+        hp -= x;
+        Debug.Log(characterName+"이/가 "+ x + "의 데미지를 입어 체력이 "+ hp +"이/가 되었다.");
+    }
+
+    public void Buffed(String name, ref int target, int x)
+    {
+        target += x;
+        Debug.Log(characterName + "의 " + name + "능력치가 " + x + "가 증가하여 "+ target + "이 되었다.");
     }
 }
