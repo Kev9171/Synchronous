@@ -10,12 +10,19 @@ namespace KWY
         [SerializeField]
         private List<CharacterBase> _characters = new List<CharacterBase>();
 
+
         private Dictionary<CID, CharacterBase> _characterData = new Dictionary<CID, CharacterBase>();
 
         public static Dictionary<CID, CharacterBase> CharacterData { get { return Instance._characterData; } }
 
+
+        private static bool loaded = false;
         public static CharacterBase GetData(CID cid)
         {
+            if (!loaded)
+            {
+                FirstInitialize();
+            }
             if (CharacterData.TryGetValue(cid, out var value))
             {
                 Debug.Log("Found value on " + cid + ": " + value);
@@ -24,11 +31,12 @@ namespace KWY
             }
             else
             {
+                Debug.LogErrorFormat("Can not find : {0}, add the object at manager.", cid);
                 return null;
             }
         }
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        //[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void FirstInitialize()
         {
             //Debug.Log("This message will output before Awake");
@@ -37,7 +45,11 @@ namespace KWY
             foreach (var cb in Instance._characters)
             {
                 Instance._characterData.Add(cb.cid, cb);
+                Debug.Log(cb);
             }
+            
+
+            loaded = true;
         }
     }
 }

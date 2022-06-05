@@ -25,6 +25,7 @@ namespace KWY
 
         public void Start()
         {
+            des = SimulDes;
         }
 
         private void Update()

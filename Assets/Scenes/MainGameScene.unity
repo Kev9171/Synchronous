@@ -961,6 +961,7 @@ MonoBehaviour:
   TurnCanvas: {fileID: 1525828504}
   SimulCanvas: {fileID: 1489451882}
   mainCamera: {fileID: 1522991448}
+  data: {fileID: 1447055416}
   ShowTurnReadyCanvas: 1
   ShowSimulCanvas: 0
 --- !u!4 &776724094
@@ -1527,6 +1528,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1246747941 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7525552359230187016, guid: 8d2336f15d961c94d80f72e7d666cefa, type: 3}
+  m_PrefabInstance: {fileID: 4967304205615086245}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28b10af590cd43b4fa5f47310130b712, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1253397463 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2066076434692316287, guid: 61d59f458c104b244818431d30d4a0c0, type: 3}
@@ -1779,10 +1791,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93273bd880a8deb49bfa6c76df3c848c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerSkillList: 01000000
-  _characters:
+  logicData: {fileID: 11400000, guid: 7a37ecefc5b39ec42b99d217720c46bc, type: 2}
+  _playerSkillList: 0100000002000000
+  _characterList:
   - {fileID: 11400000, guid: da6c8684341450244928e0a87054b797, type: 2}
-  chara1BuffListTest: 01000000
+  - {fileID: 11400000, guid: 9cc1e36a50a670d4289b912bc85d48df, type: 2}
+  chara1BuffListTest: 0100000002000000
 --- !u!4 &1447055417
 Transform:
   m_ObjectHideFlags: 0
@@ -2268,6 +2282,7 @@ MonoBehaviour:
   buffInfoPanel: {fileID: 999640086}
   settingPanel: {fileID: 433663912}
   gameEvent: {fileID: 1896979066}
+  selCharaPanelManager: {fileID: 624665549}
   data: {fileID: 1447055416}
 --- !u!1001 &1634524034
 PrefabInstance:
@@ -3321,7 +3336,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   readyBtn: {fileID: 1710340621}
-  turnReadyPanel: {fileID: 0}
   winPanel: {fileID: 0}
   losePanel: {fileID: 0}
   turnReady: {fileID: 0}
@@ -3370,6 +3384,7 @@ MonoBehaviour:
   _skillManager: {fileID: 11400000, guid: c1de5702fa954744cb8f34dda57c0090, type: 2}
   _buffManager: {fileID: 11400000, guid: 7cf82ee0358583b42943c697032a33a0, type: 2}
   playerSkillManager: {fileID: 11400000, guid: 685dfcb5bb0c68c4aa747a828431fcc9, type: 2}
+  _userManager: {fileID: 11400000, guid: b1c4c8f48f4e19b42b78a318f39bcb02, type: 2}
 --- !u!4 &1904048503
 Transform:
   m_ObjectHideFlags: 0
@@ -4110,6 +4125,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: CharacterPanel
       objectReference: {fileID: 0}
+    - target: {fileID: 4524997008233444458, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
+      propertyPath: m_Color.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4524997008233444458, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4524997008233444458, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4524997008233444458, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4997266782459889336, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -4424,6 +4455,34 @@ PrefabInstance:
     - target: {fileID: 4967304204022119409, guid: 8d2336f15d961c94d80f72e7d666cefa, type: 3}
       propertyPath: m_Name
       value: SettingBtn
+      objectReference: {fileID: 0}
+    - target: {fileID: 4967304204022119411, guid: 8d2336f15d961c94d80f72e7d666cefa, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4967304204022119411, guid: 8d2336f15d961c94d80f72e7d666cefa, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4967304204022119411, guid: 8d2336f15d961c94d80f72e7d666cefa, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1246747941}
+    - target: {fileID: 4967304204022119411, guid: 8d2336f15d961c94d80f72e7d666cefa, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4967304204022119411, guid: 8d2336f15d961c94d80f72e7d666cefa, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnClickSettingBtn
+      objectReference: {fileID: 0}
+    - target: {fileID: 4967304204022119411, guid: 8d2336f15d961c94d80f72e7d666cefa, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: KWY.SettingButton, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 4967304204022119411, guid: 8d2336f15d961c94d80f72e7d666cefa, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 7525552359230187016, guid: 8d2336f15d961c94d80f72e7d666cefa, type: 3}
       propertyPath: settingPanel

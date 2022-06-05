@@ -18,6 +18,10 @@ namespace KWY
 
             string content = "";
 
+            if (!(data is object[]))
+            {
+                return;
+            }
             foreach (object a in data)
             {
                 content += (string)a + ", ";

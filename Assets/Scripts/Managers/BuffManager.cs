@@ -11,9 +11,11 @@ namespace KWY
 
         private Dictionary<BID, BuffBase> _buffData = new Dictionary<BID, BuffBase>();
 
+        private static bool loaded = false;
         public static Dictionary<BID, BuffBase> BuffData { get { return Instance._buffData; } }
         public static BuffBase GetData(BID bid)
         {
+            if (!loaded) FirstInitialize();
             if (BuffData.TryGetValue(bid, out var value))
             {
                 Debug.Log("Found value on " + bid + ": " + value);
@@ -22,11 +24,12 @@ namespace KWY
             }
             else
             {
+                Debug.LogErrorFormat("Can not find : {0}, add the object at manager.", bid);
                 return null;
             }
         }
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        //[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void FirstInitialize()
         {
             //Debug.Log("This message will output before Awake");
@@ -36,6 +39,7 @@ namespace KWY
             {
                 Instance._buffData.Add(bb.bid, bb);
             }
+            loaded = true;
         }
     }
 }

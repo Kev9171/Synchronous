@@ -54,6 +54,10 @@ namespace KWY
 
         private CharacterBase cb;
         private List<GameObject> buffPanelLists = new List<GameObject>();
+        private bool selectable = true;
+
+        [SerializeField]
+        private Color breakDownColor = new Color(0.66f, 0, 0, 0.7f);
 
         #endregion
 
@@ -86,6 +90,25 @@ namespace KWY
             buffInfoPanel.SetActive(false);
             characterInfoPanel.SetActive(false);
         }
+
+        public void UpdateData(Character c)
+        {
+            if (c.BreakDown)
+            {
+                selectable = false;
+                charaImg.color = breakDownColor;
+                ClearBuffs();
+            }
+
+            else
+            {
+                UpdateHP(c.Hp);
+                UpdateMP(c.Mp);
+
+                LoadBuffs(c.Buffs);
+            }
+        }
+
 
         public void UpdateHP(float hp)
         {
@@ -150,6 +173,11 @@ namespace KWY
 
         public void OnClickShowSkillPanel()
         {
+            if (!selectable)
+            {
+                Debug.Log("This character is break down. You can not choose");
+                return;
+            }
             showingSkillManager.GetComponent<ManageShowingSkills>().ShowSkillPanel(nthCharacter);
         }
 
@@ -157,8 +185,20 @@ namespace KWY
 
         #region Private Methods
 
+        private void ClearBuffs()
+        {
+            foreach (GameObject buffPanel in buffPanelLists)
+            {
+                Destroy(buffPanel);
+            }
+
+            buffPanelLists.Clear();
+        }
+
         private void LoadBuffs(List<Buff> buffs)
         {
+            ClearBuffs();
+
             foreach (Buff bf in buffs)
             {
                 //ReduceTurn(10); // temp

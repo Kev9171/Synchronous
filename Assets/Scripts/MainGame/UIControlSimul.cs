@@ -76,6 +76,8 @@ namespace KWY
             playerSkillInfoPanel.SetActive(false);
             settingPanel.SetActive(false);
             LoadPlayerSkills();
+
+            playerMPPanel.GetComponent<PlayerMPPanel>().SetData(UserManager.UserIcon, data.mp);
         }
 
         #endregion

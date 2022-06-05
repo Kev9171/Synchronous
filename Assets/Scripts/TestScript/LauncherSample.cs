@@ -32,7 +32,7 @@ namespace KWY
         /// </summary>
         string gameVersion = "1";
 
-        string nextLevel = "CharacterTest";
+        string nextLevel = "MainGameScene";
 
         #endregion
 

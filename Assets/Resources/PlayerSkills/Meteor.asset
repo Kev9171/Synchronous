@@ -9,8 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bdb4f39e70e9d7245bec614ab066c16b, type: 3}
-  m_Name: BuffManager
+  m_Script: {fileID: 11500000, guid: 623b57427dde89f4286d0ad42b39ba70, type: 3}
+  m_Name: Meteor
   m_EditorClassIdentifier: 
-  _buffs:
-  - {fileID: 11400000, guid: 7fa09dc047247df4dad19a5cf84a82a3, type: 2}
+  psid: 2
+  name: Meteor
+  skillExplanation: aaaaaaaa
+  icon: {fileID: 0}
+  cost: 7

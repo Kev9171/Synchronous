@@ -9,8 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7e2671b7110598b43825b42d016ee479, type: 3}
-  m_Name: CharaManager
+  m_Script: {fileID: 11500000, guid: 8fca37fc5bbea024a93a4275027d4bec, type: 3}
+  m_Name: MainGameLogicData
   m_EditorClassIdentifier: 
-  _characters:
-  - {fileID: 11400000, guid: da6c8684341450244928e0a87054b797, type: 2}
+  playerMPIncrement: 2
+  characterMPIncrement: 3
+  timeLimit: 60

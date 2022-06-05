@@ -48,8 +48,7 @@ namespace KWY
         IEnumerator CallTest(float delaytime)
         {
             int t = Random.Range(0, 2);
-            Debug.Log("rand: " + t);
-            ShowAction(CharaManager.CharacterData[CID.Flappy], SkillManager.SkillData[SID.FireBall], t==0);
+            ShowAction(CharaManager.GetData(CID.Flappy), SkillManager.GetData(SID.FireBall), t==0);
             yield return new WaitForSeconds(delaytime);
             if (execTestYieldAction)
                 StartCoroutine("CallTest", 0.7f);

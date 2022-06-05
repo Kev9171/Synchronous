@@ -15,5 +15,10 @@ namespace KWY
             this.bb = bb;
             this.turn = turn;
         }
+
+        public override string ToString()
+        {
+            return string.Format("<{0}, {1}>", bb.name, turn);
+        }
     }
 }

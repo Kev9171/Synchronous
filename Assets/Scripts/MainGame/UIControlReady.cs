@@ -55,6 +55,9 @@ namespace KWY
         [SerializeField]
         private MainGameEvent gameEvent;
 
+        [SerializeField]
+        private GameObject selCharaPanelManager;
+
         #endregion
 
         
@@ -66,8 +69,6 @@ namespace KWY
         private MainGameData data;
 
         private bool actTimer = false;
-        [Tooltip("턴 준비 시간 제한")]
-        private readonly float startTime = 60f;
         private float time;
         private bool timesup = false;
 
@@ -78,6 +79,25 @@ namespace KWY
 
         #region Public Methods
 
+        public void UpdateDataOnUI()
+        {
+            selCharaPanelManager.GetComponent<ManageShowingSkills>().ShowSkillPanel(-1);
+
+            // 주의: 캐릭터가 쓰러져도 data에는 그대로 남아있어야 함 해당 내용은
+            // CharacterPanel의 UpdateData에서 처리
+            int idx = 0;
+            foreach (Character c in data.Characters)
+            {
+                characterPanels[idx].GetComponent<CharacterPanel>().UpdateData(c);
+                idx++;
+            }
+
+            // skill update는 안해도 됨 (사용할 수 있는 스킬이 바뀌거나 하지 않으면)
+
+            playerMPPanel.GetComponent<PlayerMPPanel>().UpdateData(data.mp);
+        }
+
+
         public void StartTimer()
         {
             // 타이머 시작
@@ -87,7 +107,7 @@ namespace KWY
         public void ResetTimer()
         {
             actTimer = false;
-            time = startTime;
+            time = data.TimeLimit;
         }
 
         public void SetOrderOnActionPanel(AID action, int order) 
@@ -169,7 +189,7 @@ namespace KWY
                 return;
             }
             // reset timer
-            time = startTime;
+            time = data.TimeLimit;
         }
 
         private void Start()
@@ -189,6 +209,8 @@ namespace KWY
                 p.SetActive(false);
             }
 
+            playerMPPanel.GetComponent<PlayerMPPanel>().SetData(UserManager.UserIcon, data.mp);
+
             StartTimer();
         }
 
@@ -203,7 +225,12 @@ namespace KWY
             else if (!timesup)
             {
                 timesup = true;
-                SendReadyState();
+                timeText.text = "0";
+
+                UpdateDataOnUI();
+
+                // 잠시 주석 처리
+                // SendReadyState();
             }
         }
 
