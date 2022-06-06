@@ -17,7 +17,7 @@ namespace KWY
 
         public override string ToString()
         {
-            return string.Format("SID: {0}, SkillName: {1}, Cost: {2}", sid, name, cost);
+            return string.Format("SID: {0}, SkillName: {1}, CastingTime: {2}, Cost: {3}", sid, name, castingTime, cost);
         }
     }
 }

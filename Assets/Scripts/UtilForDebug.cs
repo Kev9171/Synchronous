@@ -16,18 +16,9 @@ namespace KWY
             byte code = eventData.Code;
             object[] data = (object[])eventData.CustomData;
 
-            string content = "";
+            
 
-            if (!(data is object[]))
-            {
-                return;
-            }
-            foreach (object a in data)
-            {
-                content += (string)a + ", ";
-            }
-
-            Debug.LogFormat("EventData: {0}, [{1}]", code, content);
+            Debug.LogFormat("EventData: {0}, [{1}]", code, data);
         }
 
         public static void LogRaiseEvent(byte evcode, object content, RaiseEventOptions raiseEventOptions, SendOptions sendOptions)

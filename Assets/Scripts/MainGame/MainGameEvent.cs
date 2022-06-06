@@ -50,9 +50,9 @@ namespace KWY
         /// <summary>
         /// Send to 'ready signal to start simulation' to the Server; content: actionData: Dictionary(int, string)
         /// </summary>
-        public void RaiseEventTurnReady()
+        public void RaiseEventTurnReady(ActionData actionData)
         {
-            Dictionary<int, string> actionData = new Dictionary<int, string>(); // temp
+            Debug.Log(actionData);
 
             byte evCode = (byte)EvCode.TurnReady;
 
@@ -66,9 +66,9 @@ namespace KWY
                 Reliability = true
             };
 
-            if (PhotonNetwork.RaiseEvent(evCode, actionData, raiseEventOptions, sendOptions))
+            if (PhotonNetwork.RaiseEvent(evCode, actionData.Data, raiseEventOptions, sendOptions))
             {
-                UtilForDebug.LogRaiseEvent(evCode, actionData, raiseEventOptions, sendOptions);
+                UtilForDebug.LogRaiseEvent(evCode, actionData.Data, raiseEventOptions, sendOptions);
             }
             else
             {
@@ -218,7 +218,8 @@ namespace KWY
                 // 아직 테스트 하지 못하였음!!!!!!!!
                 if (PhotonNetwork.IsMasterClient)
                 {
-                    gameManager.SetState(1, (Dictionary<int, string>)data[3]); // Note: if data[2] is false, there is no data[3]
+                    Debug.Log("Received simul data!!!!");
+                    gameManager.SetState(1, (Dictionary<int, object[]>)data[3]); // Note: if data[2] is false, there is no data[3]
                 }
             }
         }
@@ -290,6 +291,11 @@ namespace KWY
         public void OnDisable()
         {
             PhotonNetwork.NetworkingClient.EventReceived -= OnEvent;
+        }
+
+        public void Start()
+        {
+            // ExitGames.Client.Photon.PhotonPeer.RegisterType(); //ㅠㅠ
         }
 
         #endregion

@@ -15,4 +15,6 @@ MonoBehaviour:
   cost: 1
   icon: {fileID: 0}
   name: Move
+  castingTime: 0
+  triggerTime: 1
   distance: 1

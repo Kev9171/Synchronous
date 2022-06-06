@@ -4,6 +4,16 @@ using UnityEngine;
 
 namespace KWY
 {
+    // not editable
+    public enum ActionType
+    {
+        Skill, Move
+    }
+
+    public enum SkillDicection
+    {
+        Left, Right
+    }
 
     public enum AID : int
     {
@@ -16,12 +26,15 @@ namespace KWY
         // temp
         Flappy = 1,
         Flappy2 = 2,
+        Knight = 3
     }
 
     public enum SID : int
     {
         FireBall = 1,
         LightingVolt = 2,
+        KnightNormal = 3,
+        KnightSpecial = 4,
     }
 
     public enum BID : int

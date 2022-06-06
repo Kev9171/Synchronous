@@ -6,6 +6,8 @@ using System.Collections;
 
 using TMPro;
 
+using Photon.Pun;
+
 namespace KWY
 {
     public class UIControlReady : MonoBehaviour
@@ -60,7 +62,6 @@ namespace KWY
 
         #endregion
 
-        
 
         #region Private Fields
 
@@ -79,6 +80,14 @@ namespace KWY
 
         #region Public Methods
 
+        public void StartTurnReady()
+        {
+            // for test
+            data.Characters[0].GetComponent<Collider2D>().enabled = true;
+            data.Characters[1].GetComponent<Collider2D>().enabled = true;
+            data.Characters[2].GetComponent<Collider2D>().enabled = true;
+        }
+
         public void UpdateDataOnUI()
         {
             selCharaPanelManager.GetComponent<ManageShowingSkills>().ShowSkillPanel(-1);
@@ -94,7 +103,7 @@ namespace KWY
 
             // skill update는 안해도 됨 (사용할 수 있는 스킬이 바뀌거나 하지 않으면)
 
-            playerMPPanel.GetComponent<PlayerMPPanel>().UpdateData(data.mp);
+            playerMPPanel.GetComponent<PlayerMPPanel>().UpdateData(data.PlayerMp);
         }
 
 
@@ -117,7 +126,7 @@ namespace KWY
 
         public void OnClickTurnReady()
         {
-
+            SendReadyState();
         }
 
         #endregion
@@ -129,10 +138,10 @@ namespace KWY
         /// </summary>
         private void LoadSkills()
         {
-            foreach (CharacterBase cb in data.CharacterData)
+            foreach (Character c in data.Characters)
             {
                 List<SkillBase> bases = new List<SkillBase>();
-                foreach (SID sid in cb.skills)
+                foreach (SID sid in c.Cb.skills)
                 {
                     SkillBase t = SkillManager.GetData(sid);
                     if (t != null)
@@ -141,17 +150,17 @@ namespace KWY
                     }
                 }
 
-                charaSkills.Add(cb.cid, bases);
+                charaSkills.Add(c.Cb.cid, bases);
             }
         }
 
         private void SetSkillsOnPanel()
         {
             int idx = 0;
-            foreach(CharacterBase cb in data.CharacterData)
+            foreach(Character c in data.Characters)
             {
-                selSkillPanel[idx].GetComponent<SelSkillPanel>().SetCharaterName(cb.name);
-                selSkillPanel[idx].GetComponent<SelSkillPanel>().AddSkillPanels(charaSkills[cb.cid]);
+                selSkillPanel[idx].GetComponent<SelSkillPanel>().SetCharaterName(c.Cb.name);
+                selSkillPanel[idx].GetComponent<SelSkillPanel>().AddSkillPanels(charaSkills[c.Cb.cid]);
                 idx++;
             }
         }
@@ -159,11 +168,11 @@ namespace KWY
         private void LoadCharacters()
         {
             int idx = 0;
-            foreach (CharacterBase cb in data.CharacterData)
+            foreach (Character c in data.Characters)
             {
                 // SetPanelRef 를 먼저 호출해야됨
                 characterPanels[idx].GetComponent<CharacterPanel>().SetPanelRef(characterInfoPanel, buffInfoPanel);
-                characterPanels[idx].GetComponent<CharacterPanel>().SetData(cb, data.CharaBuffList(cb.cid));
+                characterPanels[idx].GetComponent<CharacterPanel>().SetData(c.Cb, c.Buffs);
                 idx++;
             }
         }
@@ -174,7 +183,44 @@ namespace KWY
 
             /// action 랜덤으로 선택 한 후 aminGameEvent에 넘겨주기
 
-            gameEvent.RaiseEventTurnReady(); // ready 상태 전송 with actiondata
+
+            gameEvent.RaiseEventTurnReady(ActionData.CreateActionData(data.CharaActionData)); // ready 상태 전송 with actiondata
+        }
+
+        private IEnumerator TimesUp()
+        {
+            // 캐릭터 선택 못하게 + 스킬 선택 패널 안보이게
+            selCharaPanelManager.GetComponent<ManageShowingSkills>().SetSeletable(false);
+            FillRandomMoveAtEmpty();
+            SendReadyState();
+
+            yield return null;
+        }
+
+        private void FillRandomMoveAtEmpty()
+        {
+            // 3개의 액션이 모두 정해지지 않은 캐릭터만 이동으로 대체
+            foreach (CID cid in data.CharaActionData.Keys)
+            {
+                Debug.Log(data.CharaActionData[cid].Count);
+                // 다 정해지지 않았을 경우 move로 추가
+                if (data.CharaActionData[cid].Count != 3)
+                {
+                    data.CharaActionData[cid].ClearActions();
+                    for (int i=0; i<3; i++)
+                    {
+                        int dx = 0, dy = 0;
+                        while (dx == 0 && dy == 0)
+                        {
+                            dx = Random.Range(-1, 2);
+                            dy = Random.Range(-1, 2);
+                        }
+                        Debug.LogFormat("dx: {0}, dy: {1}", dx, dy);
+
+                        data.CharaActionData[cid].AddMoveAction(ActionType.Move, dx, dy);
+                    }
+                }
+            }
         }
 
         #endregion
@@ -209,9 +255,12 @@ namespace KWY
                 p.SetActive(false);
             }
 
-            playerMPPanel.GetComponent<PlayerMPPanel>().SetData(UserManager.UserIcon, data.mp);
+            playerMPPanel.GetComponent<PlayerMPPanel>().SetData(UserManager.UserIcon, data.PlayerMp);
 
             StartTimer();
+
+            // for test
+            StartTurnReady();
         }
 
         private void Update()
@@ -227,7 +276,9 @@ namespace KWY
                 timesup = true;
                 timeText.text = "0";
 
-                UpdateDataOnUI();
+                StartCoroutine("TimesUp");
+
+                //UpdateDataOnUI(); // test
 
                 // 잠시 주석 처리
                 // SendReadyState();

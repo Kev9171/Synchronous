@@ -34,7 +34,7 @@ namespace KWY
                     break;
                 case 1: // start simul
                     if (PhotonNetwork.IsMasterClient)
-                        Simulation((Dictionary<int, string>)data[0]);
+                        Simulation(new ActionData((Dictionary<int, object[]>)data[0]));
                     else
                         SimulationState();
                     break;
@@ -42,9 +42,6 @@ namespace KWY
                     break;
             }
         }
-
-        
-
 
         
 
@@ -77,7 +74,7 @@ namespace KWY
 
             // mp Ãß°¡
             // player
-            data.mp += data.playerMPIncrement;
+            data.PlayerMp += data.playerMPIncrement;
 
         }
 
@@ -86,9 +83,9 @@ namespace KWY
             SetCameraOnSimul();
         }
 
-        private void Simulation(Dictionary<int, string> actionData)
+        private void Simulation(ActionData actionData)
         {
-
+            Debug.Log("simul start -- GameManger");
         }
         #endregion
 

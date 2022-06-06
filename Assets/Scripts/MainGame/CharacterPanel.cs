@@ -37,8 +37,10 @@ namespace KWY
         [SerializeField]
         Button charaInfoBtn;
 
+        
+
         [SerializeField]
-        GameObject showingSkillManager;
+        CharacterControl charaControl;
 
         [Tooltip("0 ~ 2 (위에서 부터)")]
         [SerializeField]
@@ -178,7 +180,9 @@ namespace KWY
                 Debug.Log("This character is break down. You can not choose");
                 return;
             }
-            showingSkillManager.GetComponent<ManageShowingSkills>().ShowSkillPanel(nthCharacter);
+
+            // 캐릭터 선택
+            charaControl.SetSelChara(cb.cid);
         }
 
         #endregion
