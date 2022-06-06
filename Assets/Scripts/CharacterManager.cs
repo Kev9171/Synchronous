@@ -164,24 +164,6 @@ namespace KWY
                     Debug.Log(item.Key + ", " +item.Value[0] + ", " + item.Value[1] + ", " + item.Value[2]);
                 }
             }
-
-
-            //switch (selOption)
-            //{
-            //    case 0:
-            //        Debug.Log("nothing selected");
-            //        break;
-            //    case 1:
-            //        Debug.Log("movement selected");
-
-                    
-
-            //        break;
-            //    case 2:
-            //        Debug.Log("skill selected");
-            //        break;
-            //}
-            //}
             
         }
 
