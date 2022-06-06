@@ -20,6 +20,8 @@ namespace KWY
     public enum SID : int
     {
         FireBall = 1,
+        KnightNA = 2,
+        KnightSA = 3,
     }
 
     public enum BID : int
