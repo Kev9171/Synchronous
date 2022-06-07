@@ -9,15 +9,40 @@ namespace KWY
         [SerializeField]
         GameObject[] selSkillPanels = new GameObject[3];
 
+        private bool seletable = true;
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="nth">0 ~ 2</param>
         public void ShowSkillPanel(int nth)
         {
-            for (int i=0; i<selSkillPanels.Length; i++)
+            if (!seletable)
             {
-                selSkillPanels[i].SetActive(nth == i);
+                for (int i = 0; i < selSkillPanels.Length; i++)
+                {
+                    selSkillPanels[i].SetActive(false);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < selSkillPanels.Length; i++)
+                {
+                    selSkillPanels[i].SetActive(nth == i);
+                }
+            }
+        }
+
+        public void SetSeletable(bool state)
+        {
+            seletable = state;
+
+            if (!seletable)
+            {
+                for (int i = 0; i < selSkillPanels.Length; i++)
+                {
+                    selSkillPanels[i].SetActive(false);
+                }
             }
         }
     }

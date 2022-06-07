@@ -669,8 +669,13 @@ MonoBehaviour:
   mpLabel: {fileID: 4138337864311442045}
   buffPanel: {fileID: 6156940872770366380}
   charaInfoBtn: {fileID: 8801146078354904382}
-  showingSkillManager: {fileID: 0}
+  charaControl: {fileID: 0}
   nthCharacter: 0
+  selectedActionImages:
+  - {fileID: 7553120284138084260}
+  - {fileID: 556717315584252206}
+  - {fileID: 7408027369189840771}
+  breakDownColor: {r: 0.66, g: 0, b: 0, a: 0.7}
 --- !u!1 &4262638147718437218
 GameObject:
   m_ObjectHideFlags: 0

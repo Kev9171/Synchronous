@@ -2,16 +2,28 @@ using UnityEngine;
 
 using System.Collections.Generic;
 
+using Photon.Pun;
+
 namespace KWY
 {
     public class MainGameData : MonoBehaviour
     {
+        // for prototype
+        [SerializeField]
+        GameObject[] tCharas = new GameObject[6];
+
+        [SerializeField]
+        LogicData logicData;
+
+
         #region Immutable Variables
 
         [Tooltip("Player Name or Player NickName")]
         private string playerName;
-        [Tooltip("Time limit of TurnReady")]
-        private int timeLimit;
+
+        public float TimeLimit { get; private set; }
+        public int playerMPIncrement { get; private set; }
+        public int characterMPIncrement { get; private set; }
         
         [Tooltip("0: left is my side; 1: right is my side")]
         private bool mySide; 
@@ -29,57 +41,71 @@ namespace KWY
         [Tooltip("진행 턴 수 = 진행중인 n 번째 턴(start: 1)")]
         private int turnNum;
 
-        [Tooltip("Player Mana Point")]
-        private int mp;
+        [SerializeField]
+        public int PlayerMp { get; internal set; } = 0;
 
 
         [Tooltip("Pre-set Possible-to-use Playerskills")]
         [SerializeField]
         private List<PSID> _playerSkillList;
 
-        [Tooltip("Characters under user's control")]
-        [SerializeField]
-        private List<CharacterBase> _characters;
 
+        private List<Character> _characters = new List<Character>(); // 게임 진행 중 캐릭터 정보를 가지고 있는 리스트
+        private Dictionary<CID, GameObject> _charaObjects = new Dictionary<CID, GameObject>();
 
-
-
-        [SerializeField]
-        private List<Buff> chara1BuffList = new List<Buff>();
-        [SerializeField]
-        private List<Buff> chara2BuffList = new List<Buff>();
-        [SerializeField]
-        private List<Buff> chara3BuffList = new List<Buff>();
-
-        //for test
-        [SerializeField]
-        private List<BID> chara1BuffListTest = new List<BID>();
-
-
+        private Dictionary<CID, CharacterActionData> _charaActionData = new Dictionary<CID, CharacterActionData>();
+        
 
 
         #endregion
 
         #region Public Fields
 
-        public List<CharacterBase> CharacterData { get { return _characters; } }
+        public List<Character> Characters { get { return _characters; } }
+        public Dictionary<CID, GameObject> CharacterObjects { get { return _charaObjects; } }
+        public Dictionary<CID, CharacterActionData> CharaActionData { get { return _charaActionData; } }
+        
 
         public List<PSID> PlayerSkillList { get { return _playerSkillList; } }
 
-        public List<Buff> CharaBuffList(CID cid)
+
+        #endregion
+
+        #region Public Methods
+
+        public Character GetCharacter(CID cid)
         {
-            for(int i=0; i<_characters.Count; i++)
+            foreach(Character c in Characters)
             {
-                if (cid == _characters[i].cid)
+                if (c.Cb.cid == cid)
                 {
-                    switch(i)
-                    {
-                        case 0: return chara1BuffList;
-                        case 1: return chara2BuffList;
-                        case 2: return chara3BuffList;
-                    }
+                    return c;
                 }
             }
+            return null;
+        }
+
+        public int GetCharacterNth(CID cid)
+        {
+            for (int i=0; i<Characters.Count; i++)
+            {
+                if (Characters[i].Cb.cid == cid)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        public CharacterActionData GetActionData(CID cid)
+        {
+            if (_charaActionData.TryGetValue(cid, out var value))
+            {
+                return value;
+            }
+
+            Debug.Log("There is no data: " + cid);
             return null;
         }
 
@@ -89,11 +115,71 @@ namespace KWY
 
         private void Awake()
         {
-            // for test
-            foreach(BID bid in chara1BuffListTest)
+            if (logicData == null)
             {
-                chara1BuffList.Add(new Buff(BuffManager.GetData(bid), 1));
+                // 할당안되있으면 직접 로드
+                logicData = Resources.Load<LogicData>("MainGameLogicData");
+                Debug.Log("Logic Data is loaded from resources");
+                if (logicData == null)
+                {
+                    Debug.LogError("Logic Data is null");
+                    return;
+                }
             }
+
+            this.TimeLimit = logicData.timeLimit;
+        }
+
+        private void Start()
+        {
+            turnNum = 1;
+
+            //_characters.Add(TestCharacter()); // test 
+
+            // for prototype
+            if (PhotonNetwork.IsMasterClient)
+            {
+                // 0 1 2 추가
+                _characters.Add(tCharas[0].GetComponent<Character>());
+                _characters.Add(tCharas[1].GetComponent<Character>());
+                _characters.Add(tCharas[2].GetComponent<Character>());
+
+                _charaObjects.Add(_characters[0].Cb.cid, tCharas[0]);
+                _charaObjects.Add(_characters[1].Cb.cid, tCharas[1]);
+                _charaObjects.Add(_characters[2].Cb.cid, tCharas[2]);
+            }
+            else
+            {
+                _characters.Add(tCharas[3].GetComponent<Character>());
+                _characters.Add(tCharas[4].GetComponent<Character>());
+                _characters.Add(tCharas[5].GetComponent<Character>());
+
+                _charaObjects.Add(_characters[0].Cb.cid, tCharas[3]);
+                _charaObjects.Add(_characters[1].Cb.cid, tCharas[4]);
+                _charaObjects.Add(_characters[2].Cb.cid, tCharas[5]);
+            }
+
+            foreach (CID cid in _charaObjects.Keys)
+            {
+                _charaActionData.Add(cid, new CharacterActionData());
+            }
+
+            // add chara panel
+
+
+        }
+
+
+        private Character TestCharacter()
+        {
+            Character c = new Character(CharaManager.GetData(CID.Flappy));
+            c.DamageHP(300);
+            c.AddBuff(BuffManager.GetData(BID.Burn), 3);
+            c.AddBuff(BuffManager.GetData(BID.Paralyzed), 1);
+
+            Debug.Log(c);
+
+            return c;
         }
 
         #endregion

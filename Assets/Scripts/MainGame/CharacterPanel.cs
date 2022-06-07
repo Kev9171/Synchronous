@@ -38,7 +38,10 @@ namespace KWY
         Button charaInfoBtn;
 
         [SerializeField]
-        GameObject showingSkillManager;
+        private Image[] selectedActionImages;
+
+        [SerializeField]
+        CharacterControl charaControl;
 
         [Tooltip("0 ~ 2 (위에서 부터)")]
         [SerializeField]
@@ -46,7 +49,6 @@ namespace KWY
 
         private GameObject buffInfoPanel;
 
-        private Image[] selectedActionImages;
 
         private GameObject characterInfoPanel;
 
@@ -54,6 +56,10 @@ namespace KWY
 
         private CharacterBase cb;
         private List<GameObject> buffPanelLists = new List<GameObject>();
+        private bool selectable = true;
+
+        [SerializeField]
+        private Color breakDownColor = new Color(0.66f, 0, 0, 0.7f);
 
         #endregion
 
@@ -86,6 +92,27 @@ namespace KWY
             buffInfoPanel.SetActive(false);
             characterInfoPanel.SetActive(false);
         }
+
+        public void UpdateData(Character c)
+        {
+            if (c.BreakDown)
+            {
+                selectable = false;
+                charaImg.color = breakDownColor;
+                ClearBuffs();
+            }
+
+            else
+            {
+                UpdateHP(c.Hp);
+                UpdateMP(c.Mp);
+
+                LoadBuffs(c.Buffs);
+            }
+
+            SetSelActionImg(-1, null);
+        }
+
 
         public void UpdateHP(float hp)
         {
@@ -150,15 +177,34 @@ namespace KWY
 
         public void OnClickShowSkillPanel()
         {
-            showingSkillManager.GetComponent<ManageShowingSkills>().ShowSkillPanel(nthCharacter);
+            if (!selectable)
+            {
+                Debug.Log("This character is break down. You can not choose");
+                return;
+            }
+
+            // 캐릭터 선택
+            charaControl.SetSelChara(cb.cid);
         }
 
         #endregion
 
         #region Private Methods
 
+        private void ClearBuffs()
+        {
+            foreach (GameObject buffPanel in buffPanelLists)
+            {
+                Destroy(buffPanel);
+            }
+
+            buffPanelLists.Clear();
+        }
+
         private void LoadBuffs(List<Buff> buffs)
         {
+            ClearBuffs();
+
             foreach (Buff bf in buffs)
             {
                 //ReduceTurn(10); // temp

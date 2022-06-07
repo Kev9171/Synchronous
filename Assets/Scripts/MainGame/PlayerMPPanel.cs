@@ -17,18 +17,25 @@ namespace KWY
         [SerializeField]
         private TMP_Text mpLabel;
 
-        public void SetPlayerImage(Sprite sprite)
-        {
-            playerImg.sprite = sprite;
-        }
-
         public void SetData(Sprite sprite, int mp)
         {
             playerImg.sprite = sprite;
 
             // bar
+            UpdateMPBar();
 
             mpLabel.text = mp.ToString();
+        }
+
+        public void UpdateData(int mp)
+        {
+            mpLabel.text = mp.ToString();
+            UpdateMPBar();
+        }
+
+        private void UpdateMPBar()
+        {
+
         }
     }
 }
