@@ -16,7 +16,9 @@ namespace KWY
         GameEnd = 13, // 게임이 종료됬다는 시그널 전송 content: winnerId: string
 
 
-        PlayerSkill = 20,
+        PlayerSkill1 = 21,
+        PlayerSkill2 = 22,
+        PlayerSkill3 = 23,
 
         // TurnReady에 대한 res 값 data: [ userId: string, ok: bool, startSimul: bool, simulData: Dictionary<int, int> ];
         // if startSimul is false, there is no simulData

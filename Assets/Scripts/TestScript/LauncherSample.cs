@@ -19,8 +19,6 @@ namespace KWY
         [Tooltip("The UI Label to inform the user that the connection is in progress")]
         [SerializeField] private GameObject progresssLabel;
 
-        [SerializeField] private GameObject btn;
-
         /// <summary>
         /// Keep track of the current process. Since connection is asynchronous and is based on several callbacks from Photon,
         /// we need to keep track of this to properly adjust the behavior when we receive call back by Photon.
@@ -34,7 +32,7 @@ namespace KWY
         /// </summary>
         string gameVersion = "1";
 
-        string nextLevel = "MainGameScene";
+        string nextLevel = "CharacterTest";
 
         #endregion
 
@@ -59,7 +57,6 @@ namespace KWY
         {
             progresssLabel.SetActive(false);
             controlPanel.SetActive(true);
-            btn.SetActive(false);
             Debug.LogWarningFormat("PUN Basics Tutorial/Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
 
             // #Critical: The first we try to do is to join a potential existing room.
@@ -79,13 +76,11 @@ namespace KWY
         public override void OnJoinedRoom()
         {
             Debug.Log("PUN Basics Tutorial/LauncherL OnJoinedRoom() called by PUN. Now this client is in a room.");
-
-            btn.SetActive(true);
-            //Debug.Log("We load the '" + nextLevel +"' ");
+            Debug.Log("We load the '" + nextLevel +"' ");
             
             // #Critical
             // Load the Room Level.
-            //PhotonNetwork.LoadLevel(nextLevel);
+            PhotonNetwork.LoadLevel(nextLevel);
         }
 
 
@@ -108,7 +103,6 @@ namespace KWY
             //Connect();
             progresssLabel.SetActive(false);
             controlPanel.SetActive(true);
-            btn.SetActive(false);
         }
 
         #endregion
