@@ -54,6 +54,7 @@ namespace KWY
         private Dictionary<CID, GameObject> _charaObjects = new Dictionary<CID, GameObject>();
 
         private Dictionary<CID, CharacterActionData> _charaActionData = new Dictionary<CID, CharacterActionData>();
+        
 
 
         #endregion
@@ -63,6 +64,7 @@ namespace KWY
         public List<Character> Characters { get { return _characters; } }
         public Dictionary<CID, GameObject> CharacterObjects { get { return _charaObjects; } }
         public Dictionary<CID, CharacterActionData> CharaActionData { get { return _charaActionData; } }
+        
 
         public List<PSID> PlayerSkillList { get { return _playerSkillList; } }
 
@@ -115,7 +117,7 @@ namespace KWY
         {
             if (logicData == null)
             {
-                // 할 당안되있으면 직접 로드
+                // 할당안되있으면 직접 로드
                 logicData = Resources.Load<LogicData>("MainGameLogicData");
                 Debug.Log("Logic Data is loaded from resources");
                 if (logicData == null)
@@ -161,6 +163,9 @@ namespace KWY
             {
                 _charaActionData.Add(cid, new CharacterActionData());
             }
+
+            // add chara panel
+
 
         }
 

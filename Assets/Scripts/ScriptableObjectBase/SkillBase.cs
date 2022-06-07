@@ -10,7 +10,6 @@ namespace KWY
     public class SkillBase : ActionBase
     {
         public SID sid;
-        public List<Vector2Int> area = new List<Vector2Int>();
         public List<CID> casters = new List<CID>();
         public string skillExplanation;
         public Sprite skillExImg;

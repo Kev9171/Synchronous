@@ -37,7 +37,8 @@ namespace KWY
         [SerializeField]
         Button charaInfoBtn;
 
-        
+        [SerializeField]
+        private Image[] selectedActionImages;
 
         [SerializeField]
         CharacterControl charaControl;
@@ -48,7 +49,6 @@ namespace KWY
 
         private GameObject buffInfoPanel;
 
-        private Image[] selectedActionImages;
 
         private GameObject characterInfoPanel;
 
@@ -109,6 +109,8 @@ namespace KWY
 
                 LoadBuffs(c.Buffs);
             }
+
+            SetSelActionImg(-1, null);
         }
 
 

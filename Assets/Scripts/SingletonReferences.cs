@@ -21,4 +21,7 @@ public class SingletonReferences : MonoBehaviour
 
     [SerializeField]
     private KWY.UserManager _userManager;
+
+    [SerializeField]
+    private KWY.MoveManager _moveManager;
 }

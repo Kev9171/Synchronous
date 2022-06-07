@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Photon.Pun;
 
 
 namespace KWY
@@ -22,16 +23,46 @@ namespace KWY
             hlMap.SetColor(hlMap.WorldToCell(baseWorldPos), highlightColor);
         }
 
-        public void HighlightMap(Vector3 baseWorldPos, List<Vector2Int> posList)
+        private List<Vector2Int> ReverseX(List<Vector2Int> posList)
+        {
+            List<Vector2Int> rv = new List<Vector2Int>();
+            foreach(var v in posList)
+            {
+                rv.Add(new Vector2Int(v.x * -1, v.y));
+            }
+
+            return rv;
+        }
+
+        public void HighlightMapXReverse(Vector3Int baseTilePos, List<Vector2Int> posList)
         {
             ClearHighlight();
 
-            Vector3Int baseV = hlMap.WorldToCell(baseWorldPos);
-            foreach (Vector2Int pos in posList)
+            // 임시로 하이라이트 방향은 기본 오른쪽
+            // 마스터 클라이언트는 오른쪽으로 하이라이트,
+            // 아니면 왼쪽으로 하이라이트
+            foreach (Vector2Int pos in ReverseX(posList))
             {
-                Vector3Int v = new Vector3Int(baseV.x + pos.x, baseV.y + pos.y, 0);
+                Vector3Int v = new Vector3Int(baseTilePos.x + pos.x, baseTilePos.y + pos.y, 0);
                 if (hlMap.HasTile(v))
                 {
+                    hlMap.SetTileFlags(v, TileFlags.None);
+                    hlMap.SetColor(v, highlightColor);
+                }
+            }
+        }
+
+        public void HighlightMap(Vector3Int baseTilePos, List<Vector2Int> posList)
+        {
+            ClearHighlight();
+            Debug.LogFormat("Base: {0}", baseTilePos);
+            
+            foreach (Vector2Int pos in posList )
+            {
+                Vector3Int v = new Vector3Int(baseTilePos.x + pos.x, baseTilePos.y + pos.y, 0);
+                if (hlMap.HasTile(v))
+                {
+                    Debug.LogFormat("vvvvvv: {0}", v);
                     hlMap.SetTileFlags(v, TileFlags.None);
                     hlMap.SetColor(v, highlightColor);
                 }

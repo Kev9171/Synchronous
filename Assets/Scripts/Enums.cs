@@ -7,7 +7,7 @@ namespace KWY
     // not editable
     public enum ActionType
     {
-        Skill, Move
+        Skill, Move, None
     }
 
     public enum SkillDicection
