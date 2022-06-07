@@ -253,7 +253,7 @@ namespace KWY
                             dy = Random.Range(-1, 2);
                         }
 
-                        data.CharaActionData[cid].AddMoveAction(ActionType.Move, dx, dy);
+                        data.CharaActionData[cid].AddMoveAction(ActionType.Move, dx, dy, true);
                     }
                 }
             }
