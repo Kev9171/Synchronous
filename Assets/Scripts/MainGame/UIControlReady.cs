@@ -1,12 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Tilemaps;
 
 using System.Collections.Generic;
 using System.Collections;
 
 using TMPro;
 
-using Photon.Pun;
 
 namespace KWY
 {
@@ -60,6 +60,10 @@ namespace KWY
         [SerializeField]
         private GameObject selCharaPanelManager;
 
+        [SerializeField]
+        private Tilemap map;
+
+
         #endregion
 
 
@@ -76,9 +80,33 @@ namespace KWY
         [Tooltip("맵에 있는 자신의 캐릭터(key)에 대한 스킬 정보를 갖고 있는 자료구조")]
         private Dictionary<CID, List<SkillBase>> charaSkills = new Dictionary<CID, List<SkillBase>>();
 
+        private Dictionary<CID, CharacterPanel> _charaPanels = new Dictionary<CID, CharacterPanel>();
+
         #endregion
 
+        #region Public Fields
+        public Dictionary<CID, CharacterPanel> CharaPanels { get { return _charaPanels; } }
+        #endregion
+
+
         #region Public Methods
+
+        public void UpdateCharaActions(CID cid)
+        {
+            for (int i = 0; i < data.CharaActionData[cid].Count; i++)
+            {
+                object[] t = (object[])data.CharaActionData[cid].Actions[i];
+                if (ActionType.Move == (ActionType)(t[0]))
+                {
+                    _charaPanels[cid].SetSelActionImg(i, MoveManager.MoveData.icon);
+                }
+                else
+                {
+                    _charaPanels[cid].SetSelActionImg(i, SkillManager.GetData((SID)(t[1])).icon);
+                }
+            }
+        }
+
 
         public void StartTurnReady()
         {
@@ -86,6 +114,12 @@ namespace KWY
             data.Characters[0].GetComponent<Collider2D>().enabled = true;
             data.Characters[1].GetComponent<Collider2D>().enabled = true;
             data.Characters[2].GetComponent<Collider2D>().enabled = true;
+
+
+            // 하이라이트를 위한 임시 좌표 초기화
+            data.Characters[0].ResetTempPos();
+            data.Characters[1].ResetTempPos();
+            data.Characters[2].ResetTempPos();
         }
 
         public void UpdateDataOnUI()
@@ -173,6 +207,9 @@ namespace KWY
                 // SetPanelRef 를 먼저 호출해야됨
                 characterPanels[idx].GetComponent<CharacterPanel>().SetPanelRef(characterInfoPanel, buffInfoPanel);
                 characterPanels[idx].GetComponent<CharacterPanel>().SetData(c.Cb, c.Buffs);
+
+                _charaPanels.Add(c.Cb.cid, characterPanels[idx].GetComponent<CharacterPanel>());
+
                 idx++;
             }
         }
@@ -215,7 +252,6 @@ namespace KWY
                             dx = Random.Range(-1, 2);
                             dy = Random.Range(-1, 2);
                         }
-                        Debug.LogFormat("dx: {0}, dy: {1}", dx, dy);
 
                         data.CharaActionData[cid].AddMoveAction(ActionType.Move, dx, dy);
                     }

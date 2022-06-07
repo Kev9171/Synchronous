@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace KWY
 {
@@ -16,7 +17,7 @@ namespace KWY
         public float Hp { get; private set; }
         public float Mp { get; private set; }
         public bool BreakDown { get; private set; }
-        public Vector2 TilePos { get; private set; }
+        public Vector3Int TempTilePos { get; private set; }
 
         public static readonly float MaxMp = 10;
 
@@ -29,14 +30,14 @@ namespace KWY
             BreakDown = false;
         }
 
-        public Character(CharacterBase cb, Vector2 pos)
+        public Character(CharacterBase cb, Vector3Int pos)
         {
             Cb = cb;
             Buffs = new List<Buff>();
             Hp = cb.hp;
             Mp = 0;
             BreakDown = false;
-            TilePos = pos;
+            TempTilePos = pos;
         }
 
         public void DamageHP(float damage)
@@ -88,9 +89,15 @@ namespace KWY
             Debug.LogFormat("All buffs of {0} is removed", Cb.name);
         }
 
-        public void SetTilePos(Vector2 pos)
+        public void SetTilePos(Vector3Int pos)
         {
-            TilePos = pos;
+            TempTilePos = pos;
+        }
+
+        public void ResetTempPos()
+        {
+            Tilemap map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
+            TempTilePos = map.WorldToCell(transform.position);
         }
 
         public override string ToString()

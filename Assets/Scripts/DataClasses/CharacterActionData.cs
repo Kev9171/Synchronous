@@ -17,7 +17,6 @@ namespace KWY
 
         public int Count { get { return idx >= 3 ? 3 : idx; } }
 
-
         public void ClearActions()
         {
             idx = 0;
