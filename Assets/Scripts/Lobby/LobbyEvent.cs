@@ -21,7 +21,7 @@ namespace KWY
         #region Private Fields
 
         [Tooltip("다음에 게임이 시작되면 로드될 scene")]
-        readonly private string nextLevel = "";
+        readonly private string nextLevel = "MainGameScene";
 
         [Tooltip("Unique user id that the server determined")]
         private string UserId;
@@ -90,6 +90,7 @@ namespace KWY
         /// <param name="eventData">Received data from the server</param>
         private void OnEventLobbyReady(EventData eventData)
         {
+            UserId = PhotonNetwork.AuthValues.UserId; // temp
             object[] data = (object[])eventData.CustomData;
 
             if (UserId == (string)data[0] && (bool)data[1])
@@ -104,7 +105,7 @@ namespace KWY
                 Debug.Log("Start Game");
 
                 // load next level
-                // PhotonNetwork.LoadLevel(nextLevel);
+                PhotonNetwork.LoadLevel(nextLevel);
             }
         }
 
