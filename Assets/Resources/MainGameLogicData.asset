@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerMPIncrement: 2
   characterMPIncrement: 3
-  timeLimit: 60
+  timeLimit: 30
+  actionLogShowingTime: 2.5

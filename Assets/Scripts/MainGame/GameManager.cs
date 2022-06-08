@@ -19,13 +19,11 @@ namespace KWY
         [SerializeField]
         private MainGameData data;
 
-        
+        [SerializeField]
+        private MainGameEvent gameEvent;
 
-
-        [Tooltip("True 시에 턴 준비 상태를 보여줌")]
-        public bool ShowTurnReadyCanvas = false;
-        [Tooltip("True 시에 시뮬레이션 상태를 보여줌")]
-        public bool ShowSimulCanvas = false;
+        [SerializeField]
+        private ShowNowAction showActions;
 
         public void SetState(int state, params object[] data)
         {
@@ -36,7 +34,10 @@ namespace KWY
                     break;
                 case 1: // start simul
                     if (PhotonNetwork.IsMasterClient)
+                    {
+                        SimulationState();
                         Simulation(new ActionData((Dictionary<int, object[]>)data[0]));
+                    } 
                     else
                         SimulationState();
                     break;
@@ -64,6 +65,9 @@ namespace KWY
 
         private void TurnReadyState()
         {
+            SimulCanvas.SetActive(false);
+            TurnCanvas.SetActive(true);
+
             // 카메라 이동
             SetCameraOnTurnReady();
 
@@ -71,29 +75,57 @@ namespace KWY
             // player
             data.PlayerMp += data.playerMPIncrement;
 
+            TurnCanvas.GetComponent<UIControlReady>().UpdateDataOnUI();
+            TurnCanvas.GetComponent<UIControlReady>().StartTurnReady();
+
         }
 
         private void SimulationState()
         {
+            TurnCanvas.SetActive(false);
+            SimulCanvas.SetActive(true);
             SetCameraOnSimul();
+        }
+
+        private void EndSimulation()
+        {
+            gameEvent.RaiseEventSimulEnd();
         }
 
         private void Simulation(ActionData actionData)
         {
             Debug.Log("simul start -- GameManger");
             nowActionData = actionData;
+
+            tMax = -1;
+            foreach (int t in actionData.Data.Keys)
+            {
+                tMax = (t > tMax) ? t : tMax;
+            }
+            Debug.Log(tMax);
+            Debug.Log(actionData);
+
             StartCoroutine("StartAction", 0);
         }
 
         int time = 0;
+        int tMax;
         ActionData nowActionData;
 
         IEnumerator StartAction(int time)
         {
+            Debug.Log("StartAction at : " + time);
             DoAction(time);
             yield return new WaitForSeconds(1);
-            Debug.Log("StartAction at : " + time);
-            StartCoroutine("StartAction", ++time);
+
+            if (time <= tMax + 5)
+            {
+                StartCoroutine("StartAction", ++time);
+            }
+            else
+            {
+                EndSimulation();
+            }
         }
 
         private void DoAction(int time)
@@ -103,6 +135,7 @@ namespace KWY
                 foreach(object[] d in value)
                 {
                     int cid = (int) d[0];
+
                     ActionType type = (ActionType)d[1];
 
                     if (type == ActionType.Move)
@@ -120,14 +153,17 @@ namespace KWY
         IEnumerator DoCharaMove(int cid, Vector2Int v)
         {
             data.WholeCharacters[cid].MoveTo(v);
+            showActions.ShowMoveLog(cid);
             yield return null;
         }
 
         IEnumerator DoCharaSkill(int cid, SID sid, SkillDicection dir)
         {
             data.WholeCharacters[cid].SpellSkill(sid, dir);
+            showActions.ShowSkillLog(cid, sid);
             yield return null;
         }
+
 
         #endregion
 
@@ -136,13 +172,10 @@ namespace KWY
         private void Start()
         {
             // test code
-            SimulCanvas.SetActive(ShowSimulCanvas);
-            TurnCanvas.SetActive(ShowTurnReadyCanvas);
+            SimulCanvas.SetActive(false);
+            TurnCanvas.SetActive(true);
 
-            if (ShowTurnReadyCanvas)
-            {
-                mainCamera.GetComponent<CameraController>().SetCameraTurnReady();
-            }
+            mainCamera.GetComponent<CameraController>().SetCameraTurnReady();
         }
 
         #endregion

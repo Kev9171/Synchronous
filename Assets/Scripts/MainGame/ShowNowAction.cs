@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using Photon.Pun;
 
 namespace KWY
 {
@@ -17,41 +18,86 @@ namespace KWY
         [SerializeField]
         private GameObject rightActionPiecePrefab;
 
-        [Tooltip("True로 체크하고 시작하면 테스트로 액션이 계속 생성됨")]
-        public bool execTestYieldAction = false;
 
-        public ShowNowAction(GameObject left, GameObject right)
+
+        public void ShowMoveLog(int charaCid)
         {
-            this.leftSkillLinePanel = left;
-            this.rightSkillLinePanel = right;
+            PhotonView.Get(this).RPC("ShowMoveLogRPC", RpcTarget.Others, charaCid);
+
+            int t = charaCid;
+            if (charaCid > 100)
+            {
+                charaCid -= 100;
+            }
+
+            Sprite icon = CharaManager.GetData((CID)charaCid).icon;
+            string name = "Move";
+            StartCoroutine(ShowActionLog(icon, name, t < 100));
+
         }
 
-        public void ShowAction(CharacterBase cb, ActionBase ab, bool side)
+        public void ShowSkillLog(int charaCid, SID sid)
         {
-            if (!side)
+            PhotonView.Get(this).RPC("ShowSkillLogRPC", RpcTarget.Others, charaCid, sid);
+
+            int t = charaCid;
+            if (charaCid > 100)
             {
-                Instantiate(leftActionPiecePrefab, leftSkillLinePanel.transform).GetComponent<ActionPiece>().SetData(cb.icon, ab.name);
+                charaCid -= 100;
+            }
+
+            Sprite icon = CharaManager.GetData((CID)charaCid).icon;
+            string name = SkillManager.GetData(sid).name;
+            StartCoroutine(ShowActionLog(icon, name, t < 100));
+        }
+
+        [PunRPC]
+        public void ShowMoveLogRPC(int charaCid)
+        {
+            int t = charaCid;
+            if (charaCid > 100)
+            {
+                charaCid -= 100;
+            }
+
+            Sprite icon = CharaManager.GetData((CID)charaCid).icon;
+            string name = "Move";
+            StartCoroutine(ShowActionLog(icon, name, t < 100));
+
+        }
+
+        [PunRPC]
+        public void ShowSkillLogRPC(int charaCid, SID sid)
+        {
+            int t = charaCid;
+            if (charaCid > 100)
+            {
+                charaCid -= 100;
+            }
+
+            Sprite icon = CharaManager.GetData((CID)charaCid).icon;
+            string name = SkillManager.GetData(sid).name;
+            StartCoroutine(ShowActionLog(icon, name, t < 100));
+        }
+
+        IEnumerator ShowActionLog(Sprite icon, string name, bool left)
+        {
+            if (left)
+            {
+                Instantiate(leftActionPiecePrefab, leftSkillLinePanel.transform).GetComponent<ActionPiece>().SetData(icon, name);
+                //GameObject o = PhotonNetwork.Instantiate("Prefabs/UI/Main/LeftSKill", Vector3.zero, Quaternion.identity);
+                //o.transform.parent = leftSkillLinePanel.transform;
+                //o.GetComponent<ActionPiece>().SetData(icon, name);
             }
             else
             {
-                Instantiate(rightActionPiecePrefab, rightSkillLinePanel.transform).GetComponent<ActionPiece>().SetData(cb.icon, ab.name);
+                Instantiate(rightActionPiecePrefab, rightSkillLinePanel.transform).GetComponent<ActionPiece>().SetData(icon, name);
+                //GameObject o = PhotonNetwork.Instantiate("Prefabs/UI/Main/RightSkill", Vector3.zero, Quaternion.identity);
+                //o.transform.parent = rightSkillLinePanel.transform;
+                //o.GetComponent<ActionPiece>().SetData(icon, name);
             }
 
-        }
-
-        private void Start()
-        {
-            if (execTestYieldAction)
-                StartCoroutine("CallTest", 0.7f);
-        }
-
-        IEnumerator CallTest(float delaytime)
-        {
-            int t = Random.Range(0, 2);
-            ShowAction(CharaManager.GetData(CID.Flappy), SkillManager.GetData(SID.FireBall), t==0);
-            yield return new WaitForSeconds(delaytime);
-            if (execTestYieldAction)
-                StartCoroutine("CallTest", 0.7f);
+            yield return null;
         }
     }
 }

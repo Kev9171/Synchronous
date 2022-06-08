@@ -61,7 +61,6 @@ namespace KWY
                 Vector3Int v = new Vector3Int(baseTilePos.x + pos.x, baseTilePos.y + pos.y, 0);
                 if (hlMap.HasTile(v))
                 {
-                    Debug.LogFormat("vvvvvv: {0}", v);
                     hlMap.SetTileFlags(v, TileFlags.None);
                     hlMap.SetColor(v, highlightColor);
                 }

@@ -99,9 +99,13 @@ namespace KWY
         {
             string t = "[";
 
-            foreach(var d in _data)
+            foreach(int ti in _data.Keys)
             {
-                t += string.Format("<{0}, len: {1}>, ", d.Key, d.Value.Length);
+                t += string.Format("t: {0}", ti);
+                foreach(object[] d in _data[ti])
+                {
+                    t += string.Format("<{0}, {1}, {2}, {3}> / ", (int) d[0], (ActionType) d[1], d[2], d[3]);
+                }
             }
             t += "]";
 

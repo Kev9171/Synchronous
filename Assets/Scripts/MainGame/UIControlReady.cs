@@ -110,10 +110,11 @@ namespace KWY
 
         public void StartTurnReady()
         {
-            // for test
-            data.Characters[0].GetComponent<Collider2D>().enabled = true;
-            data.Characters[1].GetComponent<Collider2D>().enabled = true;
-            data.Characters[2].GetComponent<Collider2D>().enabled = true;
+            ResetTimer();
+
+            StartTimer();
+            selCharaPanelManager.GetComponent<ManageShowingSkills>().SetSeletable(true);
+
 
 
             // 하이라이트를 위한 임시 좌표 초기화
@@ -149,13 +150,9 @@ namespace KWY
 
         public void ResetTimer()
         {
+            timesup = false;
             actTimer = false;
             time = data.TimeLimit;
-        }
-
-        public void SetOrderOnActionPanel(AID action, int order) 
-        {
-            // 해당 액션(action) 아이콘의 좌측 상단에 있는 숫자를 order로 바꾸기
         }
 
         public void OnClickTurnReady()
@@ -216,22 +213,19 @@ namespace KWY
 
         private void SendReadyState()
         {
-            Debug.Log("Time is Up!!!");
-
-            /// action 랜덤으로 선택 한 후 aminGameEvent에 넘겨주기
-
-
+            foreach (CID c in data.CharacterObjects.Keys)
+            {
+                data.CharacterObjects[c].transform.localScale = new Vector3(0.7f, 0.7f, 1);
+            }
             gameEvent.RaiseEventTurnReady(ActionData.CreateActionData(data.CharaActionData)); // ready 상태 전송 with actiondata
         }
 
-        private IEnumerator TimesUp()
+        private void TimesUp()
         {
             // 캐릭터 선택 못하게 + 스킬 선택 패널 안보이게
             selCharaPanelManager.GetComponent<ManageShowingSkills>().SetSeletable(false);
             FillRandomMoveAtEmpty();
             SendReadyState();
-
-            yield return null;
         }
 
         private void FillRandomMoveAtEmpty()
@@ -239,7 +233,6 @@ namespace KWY
             // 3개의 액션이 모두 정해지지 않은 캐릭터만 이동으로 대체
             foreach (CID cid in data.CharaActionData.Keys)
             {
-                Debug.Log(data.CharaActionData[cid].Count);
                 // 다 정해지지 않았을 경우 move로 추가
                 if (data.CharaActionData[cid].Count != 3)
                 {
@@ -293,7 +286,9 @@ namespace KWY
 
             playerMPPanel.GetComponent<PlayerMPPanel>().SetData(UserManager.UserIcon, data.PlayerMp);
 
-            StartTimer();
+            data.Characters[0].GetComponent<Collider2D>().enabled = true;
+            data.Characters[1].GetComponent<Collider2D>().enabled = true;
+            data.Characters[2].GetComponent<Collider2D>().enabled = true;
 
             // for test
             StartTurnReady();
@@ -305,6 +300,7 @@ namespace KWY
             {
                 time -= Time.deltaTime;
             }
+
             if (time > 0)
                 timeText.text = Mathf.Ceil(time).ToString();
             else if (!timesup)
@@ -312,12 +308,9 @@ namespace KWY
                 timesup = true;
                 timeText.text = "0";
 
-                StartCoroutine("TimesUp");
 
-                //UpdateDataOnUI(); // test
-
-                // 잠시 주석 처리
-                // SendReadyState();
+                TimesUp();
+                //StartCoroutine(TimesUp());
             }
         }
 

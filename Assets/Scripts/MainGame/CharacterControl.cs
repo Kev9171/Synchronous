@@ -70,11 +70,9 @@ namespace KWY
             Vector3Int clickV = map.WorldToCell(mousePosition);
             Vector3Int charaV = SelChara.TempTilePos;
 
-            Vector2 deltaXY = (Vector2Int)clickV - (Vector2Int)charaV;
+            Vector2Int deltaXY = (Vector2Int)clickV - (Vector2Int)charaV;
 
-            Debug.LogFormat("mag: {0}", deltaXY.sqrMagnitude);
-
-            if (map.HasTile(clickV) && deltaXY.sqrMagnitude < 2)
+            if (map.HasTile(clickV) && (SelChara.TempTilePos.y % 2 == 0 ? SelAction.areaEvenY : SelAction.areaOddY).Contains(deltaXY))
             {
                 data.CharaActionData[SelChara.Cb.cid].AddMoveAction(ActionType.Move, (int)deltaXY.x, (int)deltaXY.y, SelChara.TempTilePos.y%2!=0);
 
@@ -114,13 +112,11 @@ namespace KWY
             if (charaX < clickX)
             {
                 highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y%2==0 ? ((SkillBase)SelAction).areaEvenY : ((SkillBase)SelAction).areaOddY);
-                Debug.Log("Right");
 
                 if (SelOk > 0)
                 {
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Right);
-                    Debug.Log("Add Right data");
 
                     turnReadyUI.UpdateCharaActions(SelChara.Cb.cid);
                     SetSelClear();
@@ -135,14 +131,12 @@ namespace KWY
             }
             else
             {
-                highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? SelAction.areaEvenY : SelAction.areaOddY);
-                Debug.Log("Left");
+                highLighter.HighlightMapXReverse(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? SelAction.areaEvenY : SelAction.areaOddY);
 
                 if (SelOk < 0)
                 {
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Left);
-                    Debug.Log("Add Left data");
 
                     turnReadyUI.UpdateCharaActions(SelChara.Cb.cid);
                     SetSelClear();
@@ -220,8 +214,6 @@ namespace KWY
             mouseInput.Mouse.MouseClick.performed += OnClick;
             mouseInput.Mouse.MouseClick.performed -= OnClickSkillDirection;
             mouseInput.Mouse.MouseClick.performed -= OnClickMoveDirection;
-
-            Debug.LogFormat("tPos0: {0}", SelChara.TempTilePos.GetHashCode());
 
             Debug.Log("Character selected: " + cid);
         }

@@ -26,6 +26,8 @@ namespace KWY
 
         private Tilemap map;
 
+        private bool nowMove = false;
+
         public Character(CharacterBase cb)
         {
             Cb = cb;
@@ -145,17 +147,27 @@ namespace KWY
 
         public void MoveTo(Vector2Int dir)
         {
+            map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
+
             Vector2Int realDir = TransFromY(dir);
             Vector3Int nowPos = map.WorldToCell(this.transform.position);
             Vector3 des = map.CellToWorld(new Vector3Int(nowPos.x + realDir.x, nowPos.y + realDir.y, nowPos.z));
 
-            destination = des;
-
-            Debug.LogFormat("{0} / {1} is moving to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, map.WorldToCell(des));
+            if (map.HasTile(map.WorldToCell(des)))
+            {
+                destination = des;
+                nowMove = true;
+                Debug.LogFormat("{0} / {1} is moving to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, map.WorldToCell(des));
+            }
+            else
+            {
+                Debug.LogFormat("{0} / {1} can not go to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, map.WorldToCell(des));         
+            }
         }
 
         public void SpellSkill(SID sid, SkillDicection direction)
         {
+            nowMove = false;
             Debug.LogFormat("{0} / {1} spells {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, sid);
         }
 
@@ -173,13 +185,13 @@ namespace KWY
 
         void Update()
         {
-
-            if (Vector2.Distance(transform.position, destination) > 0)
+            if (nowMove)
             {
-                transform.position = Vector2.MoveTowards(
-                    transform.position,
-                    destination,
-                    movementSpeed * Time.deltaTime);
+                transform.position = Vector3.Lerp(gameObject.transform.position, destination, 0.7f);
+            }
+            else
+            {
+
             }
         }
         #endregion

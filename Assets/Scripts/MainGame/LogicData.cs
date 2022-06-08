@@ -10,5 +10,7 @@ namespace KWY
         public int playerMPIncrement;
         public int characterMPIncrement;
         public float timeLimit;
+
+        public float actionLogShowingTime;
     }
 }

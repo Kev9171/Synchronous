@@ -14,6 +14,7 @@ public class PlayerListingsMenu : MonoBehaviourPunCallbacks
     [SerializeField]
     private Text _readyUpText;
 
+
     private List<PlayerListing> _listings = new List<PlayerListing>();
     private RoomsCanvases _roomsCanvases;
     private bool _ready = false;
@@ -129,19 +130,19 @@ public class PlayerListingsMenu : MonoBehaviourPunCallbacks
             PhotonNetwork.CurrentRoom.IsOpen = false;
             PhotonNetwork.CurrentRoom.IsVisible = false;
             // 게임 시작 시 방 목록에서 사라짐
-            PhotonNetwork.LoadLevel(1);
+            PhotonNetwork.LoadLevel("MainGameScene");
         }
     }
 
     public void OnClick_ReadyUp()
     {
-        if (!PhotonNetwork.IsMasterClient)
+        /*if (!PhotonNetwork.IsMasterClient)
         {
             SetReadyUp(!_ready);
             base.photonView.RPC("RPC_ChangeReadyState", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer, _ready);
             // base.photonView.RpcSecure("RPC_ChangeReadyState", RpcTarget.MasterClient, true, PhotonNetwork.LocalPlayer, _ready);
             // PhotonNetwork.RemoveRPCs()
-        }
+        }*/
     }
 
     [PunRPC]

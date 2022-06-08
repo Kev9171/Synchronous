@@ -11,6 +11,8 @@ namespace KWY
         Image charaIcon;
         [SerializeField]
         TMP_Text skillNameLabel;
+        [SerializeField]
+        LogicData logicData;
 
         private float activeDuraction = 2f;
         private float time = 0.0f;
@@ -21,6 +23,11 @@ namespace KWY
             skillNameLabel.text = skillName;
         }
 
+        private void Start()
+        {
+            activeDuraction = logicData.actionLogShowingTime;
+        }
+
         #region MonoBehaviour CallBacks
         private void Update()
         {
@@ -29,6 +36,7 @@ namespace KWY
             if (time > activeDuraction)
             {
                 Destroy(gameObject);
+                //PhotonNetwork.Destroy(gameObject);
             }
         }
         #endregion
