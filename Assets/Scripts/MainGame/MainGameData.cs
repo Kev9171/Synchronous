@@ -54,7 +54,9 @@ namespace KWY
         private Dictionary<CID, GameObject> _charaObjects = new Dictionary<CID, GameObject>();
 
         private Dictionary<CID, CharacterActionData> _charaActionData = new Dictionary<CID, CharacterActionData>();
-        
+
+        private Dictionary<int, Character> _wholeCharacters = new Dictionary<int, Character>();
+
 
 
         #endregion
@@ -64,7 +66,9 @@ namespace KWY
         public List<Character> Characters { get { return _characters; } }
         public Dictionary<CID, GameObject> CharacterObjects { get { return _charaObjects; } }
         public Dictionary<CID, CharacterActionData> CharaActionData { get { return _charaActionData; } }
-        
+
+        public Dictionary<int, Character> WholeCharacters { get { return _wholeCharacters; } }
+
 
         public List<PSID> PlayerSkillList { get { return _playerSkillList; } }
 
@@ -164,8 +168,14 @@ namespace KWY
                 _charaActionData.Add(cid, new CharacterActionData());
             }
 
-            // add chara panel
+            // test
+            _wholeCharacters.Add((int)(_characters[0].Cb.cid), tCharas[0].GetComponent<Character>());
+            _wholeCharacters.Add((int)(_characters[1].Cb.cid), tCharas[0].GetComponent<Character>());
+            _wholeCharacters.Add((int)(_characters[2].Cb.cid), tCharas[0].GetComponent<Character>());
 
+            _wholeCharacters.Add((int)(_characters[0].Cb.cid) + 100, tCharas[0].GetComponent<Character>());
+            _wholeCharacters.Add((int)(_characters[1].Cb.cid) + 100, tCharas[0].GetComponent<Character>());
+            _wholeCharacters.Add((int)(_characters[2].Cb.cid) + 100, tCharas[0].GetComponent<Character>());
 
         }
 

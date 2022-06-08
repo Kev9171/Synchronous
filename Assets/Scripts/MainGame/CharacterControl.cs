@@ -74,9 +74,9 @@ namespace KWY
 
             Debug.LogFormat("mag: {0}", deltaXY.sqrMagnitude);
 
-            if (map.HasTile(clickV) && deltaXY.sqrMagnitude <= 2)
+            if (map.HasTile(clickV) && deltaXY.sqrMagnitude < 2)
             {
-                data.CharaActionData[SelChara.Cb.cid].AddMoveAction(ActionType.Move, (int)deltaXY.x, (int)deltaXY.y);
+                data.CharaActionData[SelChara.Cb.cid].AddMoveAction(ActionType.Move, (int)deltaXY.x, (int)deltaXY.y, SelChara.TempTilePos.y%2!=0);
 
                 // 이동 넣었을 경우 하이라이트를 위한 임시 좌표 변경
                 SelChara.SetTilePos(clickV);
@@ -113,7 +113,7 @@ namespace KWY
             // 클릭 된 좌표가 선택된 캐릭터의 오른쪽 있다면 왼쪽 하이라이트 및 방향 선택
             if (charaX < clickX)
             {
-                highLighter.HighlightMap(SelChara.TempTilePos, ((SkillBase)SelAction).area);
+                highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y%2==0 ? ((SkillBase)SelAction).areaEvenY : ((SkillBase)SelAction).areaOddY);
                 Debug.Log("Right");
 
                 if (SelOk > 0)
@@ -135,7 +135,7 @@ namespace KWY
             }
             else
             {
-                highLighter.HighlightMapXReverse(SelChara.TempTilePos, ((SkillBase)SelAction).area);
+                highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? SelAction.areaEvenY : SelAction.areaOddY);
                 Debug.Log("Left");
 
                 if (SelOk < 0)
@@ -167,7 +167,7 @@ namespace KWY
         {
             SelAction = sb;
 
-            highLighter.HighlightMap(SelChara.TempTilePos, sb.area);
+            highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? sb.areaEvenY : sb.areaOddY);
 
         }
 
@@ -185,6 +185,8 @@ namespace KWY
             mouseInput.Mouse.MouseClick.performed -= OnClick;
             mouseInput.Mouse.MouseClick.performed -= OnClickSkillDirection;
 
+            showingSkillManager.ShowSkillPanel(-1);
+
             highLighter.ClearHighlight();
             HighlightCharacterClear();
         }
@@ -193,15 +195,7 @@ namespace KWY
         {
             SelAction = MoveManager.MoveData;
 
-            string t = "";
-            foreach(var v in MoveManager.MoveData.area)
-            {
-                t += string.Format("{0}, ", v);
-            }
-            Debug.Log(t);
-
-
-            highLighter.HighlightMap(SelChara.TempTilePos, SelAction.area);
+            highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? SelAction.areaEvenY : SelAction.areaOddY);
         }
 
         public void SetSelChara(CID cid)

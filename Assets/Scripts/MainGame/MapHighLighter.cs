@@ -55,7 +55,6 @@ namespace KWY
         public void HighlightMap(Vector3Int baseTilePos, List<Vector2Int> posList)
         {
             ClearHighlight();
-            Debug.LogFormat("Base: {0}", baseTilePos);
             
             foreach (Vector2Int pos in posList )
             {

@@ -17,11 +17,18 @@ MonoBehaviour:
   name: Move
   castingTime: 0
   triggerTime: 1
-  area:
-  - {x: 1, y: 0}
-  - {x: -1, y: 0}
+  areaOddY:
   - {x: 0, y: 1}
   - {x: 1, y: 1}
+  - {x: -1, y: 0}
+  - {x: 1, y: 0}
   - {x: 0, y: -1}
   - {x: 1, y: -1}
+  areaEvenY:
+  - {x: -1, y: 1}
+  - {x: 0, y: 1}
+  - {x: -1, y: 0}
+  - {x: 1, y: 0}
+  - {x: -1, y: -1}
+  - {x: 0, y: -1}
   distance: 1

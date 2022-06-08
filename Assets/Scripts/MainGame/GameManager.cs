@@ -19,6 +19,8 @@ namespace KWY
         [SerializeField]
         private MainGameData data;
 
+        
+
 
         [Tooltip("True 시에 턴 준비 상태를 보여줌")]
         public bool ShowTurnReadyCanvas = false;
@@ -58,14 +60,7 @@ namespace KWY
         }
 
 
-
-
         #region Private Methods
-
-        private void UpdateDataOnUI()
-        {
-
-        }
 
         private void TurnReadyState()
         {
@@ -86,7 +81,54 @@ namespace KWY
         private void Simulation(ActionData actionData)
         {
             Debug.Log("simul start -- GameManger");
+            nowActionData = actionData;
+            StartCoroutine("StartAction", 0);
         }
+
+        int time = 0;
+        ActionData nowActionData;
+
+        IEnumerator StartAction(int time)
+        {
+            DoAction(time);
+            yield return new WaitForSeconds(1);
+            Debug.Log("StartAction at : " + time);
+            StartCoroutine("StartAction", ++time);
+        }
+
+        private void DoAction(int time)
+        {
+            if (nowActionData.Data.TryGetValue(time, out var value))
+            {
+                foreach(object[] d in value)
+                {
+                    int cid = (int) d[0];
+                    ActionType type = (ActionType)d[1];
+
+                    if (type == ActionType.Move)
+                    {
+                        StartCoroutine(DoCharaMove(cid, new Vector2Int((int)d[2], (int)d[3])));
+                    }
+                    else if (type == ActionType.Skill)
+                    {
+                        StartCoroutine(DoCharaSkill(cid, (SID)d[2], (SkillDicection)d[3]));
+                    }
+                }
+            }
+        }
+
+        IEnumerator DoCharaMove(int cid, Vector2Int v)
+        {
+            data.WholeCharacters[cid].MoveTo(v);
+            yield return null;
+        }
+
+        IEnumerator DoCharaSkill(int cid, SID sid, SkillDicection dir)
+        {
+            data.WholeCharacters[cid].SpellSkill(sid, dir);
+            yield return null;
+        }
+
         #endregion
 
         #region MonoBehaviour CallBacks

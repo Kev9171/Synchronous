@@ -15,10 +15,15 @@ MonoBehaviour:
   cost: 5
   icon: {fileID: 21300000, guid: d542c7c9aff724b49b4e147eba39a697, type: 3}
   name: FireBall
-  sid: 1
-  area:
-  - {x: 0, y: 0}
+  castingTime: 0
+  triggerTime: 0
+  areaOddY:
   - {x: 1, y: 0}
+  - {x: 0, y: 0}
+  areaEvenY:
+  - {x: 1, y: 0}
+  - {x: 0, y: 0}
+  sid: 1
   casters: 01000000
   skillExplanation: Throw a fireball.
   skillExImg: {fileID: 0}
