@@ -297,3 +297,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   charaIcon: {fileID: 6576700322241707693}
   skillNameLabel: {fileID: 605968747146994734}
+  logicData: {fileID: 11400000, guid: 7a37ecefc5b39ec42b99d217720c46bc, type: 2}

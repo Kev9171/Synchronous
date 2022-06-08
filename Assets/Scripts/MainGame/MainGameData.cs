@@ -170,26 +170,13 @@ namespace KWY
 
             // test
             _wholeCharacters.Add((int)(_characters[0].Cb.cid), tCharas[0].GetComponent<Character>());
-            _wholeCharacters.Add((int)(_characters[1].Cb.cid), tCharas[0].GetComponent<Character>());
-            _wholeCharacters.Add((int)(_characters[2].Cb.cid), tCharas[0].GetComponent<Character>());
+            _wholeCharacters.Add((int)(_characters[1].Cb.cid), tCharas[1].GetComponent<Character>());
+            _wholeCharacters.Add((int)(_characters[2].Cb.cid), tCharas[2].GetComponent<Character>());
 
-            _wholeCharacters.Add((int)(_characters[0].Cb.cid) + 100, tCharas[0].GetComponent<Character>());
-            _wholeCharacters.Add((int)(_characters[1].Cb.cid) + 100, tCharas[0].GetComponent<Character>());
-            _wholeCharacters.Add((int)(_characters[2].Cb.cid) + 100, tCharas[0].GetComponent<Character>());
+            _wholeCharacters.Add(((int)(_characters[0].Cb.cid)) + 100, tCharas[3].GetComponent<Character>());
+            _wholeCharacters.Add(((int)(_characters[1].Cb.cid)) + 100, tCharas[4].GetComponent<Character>());
+            _wholeCharacters.Add(((int)(_characters[2].Cb.cid)) + 100, tCharas[5].GetComponent<Character>());
 
-        }
-
-
-        private Character TestCharacter()
-        {
-            Character c = new Character(CharaManager.GetData(CID.Flappy));
-            c.DamageHP(300);
-            c.AddBuff(BuffManager.GetData(BID.Burn), 3);
-            c.AddBuff(BuffManager.GetData(BID.Paralyzed), 1);
-
-            Debug.Log(c);
-
-            return c;
         }
 
         #endregion
