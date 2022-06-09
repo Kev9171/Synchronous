@@ -863,7 +863,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &685754300
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1057,7 +1057,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1770644138}
   m_HandleRect: {fileID: 1770644137}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1187,6 +1187,18 @@ MonoBehaviour:
       - m_Target: {fileID: 1566986920}
         m_TargetAssemblyTypeName: PlayerListingsMenu, Assembly-CSharp
         m_MethodName: OnClick_ReadyUp
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1909958091}
+        m_TargetAssemblyTypeName: KWY.LobbyEvent, Assembly-CSharp
+        m_MethodName: RaiseEventReady
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1454,6 +1466,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1028211437}
   m_CullTransparentMesh: 1
+--- !u!1 &1134666208
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1134666210}
+  - component: {fileID: 1134666209}
+  m_Layer: 0
+  m_Name: LobbyTemp
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1134666209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1134666208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3cb5e5d8a506d5142a6d41d0cf180ecf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startBtn: {fileID: 685754299}
+  readyBtn: {fileID: 842244960}
+--- !u!4 &1134666210
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1134666208}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1001.7269, y: 556.335, z: -31.841347}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1266300514
 GameObject:
   m_ObjectHideFlags: 0
@@ -1932,6 +1989,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _masterManager: {fileID: 11400000, guid: 673aabd54cf752a4593c2ed120d50174, type: 2}
+  _characterManager: {fileID: 0}
+  _skillManager: {fileID: 0}
+  _buffManager: {fileID: 0}
+  playerSkillManager: {fileID: 0}
+  _userManager: {fileID: 0}
+  _moveManager: {fileID: 0}
 --- !u!4 &1438643930
 Transform:
   m_ObjectHideFlags: 0
@@ -2541,7 +2604,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uC900\uBE44\uD558\uAE30"
+  m_Text: "\uC900\uBE44"
 --- !u!222 &1768962507
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3011,6 +3074,51 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _createOrJoinRoomCanvas: {fileID: 1531695252}
   _currentRoomCanvas: {fileID: 203750236}
+--- !u!1 &1909958090
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1909958092}
+  - component: {fileID: 1909958091}
+  m_Layer: 0
+  m_Name: LobbyEvent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1909958091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1909958090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77d959a9e40e29a4fb35446359699f9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ReadyBtn: {fileID: 842244962}
+  readyTxt: {fileID: 1768962506}
+--- !u!4 &1909958092
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1909958090}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.100645624, y: -0.11315024, z: -0.24596165}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2114679555
 GameObject:
   m_ObjectHideFlags: 0

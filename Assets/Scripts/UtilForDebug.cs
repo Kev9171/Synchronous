@@ -2,6 +2,7 @@ using Photon.Pun;
 using Photon.Realtime;
 
 using System.Collections.Generic;
+using System;
 
 using ExitGames.Client.Photon;
 
@@ -13,17 +14,17 @@ namespace KWY
     {
         public static void LogData(EventData eventData)
         {
-            byte code = eventData.Code;
-            object[] data = (object[])eventData.CustomData;
-
-            string content = "";
-
-            foreach (object a in data)
+            try
             {
-                content += (string)a + ", ";
-            }
+                byte code = eventData.Code;
+                object[] data = (object[])eventData.CustomData;
 
-            Debug.LogFormat("EventData: {0}, [{1}]", code, content);
+
+
+                Debug.LogFormat("EventData: {0}, [{1}]", code, data);
+            }
+            catch (Exception) { }
+            
         }
 
         public static void LogRaiseEvent(byte evcode, object content, RaiseEventOptions raiseEventOptions, SendOptions sendOptions)

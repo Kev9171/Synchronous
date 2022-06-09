@@ -3,7 +3,10 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - MapHighlighter
+  - CharacterControl
+  - Map
   layers:
   - Default
   - TransparentFX
@@ -40,6 +43,9 @@ TagManager:
   m_SortingLayers:
   - name: Map
     uniqueID: 3272561927
+    locked: 0
+  - name: HighlightMap
+    uniqueID: 3056056413
     locked: 0
   - name: Default
     uniqueID: 0

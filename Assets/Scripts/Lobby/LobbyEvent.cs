@@ -16,12 +16,14 @@ namespace KWY
         [Tooltip("The button to send ready to start the game to server")]
         [SerializeField] private Button ReadyBtn;
 
+        [SerializeField] private Text readyTxt;
+
         #endregion
 
         #region Private Fields
 
         [Tooltip("다음에 게임이 시작되면 로드될 scene")]
-        readonly private string nextLevel = "";
+        readonly private string nextLevel = "MainGameScene";
 
         [Tooltip("Unique user id that the server determined")]
         private string UserId;
@@ -78,7 +80,7 @@ namespace KWY
                     OnEventLobbyReady(eventData);
                     break;
                 default:
-                    Debug.LogError("There is not matching event code: " + eventData.Code);
+                    //Debug.LogError("There is not matching event code: " + eventData.Code);
                     break;
             }
 
@@ -90,12 +92,14 @@ namespace KWY
         /// <param name="eventData">Received data from the server</param>
         private void OnEventLobbyReady(EventData eventData)
         {
+            UserId = PhotonNetwork.AuthValues.UserId; // temp
             object[] data = (object[])eventData.CustomData;
 
             if (UserId == (string)data[0] && (bool)data[1])
             {
                 // 임시로 ready 완료되면 버튼 blue로 변경
-                ReadyBtn.GetComponent<Image>().color = Color.blue;
+                //ReadyBtn.GetComponent<Image>().color = Color.gray;
+                readyTxt.text = "준비 완료";
             }
 
             // check 'start game?' through data[2]
@@ -104,7 +108,7 @@ namespace KWY
                 Debug.Log("Start Game");
 
                 // load next level
-                // PhotonNetwork.LoadLevel(nextLevel);
+                PhotonNetwork.LoadLevel(nextLevel);
             }
         }
 
