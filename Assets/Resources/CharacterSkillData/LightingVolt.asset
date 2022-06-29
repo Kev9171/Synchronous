@@ -15,10 +15,17 @@ MonoBehaviour:
   cost: 7
   icon: {fileID: 0}
   name: LightingVolt
+  castingTime: 1
+  triggerTime: 2
+  areaOddY:
+  - {x: 2, y: 0}
+  - {x: 1, y: 0}
+  - {x: 0, y: 0}
+  areaEvenY:
+  - {x: 2, y: 0}
+  - {x: 1, y: 0}
+  - {x: 0, y: 0}
   sid: 2
-  area:
-  - {x: 1, y: 1}
-  - {x: 1, y: -1}
   casters: 02000000
   skillExplanation: Lighting Volt!!!!!!
-  skillExImg: {fileID: 0}
+  skillExImg: {fileID: 21300000, guid: 6baebaaa74a5b92469b0df54ffb02161, type: 3}

@@ -21,6 +21,13 @@ namespace KWY
 
         public static readonly float MaxMp = 10;
 
+        [SerializeField] private float movementSpeed;
+        private Vector2 destination;
+
+        private Tilemap map;
+
+        private bool nowMove = false;
+
         public Character(CharacterBase cb)
         {
             Cb = cb;
@@ -96,7 +103,7 @@ namespace KWY
 
         public void ResetTempPos()
         {
-            Tilemap map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
+            map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
             TempTilePos = map.WorldToCell(transform.position);
         }
 
@@ -119,6 +126,54 @@ namespace KWY
 
         #endregion
 
+        #region Private Methods
+
+
+        /// <summary>
+        /// 이동으로 들어온 좌표를 현재 자신의 y 좌표에 맞게 실제 이동하게 되는 좌표로 바꿔주는 함수
+        /// </summary>
+        /// <param name="dir">dx, dy</param>
+        /// <returns></returns>
+        private Vector2Int TransFromY(Vector2Int dir)
+        {
+            // temp
+            return dir;
+        }
+
+        #endregion
+
+
+        #region Simulation Functions
+
+        public void MoveTo(Vector2Int dir)
+        {
+            map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
+
+            Vector2Int realDir = TransFromY(dir);
+            Vector3Int nowPos = map.WorldToCell(this.transform.position);
+            Vector3 des = map.CellToWorld(new Vector3Int(nowPos.x + realDir.x, nowPos.y + realDir.y, nowPos.z));
+
+            if (map.HasTile(map.WorldToCell(des)))
+            {
+                destination = des;
+                nowMove = true;
+                Debug.LogFormat("{0} / {1} is moving to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, map.WorldToCell(des));
+            }
+            else
+            {
+                Debug.LogFormat("{0} / {1} can not go to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, map.WorldToCell(des));         
+            }
+        }
+
+        public void SpellSkill(SID sid, SkillDicection direction)
+        {
+            nowMove = false;
+            Debug.LogFormat("{0} / {1} spells {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, sid);
+        }
+
+        #endregion
+        
+
         #region MonoBehaviour CallBacks
         private void Awake()
         {
@@ -127,35 +182,20 @@ namespace KWY
 
             Debug.Log(this);
         }
+
+        void Update()
+        {
+            if (nowMove)
+            {
+                transform.position = Vector3.Lerp(gameObject.transform.position, destination, 0.7f);
+            }
+            else
+            {
+
+            }
+        }
         #endregion
 
 
-    }
-    public interface ICharacter 
-    {
-        CClass CLASS { get; }
-        float HP { get; }
-        float ATK { get; }
-
-        float YCorrectionValue { get; }
-
-        Dictionary<int, string> Moves { get; set; }
-
-        int moveCnt { get;set; }
-
-        public void Damage(float damage);
-        public void MoveTo(int row, int col);
-        public void CastSkill();
-
-        //public void OnClick();
-    }
-
-    // The claases of characters that are unique
-    public enum CClass
-    {
-        // temp
-        Class_A,
-        Class_B,
-        Class_C
     }
 }

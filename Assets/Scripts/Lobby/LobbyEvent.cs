@@ -16,6 +16,8 @@ namespace KWY
         [Tooltip("The button to send ready to start the game to server")]
         [SerializeField] private Button ReadyBtn;
 
+        [SerializeField] private Text readyTxt;
+
         #endregion
 
         #region Private Fields
@@ -78,7 +80,7 @@ namespace KWY
                     OnEventLobbyReady(eventData);
                     break;
                 default:
-                    Debug.LogError("There is not matching event code: " + eventData.Code);
+                    //Debug.LogError("There is not matching event code: " + eventData.Code);
                     break;
             }
 
@@ -96,7 +98,8 @@ namespace KWY
             if (UserId == (string)data[0] && (bool)data[1])
             {
                 // 임시로 ready 완료되면 버튼 blue로 변경
-                ReadyBtn.GetComponent<Image>().color = Color.blue;
+                //ReadyBtn.GetComponent<Image>().color = Color.gray;
+                readyTxt.text = "준비 완료";
             }
 
             // check 'start game?' through data[2]

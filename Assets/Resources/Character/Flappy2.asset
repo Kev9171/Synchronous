@@ -18,7 +18,7 @@ MonoBehaviour:
   hp: 150
   atk: 2
   spd: 10
-  icon: {fileID: 21300000, guid: 045f3392e2f0a45bcb74393fb83eed1d, type: 3}
+  icon: {fileID: 21300000, guid: d3275ad910fc31747b0dca959e2525be, type: 3}
   passiveIcon: {fileID: 0}
   passiveEx: 
   skills: 0200000001000000

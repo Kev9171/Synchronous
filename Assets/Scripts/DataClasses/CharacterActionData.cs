@@ -21,28 +21,6 @@ namespace KWY
         {
             idx = 0;
         }
-        public void AddAction(ActionType type, params object[] info )
-        {
-            Debug.LogFormat("Type: {0}, info: {1}", type, info);
-
-            if (idx >= Actions.Length)
-            {
-                // 추가 처리 필요
-                idx = 0;
-            }
-
-            if (type == ActionType.Move)
-            {
-                // 2개 (dx, dy)
-                Actions[idx] = new object[] { type, (int)info[0], (int)info[1] };
-            }
-            else
-            {
-                // 2개 (sid, diection)
-                Actions[idx] = new object[] { type, (int)info[0], (SkillDicection)info[1] };
-            }
-            idx++;
-        }
 
         public void AddSkillAction(ActionType type, SID sid, SkillDicection dir, params object[] skillOps)
         {
@@ -60,9 +38,9 @@ namespace KWY
             idx++;
         }
 
-        public void AddMoveAction(ActionType type, int dx, int dy, params object[] moveOps)
+        public void AddMoveAction(ActionType type, int dx, int dy, bool odd, params object[] moveOps)
         {
-            Debug.LogFormat("Type: {0}, dx: {1}, dy: {2}, ops: {3}", type, dx, dy, moveOps);
+            Debug.LogFormat("Type: {0}, dx: {1}, dy: {2}, odd?: {3}, ops: {4}", type, dx, dy, odd, moveOps);
             if (type != ActionType.Move)
             {
                 Debug.Log("Wrong method; This method is for move");

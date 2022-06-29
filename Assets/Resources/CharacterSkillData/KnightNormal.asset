@@ -17,9 +17,13 @@ MonoBehaviour:
   name: KnightNormal
   castingTime: 2
   triggerTime: 1
-  sid: 3
-  area:
+  areaOddY:
   - {x: 1, y: 0}
+  - {x: 2, y: 0}
+  areaEvenY:
+  - {x: 1, y: 0}
+  - {x: 2, y: 0}
+  sid: 3
   casters: 03000000
   skillExplanation: lalalalalalalalalal
   skillExImg: {fileID: 21300000, guid: bf2dcaafd8fd28b42b2d603724e7a75c, type: 3}

@@ -52,8 +52,6 @@ namespace KWY
         /// </summary>
         public void RaiseEventTurnReady(ActionData actionData)
         {
-            Debug.Log(actionData);
-
             byte evCode = (byte)EvCode.TurnReady;
 
             RaiseEventOptions raiseEventOptions = new RaiseEventOptions
@@ -189,7 +187,7 @@ namespace KWY
                     OnEventGameEnd(eventData);
                     break;
                 default:
-                    Debug.LogError("There is not matching event code: " + eventData.Code);
+                    //Debug.LogError("There is not matching event code: " + eventData.Code);
                     break;
             }
 
@@ -220,6 +218,11 @@ namespace KWY
                 {
                     Debug.Log("Received simul data!!!!");
                     gameManager.SetState(1, (Dictionary<int, object[]>)data[3]); // Note: if data[2] is false, there is no data[3]
+                }
+                else
+                {
+                    Debug.Log("It is not matser client");
+                    gameManager.SetState(1);
                 }
             }
         }
