@@ -23,6 +23,9 @@ namespace KWY
         [SerializeField]
         UIControlReady turnReadyUI;
 
+        [SerializeField]
+        RayTest ray;
+
 
         public Character SelChara { get; private set; }
         public ActionBase SelAction { get; private set; }
@@ -162,7 +165,7 @@ namespace KWY
             SelAction = sb;
 
             highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? sb.areaEvenY : sb.areaOddY);
-
+            ray.Ray(map.CellToWorld(SelChara.TempTilePos), sb);
         }
 
         public void StartControl()

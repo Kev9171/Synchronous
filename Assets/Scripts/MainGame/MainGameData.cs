@@ -143,6 +143,21 @@ namespace KWY
             // for prototype
             if (PhotonNetwork.IsMasterClient)
             {
+                // 캐릭터 태그 추가
+                for (int i = 0; i < tCharas.Length; i++)
+                {
+                    if(i < 3)
+                    {
+                        tCharas[i].tag = "Friendly";
+                        tCharas[i].layer = 7;
+                    }
+                    else
+                    {
+                        tCharas[i].tag = "Enemy";
+                        tCharas[i].layer = 6;
+                    }
+                }
+
                 // 0 1 2 추가
                 _characters.Add(tCharas[0].GetComponent<Character>());
                 _characters.Add(tCharas[1].GetComponent<Character>());
@@ -154,6 +169,20 @@ namespace KWY
             }
             else
             {
+                for (int i = 0; i < tCharas.Length; i++)
+                {
+                    if (i < 3)
+                    {
+                        tCharas[i].tag = "Enemy";
+                        tCharas[i].layer = 6;
+                    }
+                    else
+                    {
+                        tCharas[i].tag = "Friendly";
+                        tCharas[i].layer = 7;
+                    }
+                }
+
                 _characters.Add(tCharas[3].GetComponent<Character>());
                 _characters.Add(tCharas[4].GetComponent<Character>());
                 _characters.Add(tCharas[5].GetComponent<Character>());
