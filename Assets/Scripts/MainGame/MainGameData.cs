@@ -22,8 +22,6 @@ namespace KWY
         private string playerName;
 
         public float TimeLimit { get; private set; }
-        public int playerMPIncrement { get; private set; }
-        public int characterMPIncrement { get; private set; }
         
         [Tooltip("0: left is my side; 1: right is my side")]
         private bool mySide; 
@@ -39,7 +37,7 @@ namespace KWY
         #region Mutable Variables
 
         [Tooltip("진행 턴 수 = 진행중인 n 번째 턴(start: 1)")]
-        private int turnNum;
+        public int turnNum = 1;
 
         [SerializeField]
         public int PlayerMp { get; internal set; } = 0;
@@ -48,7 +46,6 @@ namespace KWY
         [Tooltip("Pre-set Possible-to-use Playerskills")]
         [SerializeField]
         private List<PSID> _playerSkillList;
-
 
         private List<Character> _characters = new List<Character>(); // 게임 진행 중 캐릭터 정보를 가지고 있는 리스트
         private Dictionary<CID, GameObject> _charaObjects = new Dictionary<CID, GameObject>();
@@ -62,20 +59,31 @@ namespace KWY
         #endregion
 
         #region Public Fields
-
+        
         public List<Character> Characters { get { return _characters; } }
         public Dictionary<CID, GameObject> CharacterObjects { get { return _charaObjects; } }
         public Dictionary<CID, CharacterActionData> CharaActionData { get { return _charaActionData; } }
-
         public Dictionary<int, Character> WholeCharacters { get { return _wholeCharacters; } }
-
-
         public List<PSID> PlayerSkillList { get { return _playerSkillList; } }
 
 
         #endregion
 
         #region Public Methods
+
+        public void UpdatePlayerMP(int value)
+        {
+            PlayerMp += value;
+
+            if (PlayerMp < 0)
+            {
+                PlayerMp = 0;
+            }
+            else if (PlayerMp > 10)
+            {
+                PlayerMp = 10;
+            }
+        }
 
         public Character GetCharacter(CID cid)
         {
@@ -113,11 +121,7 @@ namespace KWY
             return null;
         }
 
-        #endregion
-
-        #region MonoBehaviour CallBacks
-
-        private void Awake()
+        public void LoadData()
         {
             if (logicData == null)
             {
@@ -132,10 +136,8 @@ namespace KWY
             }
 
             this.TimeLimit = logicData.timeLimit;
-        }
+            this.PlayerMp = logicData.playerInitialMp;
 
-        private void Start()
-        {
             turnNum = 1;
 
             //_characters.Add(TestCharacter()); // test 
@@ -176,7 +178,19 @@ namespace KWY
             _wholeCharacters.Add(((int)(_characters[0].Cb.cid)) + 100, tCharas[3].GetComponent<Character>());
             _wholeCharacters.Add(((int)(_characters[1].Cb.cid)) + 100, tCharas[4].GetComponent<Character>());
             _wholeCharacters.Add(((int)(_characters[2].Cb.cid)) + 100, tCharas[5].GetComponent<Character>());
+        }
 
+        #endregion
+
+        #region MonoBehaviour CallBacks
+
+        private void Awake()
+        {
+            
+        }
+
+        private void Start()
+        {
         }
 
         #endregion

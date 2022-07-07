@@ -25,8 +25,7 @@ namespace KWY
             }
             if (CharacterData.TryGetValue(cid, out var value))
             {
-                Debug.Log("Found value on " + cid + ": " + value);
-                Debug.Log("Hash: " + value.GetHashCode());
+                //Debug.Log("Found value on " + cid + ": " + value);
                 return value;
             }
             else
@@ -45,7 +44,6 @@ namespace KWY
             foreach (var cb in Instance._characters)
             {
                 Instance._characterData.Add(cb.cid, cb);
-                Debug.Log(cb);
             }
             
 

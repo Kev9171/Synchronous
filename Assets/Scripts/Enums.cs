@@ -48,4 +48,12 @@ namespace KWY
         Flash = 1,
         Meteor = 2,
     }
+
+    public enum STATE : int
+    {
+        StandBy = 0,
+        TurnReady = 1,
+        Simul = 2,
+        GameOver = 3
+    }
 }

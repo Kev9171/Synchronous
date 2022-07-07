@@ -86,7 +86,7 @@ namespace KWY
 
         private void Start()
         {
-            ClearHighlight();
+            //ClearHighlight();
         }
     }
 }

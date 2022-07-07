@@ -2,8 +2,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 
-using System.Collections.Generic;
-
 namespace KWY
 {
     public class CharacterControl : MonoBehaviour
@@ -21,7 +19,7 @@ namespace KWY
         MapHighLighter highLighter;
 
         [SerializeField]
-        UIControlReady turnReadyUI;
+        TurnReady turnReady;
 
 
         public Character SelChara { get; private set; }
@@ -79,7 +77,7 @@ namespace KWY
                 // 이동 넣었을 경우 하이라이트를 위한 임시 좌표 변경
                 SelChara.SetTilePos(clickV);
 
-                turnReadyUI.UpdateCharaActions(SelChara.Cb.cid);
+                turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                 SetSelClear();
 
                 mouseInput.Mouse.MouseClick.performed += OnClick;
@@ -118,7 +116,7 @@ namespace KWY
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Right);
 
-                    turnReadyUI.UpdateCharaActions(SelChara.Cb.cid);
+                    turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                     SetSelClear();
 
                     mouseInput.Mouse.MouseClick.performed += OnClick;
@@ -138,7 +136,7 @@ namespace KWY
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Left);
 
-                    turnReadyUI.UpdateCharaActions(SelChara.Cb.cid);
+                    turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                     SetSelClear();
 
                     mouseInput.Mouse.MouseClick.performed += OnClick;
@@ -214,8 +212,6 @@ namespace KWY
             mouseInput.Mouse.MouseClick.performed += OnClick;
             mouseInput.Mouse.MouseClick.performed -= OnClickSkillDirection;
             mouseInput.Mouse.MouseClick.performed -= OnClickMoveDirection;
-
-            Debug.Log("Character selected: " + cid);
         }
 
         public void HighlightCharacterClear()
@@ -262,68 +258,13 @@ namespace KWY
 
         #region Private Methods
 
-        void CharMoveSelect(InputAction.CallbackContext context)
-        {
-            /*Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
-            mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
-            Vector3Int gridPosition = map.WorldToCell(mousePosition);
-
-            CharacterActionData cad = data.GetActionData(SelChara.Cb.cid);
-
-            if (map.HasTile(gridPosition) && cad.Count < 3)
-            {
-                Vector2 deltaXY = ((Vector2Int)gridPosition) - SelChara.TempTilePos;
-                object[] arr = { "move", deltaXY.x, deltaXY.y };
-                
-                cad.AddAction(ActionType.Move, deltaXY.x, deltaXY.y);
-                // selChara.SetTilePos((Vector2Int)gridPosition); 필요?
-                Debug.Log("tile selected");
-            }
-            else if (!map.HasTile(gridPosition))
-                Debug.Log("no tile selected");
-            else
-            {
-                Debug.Log("더 이상 추가 불가");
-                foreach (KeyValuePair<int, object[]> item in cad.Actions)
-                {
-                    Debug.Log(item.Key + ", " + item.Value[0] + ", " + item.Value[1] + ", " + item.Value[2]);
-                }
-            }*/
-        }
-
-        void CharAttackSelect(InputAction.CallbackContext context)
-        {
-            /*Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
-            mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
-            Vector3Int gridPosition = map.WorldToCell(mousePosition);
-
-            CharacterActionData cad = data.GetActionData(SelChara.Cb.cid);
-
-            Vector2 deltaXY = ((Vector2Int)gridPosition) - SelChara.TempTilePos;
-            if (map.HasTile(gridPosition) && deltaXY.sqrMagnitude <= 2 && cad.Count < 3)
-            {
-                object[] arr = { "skill", deltaXY.x, deltaXY.y };
-                cad.AddAction(ActionType.Skill, SID.FireBall, SkillDicection.Left); // temp
-                Debug.Log("attack selected");
-            }
-            else if (deltaXY.sqrMagnitude > 2)
-                Debug.Log("outside the atk range");
-            else
-            {
-                Debug.Log("더 이상 추가 불가");
-                foreach (KeyValuePair<int, object[]> item in cad.Actions)
-                {
-                    Debug.Log(item.Key + ", " + item.Value[0] + ", " + item.Value[1] + ", " + item.Value[2]);
-                }
-            }*/
-        }
-
         #endregion
 
         #region MonoBehaviour CallBacks
 
         private void Awake()
         {
+            // 반드시 여기서 할당해야됨! (선언에서 하면 error)
             mouseInput = new MouseInput();
         }
         private void OnEnable()
@@ -337,17 +278,11 @@ namespace KWY
 
         private void Start()
         {
-            StartControl();
+            
         }
 
         void Update()
         {
-            if (mouseInput.Mouse.MouseClick.IsPressed())
-            {
-                //mouseInput.Mouse.MouseClick.performed -= CharMoveSelect;
-                //mouseInput.Mouse.MouseClick.performed -= CharAttackSelect;
-                //mouseInput.Mouse.MouseClick.performed += OnClick;
-            }
         }
 
         #endregion

@@ -25,7 +25,7 @@ namespace KWY
 
             if (SkillData.TryGetValue(sid, out var value))
             {
-                Debug.Log("Found value on " + sid + ": " + value);
+                //Debug.Log("Found value on " + sid + ": " + value);
                 return value; 
             }
             else

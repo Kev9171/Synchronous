@@ -7,6 +7,11 @@ TagManager:
   - MapHighlighter
   - CharacterControl
   - Map
+  - CharacterInfoPanel
+  - SkillInfoPanel
+  - BuffInfoPanel
+  - MainGameData
+  - PlayerSkillInfoPanel
   layers:
   - Default
   - TransparentFX
