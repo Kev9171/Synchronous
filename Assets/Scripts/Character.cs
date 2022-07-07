@@ -24,7 +24,7 @@ namespace KWY
         [SerializeField] private float movementSpeed;
         private Vector2 destination;
 
-        private Tilemap map;
+        private Tilemap map, hlMap;
 
         private bool nowMove = false;
 
@@ -148,6 +148,7 @@ namespace KWY
         public void MoveTo(Vector2Int dir)
         {
             map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
+            hlMap = GameObject.Find("HighlightTilemap").GetComponent<Tilemap>();
 
             Vector2Int realDir = TransFromY(dir);
             Vector3Int nowPos = map.WorldToCell(this.transform.position);
@@ -157,6 +158,34 @@ namespace KWY
             {
                 destination = des;
                 nowMove = true;
+                
+                Matrix4x4 groundTile = Matrix4x4.TRS(new Vector3(0, 0f, 0), Quaternion.Euler(0f, 0f, 0f), Vector3.one);
+                Matrix4x4 elevatedTile = Matrix4x4.TRS(new Vector3(0, 0.2f, 0), Quaternion.Euler(0f, 0f, 0f), Vector3.one/*scale Á¶Á¤*/);
+
+                map.GetTile<CustomTile>(map.WorldToCell(des)).getCharCount();
+                map.GetTile<CustomTile>(nowPos).getCharCount();
+
+                if(map.GetTile<CustomTile>(map.WorldToCell(des)).getCharCount() > 1)
+                {
+                    map.SetTransformMatrix(map.WorldToCell(des), elevatedTile);
+                    hlMap.SetTransformMatrix(map.WorldToCell(des), elevatedTile);
+                }
+                else
+                {
+                    map.SetTransformMatrix(map.WorldToCell(des), groundTile);
+                    hlMap.SetTransformMatrix(map.WorldToCell(des), groundTile);
+                }
+
+                if (map.GetTile<CustomTile>(nowPos).getCharCount() < 2)
+                {
+                    map.SetTransformMatrix(map.WorldToCell(des), groundTile);
+                    hlMap.SetTransformMatrix(map.WorldToCell(des), groundTile);
+                }
+                else
+                {
+                    map.SetTransformMatrix(map.WorldToCell(des), elevatedTile);
+                    hlMap.SetTransformMatrix(map.WorldToCell(des), elevatedTile);
+                }
                 Debug.LogFormat("{0} / {1} is moving to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, map.WorldToCell(des));
             }
             else
@@ -191,7 +220,7 @@ namespace KWY
             }
             else
             {
-
+                
             }
         }
         #endregion

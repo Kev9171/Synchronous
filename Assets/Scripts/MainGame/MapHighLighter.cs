@@ -67,21 +67,38 @@ namespace KWY
             }
         }
 
-        public void ClearHighlight()
+        public void ChangeTileHeight(Vector3Int baseTilePos, Matrix4x4 height)
         {
-            Vector3 pos = new Vector3(0, 0, 0);
-            Vector3Int range;
-            for (float i = -4; i < 5; i += 0.5f)
+            hlMap.SetTransformMatrix(baseTilePos, height);
+        }
+
+            public void ClearHighlight()
+        {
+            //Vector3 pos = new Vector3(0, 0, 0);
+            //Vector3Int range;
+            //for (float i = -4; i < 5; i += 0.5f)
+            //{
+            //    for (float j = -6; j < 6; j += 0.7f)
+            //    {
+            //        pos.x = j;
+            //        pos.y = i;
+            //        range = hlMap.WorldToCell(pos);
+            //        this.hlMap.SetTileFlags(range, TileFlags.None);
+            //        this.hlMap.SetColor(range, transparent);
+            //    }
+            //}
+
+            foreach (var pos in hlMap.cellBounds.allPositionsWithin)
             {
-                for (float j = -6; j < 6; j += 0.7f)
+                Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
+                Vector3 place = hlMap.CellToWorld(localPlace);
+                if (hlMap.HasTile(localPlace))
                 {
-                    pos.x = j;
-                    pos.y = i;
-                    range = hlMap.WorldToCell(pos);
-                    this.hlMap.SetTileFlags(range, TileFlags.None);
-                    this.hlMap.SetColor(range, transparent);
+                    hlMap.SetTileFlags(localPlace, TileFlags.None);
+                    hlMap.SetColor(localPlace, transparent);
                 }
             }
+
         }
 
         private void Start()

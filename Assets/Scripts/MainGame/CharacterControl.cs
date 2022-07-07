@@ -189,7 +189,19 @@ namespace KWY
         {
             SelAction = MoveManager.MoveData;
 
+            //Matrix4x4 groundTile = Matrix4x4.TRS(new Vector3(0, 0f, 0), Quaternion.Euler(0f, 0f, 0f), Vector3.one);
+            //Matrix4x4 elevatedTile = Matrix4x4.TRS(new Vector3(0, 0.2f, 0), Quaternion.Euler(0f, 0f, 0f), Vector3.one/*scale Á¶Á¤*/);
+            //if (map.GetTile<CustomTile>(SelChara.TempTilePos).getCharCount() < 2)
+            //{
+            //    map.SetTransformMatrix(SelChara.TempTilePos, elevatedTile);
+            //    highLighter.ChangeTileHeight(SelChara.TempTilePos, elevatedTile);
+            //}
+            //else
+            //map.SetTransformMatrix(SelChara.TempTilePos, groundTile);
+
             highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? SelAction.areaEvenY : SelAction.areaOddY);
+
+            
         }
 
         public void SetSelChara(CID cid)
