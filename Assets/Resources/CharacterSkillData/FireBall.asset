@@ -27,4 +27,7 @@ MonoBehaviour:
   casters: 01000000
   skillExplanation: Throw a fireball.
   skillExImg: {fileID: 0}
-  distance: 7
+  distance:
+  - 8
+  - 2
+  directions: 0000000001000000

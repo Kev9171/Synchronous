@@ -39,7 +39,7 @@ namespace KWY
             }
             else
             {
-                d = (sb.distance[dir])/math.sqrt(2);
+                d = (sb.distance[dir]) / math.sqrt(2);
             }
 
             Debug.DrawRay(bp, dp * d, Color.blue, 2f);
