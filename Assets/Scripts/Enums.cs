@@ -48,4 +48,15 @@ namespace KWY
         Flash = 1,
         Meteor = 2,
     }
+
+    // À°°¢Çü ¹æÇâ
+    public enum Direction : int
+    {
+        TopLeft = 0,
+        Left = 1,
+        BottomLeft = 2,
+        BottomRight = 3,
+        Right = 4,
+        TopRight = 5
+    }
 }

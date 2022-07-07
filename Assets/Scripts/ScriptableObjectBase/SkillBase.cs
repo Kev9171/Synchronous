@@ -13,7 +13,8 @@ namespace KWY
         public List<CID> casters = new List<CID>();
         public string skillExplanation;
         public Sprite skillExImg;
-        public float distance;
+        public List<float> distance = new List<float>();
+        public List<Direction> directions = new List<Direction>();
 
         public override string ToString()
         {
