@@ -115,11 +115,12 @@ namespace KWY
             if (charaX < clickX)
             {
                 highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y%2==0 ? ((SkillBase)SelAction).areaEvenY : ((SkillBase)SelAction).areaOddY);
-
                 if (SelOk > 0)
                 {
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Right);
+                    //ray.Ray(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), (int)Direction.TopRight);
+                    ray.MultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, true, ((SkillBase)SelAction).directions.Count);
 
                     turnReadyUI.UpdateCharaActions(SelChara.Cb.cid);
                     SetSelClear();
@@ -140,6 +141,8 @@ namespace KWY
                 {
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Left);
+                    //ray.Ray(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), (int)Direction.TopLeft);
+                    ray.MultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, false, ((SkillBase)SelAction).directions.Count);
 
                     turnReadyUI.UpdateCharaActions(SelChara.Cb.cid);
                     SetSelClear();
@@ -165,7 +168,7 @@ namespace KWY
             SelAction = sb;
 
             highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? sb.areaEvenY : sb.areaOddY);
-            ray.Ray(map.CellToWorld(SelChara.TempTilePos), sb);
+            //ray.Ray(map.CellToWorld(SelChara.TempTilePos), sb,1);
         }
 
         public void StartControl()
