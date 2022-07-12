@@ -12,10 +12,16 @@ namespace KWY
     {
         #region UI Elements
         [SerializeField]
-        List<Button> volumeBtnList = new List<Button>();
+        Button BGMMuteBtn;
 
         [SerializeField]
-        List<Slider> volumeBarList = new List<Slider>();
+        Button SEMuteBtn;
+
+        [SerializeField]
+        Slider BGMBar;
+
+        [SerializeField]
+        Slider SEBar;
 
         [SerializeField]
         GameObject applyBtn;
@@ -34,10 +40,8 @@ namespace KWY
         #endregion
 
         #region Private Fields
-        /// <summary>
-        /// true if OFF(mute), false if ON
-        /// </summary>
-        List<bool> volumeMuteStatus = new List<bool>();
+
+        GamePlaySettingData tempData = new GamePlaySettingData();
 
         bool IsModified = false;
         #endregion
@@ -46,22 +50,15 @@ namespace KWY
         // temp
         public void SetData(Object o)
         {
-            PlayingSettings settings = Resources.Load<PlayingSettings>("PlayingSettings");
+            SettingManager settingManager = SettingManager.Instance;
 
-            // btn 이미지 로드 및 변경
-            // temp length 1
-            for(int i=0; i<settings.Volume.Count; i++)
-            {
-                volumeMuteStatus.Add(settings.IsVolumeMute[i]);
+            // deep copy
+            tempData.SetData(settingManager.gameSettings);
 
-                if (volumeMuteStatus[i])
-                {
-                    volumeBtnList[i].GetComponent<Image>().sprite = VolumeOffIcon;
-                }
-
-                // bar 위치 로드 및 변경
-                volumeBarList[i].value = settings.Volume[i];
-            }
+            BGMMuteBtn.GetComponent<Image>().sprite = tempData.BGM_Mute ? VolumeOffIcon : VolumeOnIcon;
+            SEMuteBtn.GetComponent<Image>().sprite = tempData.SE_Mute ? VolumeOffIcon : VolumeOnIcon;
+            BGMBar.value = tempData.BGM_Volume;
+            SEBar.value = tempData.SE_Volume;
 
             SetModified(false);
         }
@@ -86,41 +83,64 @@ namespace KWY
 
         public void OnClickVolumeBtn(int btn)
         {
+            switch(btn)
+            {
+                case 0:
+                    // bgm
+                    if (tempData.BGM_Mute)
+                    {
+                        BGMMuteBtn.GetComponent<Image>().sprite = VolumeOnIcon;
+                    }
+                    else
+                    {
+                        BGMMuteBtn.GetComponent<Image>().sprite = VolumeOffIcon;
+                    }
+                    tempData.BGM_Mute = !tempData.BGM_Mute;
+                    break;
+                case 1:
+                    // se
+                    if (tempData.SE_Mute)
+                    {
+                        SEMuteBtn.GetComponent<Image>().sprite = VolumeOnIcon;
+                    }
+                    else
+                    {
+                        SEMuteBtn.GetComponent<Image>().sprite = VolumeOffIcon;
+                    }
+                    tempData.SE_Mute = !tempData.SE_Mute;
+                    break;
+                default:
+                    break;
+            }
+
             SetModified(true);
-
-            // check range btn
-            if (btn < 0 || btn >= volumeBtnList.Count) return;
-
-            if (volumeMuteStatus[btn])
-            {
-                volumeBtnList[btn].GetComponent<Image>().sprite = VolumeOffIcon;
-            }
-            else
-            {
-                volumeBtnList[btn].GetComponent<Image>().sprite = VolumeOnIcon;
-            }
-
-            volumeMuteStatus[btn] = !(volumeMuteStatus[btn]);
         }
 
         public void OnClickApplySetting()
         {
-            // data 저장 at Playing Settings
-            Debug.Log("Apply Settings");
+            SettingManager settingManager = SettingManager.Instance;
 
-            PlayingSettings settings = Resources.Load<PlayingSettings>("PlayingSettings");
-
-            settings.Volume[0] = volumeBarList[0].value;
-            settings.Volume[1] = volumeBarList[1].value;
-
-            settings.IsVolumeMute[0] = volumeMuteStatus[0];
-            settings.IsVolumeMute[1] = volumeMuteStatus[1];
+            settingManager.gameSettings.SetData(tempData);
+            settingManager.SaveGameSettings();
 
             SetModified(false);
         }
 
-        public void OnVolumeValueChanged()
+        public void OnVolumeValueChanged(int bar)
         {
+            switch(bar)
+            {
+                case 0:
+                    // bgm
+                    tempData.BGM_Volume = BGMBar.value;
+                    break;
+                case 1:
+                    // se
+                    tempData.SE_Volume = SEBar.value;
+                    break;
+                default:
+                    break;
+            }
             SetModified(true);
         }
 

@@ -44,6 +44,7 @@ namespace KWY
         public void OnOkBtnClick()
         {
             Debug.Log("LosePanel - OnOkBtnClick");
+            OnClickClose();
         }
     }
 }
