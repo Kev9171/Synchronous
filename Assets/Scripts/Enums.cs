@@ -57,6 +57,7 @@ namespace KWY
         BottomLeft = 2,
         BottomRight = 3,
         Right = 4,
-        TopRight = 5
+        TopRight = 5,
+        Base = 6
     }
 }
