@@ -5,11 +5,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class MainManager : MonoBehaviour
+public class StartSceneUI : MonoBehaviour
 {
-    public GameObject LoginButton;
-    public GameObject SignUpButton;
-    public GameObject CreateButton;
+    public Button LoginBtn;
+    public Button GameStartBtn;
+    public Button JoinBtn;
+
+
     //public GameObject JoinButton;
 
     public void LoginClicked()
@@ -32,10 +34,4 @@ public class MainManager : MonoBehaviour
     {
         Debug.Log("Join Clicked!");
     }
-
-    void Awake()
-    {
-        
-    }
-
 }
