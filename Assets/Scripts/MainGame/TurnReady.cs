@@ -141,12 +141,12 @@ namespace KWY
             selCharaPanelManager.SetSeletable(false);
 
             FillRandomMoveAtEmpty();
-            //gameEvent.RaiseEventTurnReady(ActionData.CreateActionData(data.CharaActionData));
+            gameEvent.RaiseEventTurnReady(ActionData.CreateActionData(data.CharaActionData));
 
             // for test
             // 테스트로 masterclient 가 승리가 되도록
-            if (PhotonNetwork.IsMasterClient)
-                gameEvent.RaiseEventGameEnd();
+            /*if (PhotonNetwork.IsMasterClient)
+                gameEvent.RaiseEventGameEnd();*/
         }
 
         public void ShowCharacterActionPanel(CID cid)

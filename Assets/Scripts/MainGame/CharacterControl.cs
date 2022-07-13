@@ -21,6 +21,9 @@ namespace KWY
         [SerializeField]
         TurnReady turnReady;
 
+        [SerializeField]
+        RayTest ray;
+
 
         public Character SelChara { get; private set; }
         public ActionBase SelAction { get; private set; }
@@ -116,6 +119,10 @@ namespace KWY
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Right);
 
+                    //ray.Ray(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), (int)Direction.TopRight);
+                    //ray.MultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, true, ((SkillBase)SelAction).directions.Count);
+                    ray.CurvedMultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, true, ((SkillBase)SelAction).directions.Count);
+
                     turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                     SetSelClear();
 
@@ -135,6 +142,10 @@ namespace KWY
                 {
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Left);
+
+                    //ray.Ray(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), (int)Direction.TopLeft);
+                    //ray.MultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, false, ((SkillBase)SelAction).directions.Count);
+                    ray.CurvedMultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, false, ((SkillBase)SelAction).directions.Count);
 
                     turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                     SetSelClear();
@@ -160,7 +171,6 @@ namespace KWY
             SelAction = sb;
 
             highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? sb.areaEvenY : sb.areaOddY);
-
         }
 
         public void StartControl()

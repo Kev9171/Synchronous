@@ -7,11 +7,9 @@ TagManager:
   - MapHighlighter
   - CharacterControl
   - Map
-  - CharacterInfoPanel
-  - SkillInfoPanel
-  - BuffInfoPanel
   - MainGameData
-  - PlayerSkillInfoPanel
+  - Enemy
+  - Friendly
   layers:
   - Default
   - TransparentFX
@@ -19,8 +17,8 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
+  - Enemy
+  - Friendly
   - 
   - 
   - 

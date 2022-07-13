@@ -56,4 +56,16 @@ namespace KWY
         Simul = 2,
         GameOver = 3
     }
+
+    // À°°¢Çü ¹æÇâ
+    public enum Direction : int
+    {
+        TopLeft = 0,
+        Left = 1,
+        BottomLeft = 2,
+        BottomRight = 3,
+        Right = 4,
+        TopRight = 5,
+        Base = 6
+    }
 }
