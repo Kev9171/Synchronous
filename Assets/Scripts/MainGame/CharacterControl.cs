@@ -197,6 +197,27 @@ namespace KWY
         {
             SelAction = MoveManager.MoveData;
 
+            //Matrix4x4 groundTile = Matrix4x4.TRS(new Vector3(0, 0f, 0), Quaternion.Euler(0f, 0f, 0f), Vector3.one);
+            //Matrix4x4 elevatedTile = Matrix4x4.TRS(new Vector3(0, 0.2f, 0), Quaternion.Euler(0f, 0f, 0f), Vector3.one/*scale Á¶Á¤*/);
+            //if (map.GetTile<CustomTile>(SelChara.TempTilePos).getCharCount() < 2)
+            //{
+            //    map.SetTransformMatrix(SelChara.TempTilePos, elevatedTile);
+            //    highLighter.ChangeTileHeight(SelChara.TempTilePos, elevatedTile);
+            //}
+            //else
+            //map.SetTransformMatrix(SelChara.TempTilePos, groundTile);
+
+            TilemapControl fTiles = GameObject.Find("SecondTiles").GetComponent<TilemapControl>();
+
+            map.SetTileFlags(SelChara.TempTilePos, TileFlags.None);
+            map.SetColor(SelChara.TempTilePos, new Color(1, 1, 1, 0));
+
+            Debug.Log(SelChara.TempTilePos);
+            Debug.Log(map.GetTile<CustomTile>(SelChara.TempTilePos));
+
+            Sprite sprite = map.GetTile<CustomTile>(SelChara.TempTilePos).sprite;
+            fTiles.activateTile(map.CellToWorld(SelChara.TempTilePos), 2, sprite);
+
             highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? SelAction.areaEvenY : SelAction.areaOddY);
         }
 
