@@ -198,6 +198,13 @@ namespace KWY
             //}
             //else
             //map.SetTransformMatrix(SelChara.TempTilePos, groundTile);
+            TilemapControl fTiles = GameObject.Find("SecondTiles").GetComponent<TilemapControl>();
+
+            map.SetTileFlags(SelChara.TempTilePos, TileFlags.None);
+            map.SetColor(SelChara.TempTilePos, new Color(1, 1, 1, 0));
+
+            Sprite sprite = map.GetTile<CustomTile>(SelChara.TempTilePos).sprite;
+            fTiles.activateTile(map.CellToWorld(SelChara.TempTilePos), 2, sprite);
 
             highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? SelAction.areaEvenY : SelAction.areaOddY);
 

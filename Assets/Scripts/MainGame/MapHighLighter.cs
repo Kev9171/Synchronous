@@ -72,7 +72,7 @@ namespace KWY
             hlMap.SetTransformMatrix(baseTilePos, height);
         }
 
-            public void ClearHighlight()
+        public void ClearHighlight()
         {
             //Vector3 pos = new Vector3(0, 0, 0);
             //Vector3Int range;

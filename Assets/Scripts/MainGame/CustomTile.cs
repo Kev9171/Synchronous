@@ -32,11 +32,11 @@ namespace KWY {
             localTPos = position;
             worldTPos = tilemap.GetComponent<Tilemap>().CellToWorld(position);
             //tilePos = position;
-            charCount = getCharCount();
+            charCount = getCharCount().Count;
             return base.StartUp(position, tilemap, go);
         }
 
-        public int getCharCount()
+        public List<GameObject> getCharCount()
         {
             int count = 0;
             if(characters != null)
@@ -64,7 +64,7 @@ namespace KWY {
             }
             
 
-            return count;
+            return characters;
         }
 
         public void setTileSize(Vector3Int position)
