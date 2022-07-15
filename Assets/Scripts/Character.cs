@@ -180,7 +180,8 @@ namespace KWY
             Cb = _characterBase;
             Buffs = new List<Buff>();
 
-            Debug.Log(this);
+            // for test
+            //Buffs.Add(new Buff(BuffManager.GetData(BID.Burn), 2));
         }
 
         void Update()

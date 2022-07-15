@@ -8,12 +8,6 @@ namespace KWY
     public class GameManager : MonoBehaviour
     {
         [SerializeField]
-        private GameObject TurnCanvas;
-
-        [SerializeField]
-        private GameObject SimulCanvas;
-
-        [SerializeField]
         private GameObject mainCamera;
 
         [SerializeField]
@@ -25,145 +19,108 @@ namespace KWY
         [SerializeField]
         private ShowNowAction showActions;
 
+        [SerializeField]
+        private PlayerMPPanel playerMpPanel;
+
+        [SerializeField]
+        private PlayerSkillPanel playerSkillPanel;
+
+        [SerializeField]
+        private TurnReady turnReady;
+
+        [SerializeField]
+        private Simulation simulation;
+
+        int time = 0;
+        int tMax;
+        ActionData nowActionData;
+        STATE nowState = 0;
+
+        #region Public Methods
+
+        /// <summary>
+        /// 플레이어 MP 값 변경이 이 함수를 통해서 가능 (UI 업데이트 포함하는 함수)
+        /// </summary>
+        /// <param name="value">변경할 값(+, -)</param>
+        public void UpdatePlayerMP(int value)
+        {
+            data.UpdatePlayerMP(value);
+
+            // update UI
+            playerMpPanel.UpdateUI();
+
+            if (nowState == STATE.Simul)
+            {
+                playerSkillPanel.UpdateUI();
+            }
+        }
+
         public void SetState(int state, params object[] data)
         {
             switch(state)
             {
                 case 0: // turn ready
                     TurnReadyState();
+                    nowState = STATE.TurnReady;
                     break;
                 case 1: // start simul
+                    nowState = STATE.Simul;
                     if (PhotonNetwork.IsMasterClient)
                     {
                         SimulationState();
-                        Simulation(new ActionData((Dictionary<int, object[]>)data[0]));
+                        simulation.StartSimulation(new ActionData((Dictionary<int, object[]>)data[0]));
                     } 
                     else
                         SimulationState();
                     break;
                 case 2: // game over
+                    nowState = STATE.GameOver;
                     break;
             }
         }
 
-        
-
-        public void SetCameraOnTurnReady()
-        {
-            Debug.Log("Move Camera to TurnReady");
-            mainCamera.GetComponent<CameraController>().SetCameraTurnReady();
-        }
-
-        public void SetCameraOnSimul()
-        {
-            Debug.Log("Move Camera to Simul");
-            mainCamera.GetComponent<CameraController>().SetCameraSimul();
-        }
-
+        #endregion
 
         #region Private Methods
 
         private void TurnReadyState()
         {
-            SimulCanvas.SetActive(false);
-            TurnCanvas.SetActive(true);
+            simulation.EndSimulationState();
 
             // 카메라 이동
-            SetCameraOnTurnReady();
+            mainCamera.GetComponent<CameraController>().SetCameraTurnReady();
 
             // mp 추가
             // player
-            data.PlayerMp += data.playerMPIncrement;
-
-            TurnCanvas.GetComponent<UIControlReady>().UpdateDataOnUI();
-            TurnCanvas.GetComponent<UIControlReady>().StartTurnReady();
-
-        }
-
-        private void SimulationState()
-        {
-            TurnCanvas.SetActive(false);
-            SimulCanvas.SetActive(true);
-            SetCameraOnSimul();
-        }
-
-        private void EndSimulation()
-        {
-            gameEvent.RaiseEventSimulEnd();
-        }
-
-        private void Simulation(ActionData actionData)
-        {
-            Debug.Log("simul start -- GameManger");
-            nowActionData = actionData;
-
-            tMax = -1;
-            foreach (int t in actionData.Data.Keys)
+            if (data.turnNum == 1)
             {
-                tMax = (t > tMax) ? t : tMax;
-            }
-            Debug.Log(tMax);
-            Debug.Log(actionData);
-
-            StartCoroutine("StartAction", 0);
-        }
-
-        int time = 0;
-        int tMax;
-        ActionData nowActionData;
-
-        IEnumerator StartAction(int time)
-        {
-            Debug.Log("StartAction at : " + time);
-            DoAction(time);
-            yield return new WaitForSeconds(1);
-
-            if (time <= tMax + 5)
-            {
-                StartCoroutine("StartAction", ++time);
+                UpdatePlayerMP((Resources.Load("MainGameLogicData", typeof(LogicData)) as LogicData).playerInitialMp);
             }
             else
             {
-                EndSimulation();
+                UpdatePlayerMP((Resources.Load("MainGameLogicData", typeof(LogicData)) as LogicData).playerMPIncrement);
             }
+
+            // 순서 확인 필요
+            turnReady.ResetUI();
+            turnReady.UpdateUI();
+            turnReady.StartTurnReadyState();
         }
 
-        private void DoAction(int time)
+        /// <summary>
+        /// Set mode from TurnReady to Simul
+        /// </summary>
+        private void SimulationState()
         {
-            if (nowActionData.Data.TryGetValue(time, out var value))
-            {
-                foreach(object[] d in value)
-                {
-                    int cid = (int) d[0];
+            turnReady.EndTurnReadyState();
 
-                    ActionType type = (ActionType)d[1];
+            data.turnNum++;
 
-                    if (type == ActionType.Move)
-                    {
-                        StartCoroutine(DoCharaMove(cid, new Vector2Int((int)d[2], (int)d[3])));
-                    }
-                    else if (type == ActionType.Skill)
-                    {
-                        StartCoroutine(DoCharaSkill(cid, (SID)d[2], (SkillDicection)d[3]));
-                    }
-                }
-            }
+            mainCamera.GetComponent<CameraController>().SetCameraSimul();
+
+            simulation.UpdateUI();
+            simulation.StartSimulationState();
         }
-
-        IEnumerator DoCharaMove(int cid, Vector2Int v)
-        {
-            data.WholeCharacters[cid].MoveTo(v);
-            showActions.ShowMoveLog(cid);
-            yield return null;
-        }
-
-        IEnumerator DoCharaSkill(int cid, SID sid, SkillDicection dir)
-        {
-            data.WholeCharacters[cid].SpellSkill(sid, dir);
-            showActions.ShowSkillLog(cid, sid);
-            yield return null;
-        }
-
 
         #endregion
 
@@ -171,11 +128,12 @@ namespace KWY
 
         private void Start()
         {
-            // test code
-            SimulCanvas.SetActive(false);
-            TurnCanvas.SetActive(true);
+            data.LoadData();
 
-            mainCamera.GetComponent<CameraController>().SetCameraTurnReady();
+            turnReady.Init();
+            simulation.Init();
+
+            SetState(0);
         }
 
         #endregion

@@ -1035,6 +1035,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ReadyBtn: {fileID: 2108649753}
+  readyTxt: {fileID: 2000868504}
 --- !u!4 &1594742178
 Transform:
   m_ObjectHideFlags: 0

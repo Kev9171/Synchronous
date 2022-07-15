@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fca37fc5bbea024a93a4275027d4bec, type: 3}
   m_Name: MainGameLogicData
   m_EditorClassIdentifier: 
+  playerInitialMp: 3
   playerMPIncrement: 2
   characterMPIncrement: 3
-  timeLimit: 30
+  timeLimit: 20
   actionLogShowingTime: 2.5
+  simulationIntervalSeconds: 1
