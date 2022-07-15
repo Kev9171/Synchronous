@@ -14,10 +14,10 @@ namespace KWY
         Image icon;
 
         PlayerSkillBase psb;
-        private GameObject playerSkillInfoPanel;
 
         [Tooltip("Info 띄우는데 필요한 최소 클릭 시간; move 일 경우 없음")]
         public float minClickTime = 1;
+
 
         #region Private Fields
 
@@ -34,14 +34,21 @@ namespace KWY
             this.psb = psb;
         }
 
-        public void SetPanelRef(GameObject playerSkillInfoPanel)
-        {
-            this.playerSkillInfoPanel = playerSkillInfoPanel;
-        }
-
         public void OnClickUseSkill()
         {
-            Debug.Log("스킬 발동");
+            MainGameData data = GameObject.Find("GameData").GetComponent<MainGameData>();
+
+            if (data.PlayerMp >= psb.cost)
+            {
+                GameManager gm = GameObject.Find("GameManager").GetComponent<GameManager>();
+                gm.UpdatePlayerMP(-psb.cost);
+
+                Debug.Log("스킬 발동");
+            }
+            else 
+            {
+                Debug.Log("마나 부족");
+            }
         }
 
         public void ButtonUp()
@@ -50,8 +57,8 @@ namespace KWY
 
             if (clickTime >= minClickTime)
             {
-                playerSkillInfoPanel.GetComponent<PlayerSkillInfoPanel>().SetData(psb);
-                playerSkillInfoPanel.SetActive(true);
+                GameObject canvas = GameObject.Find("UICanvas");
+                PanelBuilder.ShowPlayerSkillInfoPanel(canvas.transform, psb);
             }
             else
             {

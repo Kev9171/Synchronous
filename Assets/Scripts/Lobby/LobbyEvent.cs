@@ -72,8 +72,6 @@ namespace KWY
         /// <param name="eventData">Received data from the server</param>
         private void OnEvent(EventData eventData)
         {
-            UtilForDebug.LogData(eventData);
-
             switch (eventData.Code)
             {
                 case (byte)EvCode.ResLobbyReady:

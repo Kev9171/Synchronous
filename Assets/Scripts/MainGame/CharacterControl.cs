@@ -21,7 +21,7 @@ namespace KWY
         MapHighLighter highLighter;
 
         [SerializeField]
-        UIControlReady turnReadyUI;
+        TurnReady turnReady;
 
 
         public Character SelChara { get; private set; }
@@ -79,7 +79,7 @@ namespace KWY
                 // 이동 넣었을 경우 하이라이트를 위한 임시 좌표 변경
                 SelChara.SetTilePos(clickV);
 
-                turnReadyUI.UpdateCharaActions(SelChara.Cb.cid);
+                turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                 SetSelClear();
 
                 mouseInput.Mouse.MouseClick.performed += OnClick;
@@ -118,7 +118,7 @@ namespace KWY
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Right);
 
-                    turnReadyUI.UpdateCharaActions(SelChara.Cb.cid);
+                    turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                     SetSelClear();
 
                     mouseInput.Mouse.MouseClick.performed += OnClick;
@@ -138,7 +138,7 @@ namespace KWY
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Left);
 
-                    turnReadyUI.UpdateCharaActions(SelChara.Cb.cid);
+                    turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                     SetSelClear();
 
                     mouseInput.Mouse.MouseClick.performed += OnClick;

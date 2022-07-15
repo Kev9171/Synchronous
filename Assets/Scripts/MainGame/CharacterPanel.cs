@@ -22,12 +22,12 @@ namespace KWY
         Image charaImg;
 
         [SerializeField]
-        GameObject hpBar;
+        Slider hpBar;
         [SerializeField]
         TMP_Text hpLabel;
 
         [SerializeField]
-        GameObject mpBar;
+        Slider mpBar;
         [SerializeField]
         TMP_Text mpLabel;
 
@@ -46,11 +46,6 @@ namespace KWY
         [Tooltip("0 ~ 2 (위에서 부터)")]
         [SerializeField]
         int nthCharacter;
-
-        private GameObject buffInfoPanel;
-
-
-        private GameObject characterInfoPanel;
 
         #region Private Fields
 
@@ -72,29 +67,20 @@ namespace KWY
         public void SetData(CharacterBase cb, List<Buff> buffList)
         {
             nameLabel.text = cb.characterName;
-            UpdateHP(cb.hp);
-            UpdateMP(0);
-
-            // Set data to infopanel
-            // need
 
             charaImg.sprite = cb.icon;
 
             LoadBuffs(buffList);
 
             this.cb = cb;
+
+            UpdateHP(cb.hp);
+            UpdateMP(0);
         }
 
-        public void SetPanelRef(GameObject charaInfo, GameObject buffInfo)
+        public void UpdateUI(Character c)
         {
-            buffInfoPanel = buffInfo;
-            characterInfoPanel = charaInfo;
-            buffInfoPanel.SetActive(false);
-            characterInfoPanel.SetActive(false);
-        }
-
-        public void UpdateData(Character c)
-        {
+            Debug.Log(c);
             if (c.BreakDown)
             {
                 selectable = false;
@@ -113,24 +99,22 @@ namespace KWY
             SetSelActionImg(-1, null);
         }
 
-
         public void UpdateHP(float hp)
         {
-            // bar 관련 처리 필요
-            hpLabel.text = hp.ToString();
+            hpLabel.text = hp.ToString() + "/" + cb.hp.ToString();
+            hpBar.value = hp / cb.hp;
         }
 
         public void UpdateMP(float mp)
         {
-            // bar 관련 처리 필요
-            mpLabel.text = mp.ToString();
+            mpLabel.text = mp.ToString() + "/10";
+            mpBar.value = mp / 10;
         }
-
 
         public void AddBuff(BuffBase bb, int nTurn)
         {
             GameObject bPanel = Instantiate(buffPanelPrefab, buffPanel.transform);
-            bPanel.GetComponent<BuffPanel>().SetData(bb, nTurn, buffInfoPanel);
+            bPanel.GetComponent<BuffPanel>().SetData(bb, nTurn);
             buffPanelLists.Add(bPanel);
         }
 
@@ -152,8 +136,8 @@ namespace KWY
         /// </summary>
         public void CharaInfoBtnOnClick()
         {
-            characterInfoPanel.GetComponent<CharacterInfoPanel>().SetData(cb);
-            characterInfoPanel.SetActive(true);
+            GameObject canvas = GameObject.Find("UICanvas");
+            PanelBuilder.ShowCharacterInfoPanel(canvas.transform, cb);
         }
 
         public void SetSelActionImg(int nth, Sprite icon)
@@ -187,6 +171,17 @@ namespace KWY
             charaControl.SetSelChara(cb.cid);
         }
 
+        /// <summary>
+        /// SetActive(false)가 되면 find 할 수 없으므로 SetActive(false)가 되기 전에 호출하여 참조 넣기
+        /// </summary>
+        /// <param name="characterInfoPanel">CharacterInfoPanel</param>
+        /// <param name="buffInfoPanel">BuffInfoPanel</param>
+        public void LoadInfoPanel(GameObject characterInfoPanel, GameObject buffInfoPanel)
+        {
+            //this.characterInfoPanel = characterInfoPanel;
+            //this.buffInfoPanel = buffInfoPanel;
+        }
+
         #endregion
 
         #region Private Methods
@@ -212,20 +207,6 @@ namespace KWY
             }
         }
 
-
-
-        #endregion
-
-
-        #region MonoBehaviour CallBacks
-
-        private void Start()
-        {
-            
-        }
-
-        #endregion
-
-        
+        #endregion        
     }
 }

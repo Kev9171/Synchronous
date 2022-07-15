@@ -226,6 +226,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   costLabel: {fileID: 2816787750996143841}
   icon: {fileID: 2816787751648910930}
+  psp: {fileID: 3023831340802591439, guid: 7c51e4e5137bd5c4b8213ee9a2dbeeb8, type: 3}
   minClickTime: 1
 --- !u!114 &2014451614452840489
 MonoBehaviour:

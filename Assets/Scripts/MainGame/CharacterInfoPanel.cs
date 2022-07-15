@@ -5,7 +5,7 @@ using UnityEngine.UI;
 namespace KWY
 {
     [RequireComponent(typeof(CanvasRenderer))]
-    public class CharacterInfoPanel : MonoBehaviour
+    public class CharacterInfoPanel : MonoBehaviour, IInstantiatableUI
     {
         [SerializeField]
         Image icon;
@@ -29,9 +29,6 @@ namespace KWY
         [SerializeField]
         TMP_Text passiveExLabel;
 
-        [SerializeField]
-        GameObject containerPanel;
-
         public void SetData(CharacterBase cb)
         {
             icon.sprite = cb.icon;
@@ -44,10 +41,14 @@ namespace KWY
             passiveExLabel.text = cb.passiveEx;
         }
 
-        
-        public void OnClickSetInvisible()
+        public void Init()
         {
-            containerPanel.SetActive(false);
+            // empty
+        }
+
+        public void OnClickClose()
+        {
+            Destroy(gameObject);
         }
     }
 }

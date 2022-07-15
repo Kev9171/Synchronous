@@ -10,9 +10,6 @@ namespace KWY
     {
         public Image image;
         public TMP_Text costText;
-        public TMP_Text orderText;
-
-        GameObject skillInfoPanel;
 
         [Tooltip("Info 띄우는데 필요한 최소 클릭 시간; move 일 경우 없음")]
         public float minClickTime = 1;
@@ -26,30 +23,11 @@ namespace KWY
         
         #endregion
 
-        public void SetValue(ActionBase ab, int order)
+        public void SetData(ActionBase ab)
         {
             image.sprite = ab.icon;
             costText.text = ab.cost.ToString();
-            SetOrder(order);
-
             this.ab = ab;
-        }
-
-        public void SetPanelRef(GameObject skillInfoPanel)
-        {
-            this.skillInfoPanel = skillInfoPanel;
-        }
-
-        public void SetOrder(int order)
-        {
-            if (order == -1)
-            {
-                orderText.text = "";
-            }
-            else
-            {
-                orderText.text = order.ToString();
-            }
         }
 
         public void OnClickSetOrder()
@@ -92,10 +70,15 @@ namespace KWY
         {
             isClick = false;
 
-            if (ab is SkillBase @base && clickTime >= minClickTime)
+            if (clickTime >= minClickTime)
             {
-                skillInfoPanel.GetComponent<SkillInfoPanel>().SetData(@base);
-                skillInfoPanel.SetActive(true);
+                // move 는 정보 안보여줌
+                if (ab is SkillBase @base)
+                {
+                    GameObject canvas = GameObject.Find("UICanvas");
+
+                    PanelBuilder.ShowSkillInfoPanel(canvas.transform, @base);
+                }
             }
             else
             {

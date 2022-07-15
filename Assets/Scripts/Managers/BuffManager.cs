@@ -18,8 +18,7 @@ namespace KWY
             if (!loaded) FirstInitialize();
             if (BuffData.TryGetValue(bid, out var value))
             {
-                Debug.Log("Found value on " + bid + ": " + value);
-                Debug.Log("Hash: " + value.GetHashCode());
+                //Debug.Log("Found value on " + bid + ": " + value);
                 return value;
             }
             else

@@ -625,7 +625,7 @@ GameObject:
   - component: {fileID: 8628524526940866125}
   m_Layer: 5
   m_Name: SkillInfoPanel
-  m_TagString: Untagged
+  m_TagString: SkillInfoPanel
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -706,7 +706,6 @@ MonoBehaviour:
   costLabel: {fileID: 8925445621557648211}
   skillExLabel: {fileID: 4868432415152529798}
   skillImg: {fileID: 9156248674265350107}
-  containerPanel: {fileID: 4006831976910603606}
 --- !u!114 &8628524526940866125
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -753,7 +752,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 4305176295215314499}
         m_TargetAssemblyTypeName: KWY.SkillInfoPanel, Assembly-CSharp
-        m_MethodName: OnClickSetInvisible
+        m_MethodName: OnClickClose
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

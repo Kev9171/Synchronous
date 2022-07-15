@@ -5,7 +5,7 @@ using UnityEngine.UI;
 namespace KWY
 {
     [RequireComponent(typeof(CanvasRenderer))]
-    public class PlayerSkillInfoPanel : MonoBehaviour
+    public class PlayerSkillInfoPanel : MonoBehaviour, IInstantiatableUI
     {
         [SerializeField]
         Image icon;
@@ -22,9 +22,19 @@ namespace KWY
         [SerializeField]
         GameObject containerPanel;
 
+        #region IInstantiatableUI 
+
+        public void Init()
+        {
+            // empty
+        }
+
+        #endregion
+
         public void OnClickClose()
         {
-            containerPanel.SetActive(false);
+            //containerPanel.SetActive(false);
+            Destroy(gameObject);
         }
 
         internal void SetData(PlayerSkillBase psb)
@@ -34,7 +44,5 @@ namespace KWY
             exLabel.text = psb.skillExplanation;
             costLabel.text = psb.cost.ToString();
         }
-
-        
     }
 }

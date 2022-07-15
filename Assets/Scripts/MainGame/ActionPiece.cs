@@ -36,7 +36,6 @@ namespace KWY
             if (time > activeDuraction)
             {
                 Destroy(gameObject);
-                //PhotonNetwork.Destroy(gameObject);
             }
         }
         #endregion

@@ -9,7 +9,7 @@ namespace KWY
     public class TurnReadyBtn : MonoBehaviour
     {
         [SerializeField]
-        UIControlReady uiControlReady;
+        TurnReady turnReady;
 
         [SerializeField]
         TMP_Text ReadyText;
@@ -21,7 +21,7 @@ namespace KWY
         public void SendReadyState()
         {
             // ready 되었을 때 실행
-            uiControlReady.OnClickTurnReady();
+            turnReady.OnClickTurnReady();
 
             // ready 버튼 이미지 변경 or 텍스트 변경
             this.GetComponent<Image>().color = IsReadyColor;

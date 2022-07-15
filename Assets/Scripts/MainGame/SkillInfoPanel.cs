@@ -5,7 +5,7 @@ using UnityEngine.UI;
 namespace KWY
 {
     [RequireComponent(typeof(CanvasRenderer))]
-    public class SkillInfoPanel : MonoBehaviour
+    public class SkillInfoPanel : MonoBehaviour, IInstantiatableUI
     {
         [SerializeField]
         Image skillIcon;
@@ -25,9 +25,6 @@ namespace KWY
         [SerializeField]
         Image skillImg;
 
-        [SerializeField]
-        GameObject containerPanel;
-
         public void SetData(SkillBase sb)
         {
             skillIcon.sprite = sb.icon;
@@ -45,7 +42,11 @@ namespace KWY
 
         public void OnClickClose()
         {
-            containerPanel.SetActive(false);
+            Destroy(gameObject);
+        }
+
+        public void Init()
+        {
         }
     }
 }

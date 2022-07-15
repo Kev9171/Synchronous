@@ -7,35 +7,31 @@ namespace KWY
     [RequireComponent(typeof(CanvasRenderer))]
     public class PlayerMPPanel : MonoBehaviour
     {
-        // temp bar 구현 방법 찾아보기
-        [SerializeField]
-        private GameObject manaBar;
-
         [SerializeField]
         private Image playerImg;
 
         [SerializeField]
         private TMP_Text mpLabel;
 
+        [SerializeField]
+        private Slider mpBar;
+
         public void SetData(Sprite sprite, int mp)
         {
             playerImg.sprite = sprite;
-
-            // bar
-            UpdateMPBar();
-
-            mpLabel.text = mp.ToString();
+            UpdateMP(mp);
         }
 
-        public void UpdateData(int mp)
+        public void UpdateUI()
         {
-            mpLabel.text = mp.ToString();
-            UpdateMPBar();
+            int mp = GameObject.Find("GameData").GetComponent<MainGameData>().PlayerMp;
+            UpdateMP(mp);
         }
 
-        private void UpdateMPBar()
+        private void UpdateMP(int mp)
         {
-
+            mpLabel.text = mp.ToString();
+            mpBar.value = mp / (float)10;
         }
     }
 }

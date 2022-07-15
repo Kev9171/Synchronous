@@ -13,19 +13,16 @@ namespace KWY
         [SerializeField]
         TMP_Text turnLabel;
 
-        [Tooltip("buff 정보를 띄우는 UI Panel; Character Panel 로부터 값 할당 받아서 사용")]
         GameObject buffInfoPanel;
 
         private int turn;
         private BuffBase buffBase;
 
-        public void SetData(BuffBase bb, int turn, GameObject infoPanel)
+        public void SetData(BuffBase bb, int turn)
         {
             icon.sprite = bb.icon;
             turnLabel.text = turn.ToString();
             this.turn = turn;
-
-            buffInfoPanel = infoPanel;
 
             buffBase = bb;
         }
@@ -51,20 +48,23 @@ namespace KWY
 
         public void ButtonUp()
         {
-            buffInfoPanel.SetActive(false);
+            //buffInfoPanel.SetActive(false);
+            Destroy(buffInfoPanel);
         }
 
         public void ButtonDown()
         {
-            buffInfoPanel.GetComponent<BuffInfoPanel>().SetText(buffBase.explanation);
-            buffInfoPanel.SetActive(true);
+            GameObject canvas = GameObject.Find("UICanvas");
+            buffInfoPanel =  PanelBuilder.ShowBuffInfoPanel(canvas.transform, buffBase);
+            //buffInfoPanel.GetComponent<BuffInfoPanel>().SetData(buffBase.explanation);
+            //buffInfoPanel.SetActive(true);
         }
 
         #region MonoBehaviour CallBacks
 
         private void Start()
         {
-            buffInfoPanel.SetActive(false);
+            buffInfoPanel = GameObject.FindGameObjectWithTag("BuffInfoPanel");
         }
 
         #endregion
