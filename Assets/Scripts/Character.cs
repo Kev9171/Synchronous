@@ -24,7 +24,8 @@ namespace KWY
         [SerializeField] private float movementSpeed;
         private Vector2 destination;
 
-        private Tilemap map;
+        private Tilemap map, hlMap;
+        private TilemapControl fTiles;
 
         private bool nowMove = false;
 
@@ -148,6 +149,8 @@ namespace KWY
         public void MoveTo(Vector2Int dir)
         {
             map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
+            hlMap = GameObject.Find("HighlightTilemap").GetComponent<Tilemap>();
+            fTiles = GameObject.Find("SecondTiles").GetComponent<TilemapControl>();
 
             Vector2Int realDir = TransFromY(dir);
             Vector3Int nowPos = map.WorldToCell(this.transform.position);
@@ -157,11 +160,47 @@ namespace KWY
             {
                 destination = des;
                 nowMove = true;
+
+                //Matrix4x4 groundTile = Matrix4x4.TRS(new Vector3(0, 0f, 0), Quaternion.Euler(0f, 0f, 0f), Vector3.one);
+                //Matrix4x4 elevatedTile = Matrix4x4.TRS(new Vector3(0, 0.2f, 0), Quaternion.Euler(0f, 0f, 0f), Vector3.one/*scale 조정*/);
+
+                List<GameObject> charsOnDes = map.GetTile<CustomTile>(map.WorldToCell(des)).getCharCount();
+                List<GameObject> charsOnCur = map.GetTile<CustomTile>(nowPos).getCharCount();
+
+                if (charsOnDes.Count > 1)
+                {
+                    //map.SetTransformMatrix(map.WorldToCell(des), elevatedTile);
+                    //hlMap.SetTransformMatrix(map.WorldToCell(des), elevatedTile);
+                    map.SetTileFlags(map.WorldToCell(des), TileFlags.None);
+                    map.SetColor(map.WorldToCell(des), new Color(1, 1, 1, 0));
+
+                    Sprite sprite = map.GetTile<CustomTile>(map.WorldToCell(des)).sprite;
+                    fTiles.activateTile(des, charsOnDes.Count, sprite);
+
+                    foreach (GameObject chara in charsOnDes)
+                    {
+                        Vector3 charPos = chara.transform.position;
+                        chara.transform.position += new Vector3(-0.1f, 0.5f, 0);
+                        chara.GetComponent<BoxCollider>().center -= new Vector3(-0.1f, 0.5f, 0); //임시값; 벡터값 그룹 필요
+                    }
+                }
+
+                if (charsOnCur.Count < 2)
+                {
+                    //map.SetTransformMatrix(map.WorldToCell(des), groundTile);
+                    //hlMap.SetTransformMatrix(map.WorldToCell(des), groundTile);
+
+                    map.SetTileFlags(nowPos, TileFlags.None);
+                    map.SetColor(nowPos, new Color(1, 1, 1, 1));
+
+                    fTiles.deactivateTile(map.CellToWorld(nowPos));
+                }
+
                 Debug.LogFormat("{0} / {1} is moving to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, map.WorldToCell(des));
             }
             else
             {
-                Debug.LogFormat("{0} / {1} can not go to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, map.WorldToCell(des));         
+                Debug.LogFormat("{0} / {1} can not go to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, map.WorldToCell(des));
             }
         }
 
@@ -179,8 +218,6 @@ namespace KWY
         {
             Cb = _characterBase;
             Buffs = new List<Buff>();
-
-            Debug.Log(this);
         }
 
         void Update()
@@ -188,6 +225,8 @@ namespace KWY
             if (nowMove)
             {
                 transform.position = Vector3.Lerp(gameObject.transform.position, destination, 0.7f);
+                if (transform.position == new Vector3(destination.x, destination.y, 0))
+                    nowMove = false;
             }
             else
             {

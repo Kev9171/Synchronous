@@ -67,9 +67,14 @@ namespace KWY
             }
         }
 
+        public void ChangeTileHeight(Vector3Int baseTilePos, Matrix4x4 height)
+        {
+            hlMap.SetTransformMatrix(baseTilePos, height);
+        }
+
         public void ClearHighlight()
         {
-            Vector3 pos = new Vector3(0, 0, 0);
+            /*Vector3 pos = new Vector3(0, 0, 0);
             Vector3Int range;
             for (float i = -4; i < 5; i += 0.5f)
             {
@@ -80,6 +85,17 @@ namespace KWY
                     range = hlMap.WorldToCell(pos);
                     this.hlMap.SetTileFlags(range, TileFlags.None);
                     this.hlMap.SetColor(range, transparent);
+                }
+            }*/
+
+            foreach (var pos in hlMap.cellBounds.allPositionsWithin)
+            {
+                Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
+                Vector3 place = hlMap.CellToWorld(localPlace);
+                if (hlMap.HasTile(localPlace))
+                {
+                    hlMap.SetTileFlags(localPlace, TileFlags.None);
+                    hlMap.SetColor(localPlace, transparent);
                 }
             }
         }
