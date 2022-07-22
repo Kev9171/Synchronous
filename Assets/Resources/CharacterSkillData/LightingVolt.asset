@@ -29,3 +29,7 @@ MonoBehaviour:
   casters: 02000000
   skillExplanation: Lighting Volt!!!!!!
   skillExImg: {fileID: 21300000, guid: 6baebaaa74a5b92469b0df54ffb02161, type: 3}
+  distance: []
+  directions: 
+  areaAttack: 1
+  area: {fileID: 2418642603031395723, guid: d93befd5a3ac80543b77e7a71c48766e, type: 3}

@@ -24,6 +24,9 @@ namespace KWY
         [SerializeField]
         RayTest ray;
 
+        //[SerializeField]
+        //skillSpawner skillSpawner;
+
 
         public Character SelChara { get; private set; }
         public ActionBase SelAction { get; private set; }
@@ -33,6 +36,8 @@ namespace KWY
         MouseInput mouseInput;
 
         private int SelOk = 0; // 음수: left, 양수: right -> |2| 가 되었을 때 액션 확정
+
+        private skillSpawner skillSpawner;
         #endregion
 
         #region Public Methods
@@ -105,9 +110,10 @@ namespace KWY
             Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
 
             // 클릭 된 좌표 맵 좌표로 변환
-            float clickX = map.WorldToCell(Camera.main.ScreenToWorldPoint(mousePosition)).x;
+            int clickX = map.WorldToCell(Camera.main.ScreenToWorldPoint(mousePosition)).x;
+            int clickY = map.WorldToCell(Camera.main.ScreenToWorldPoint(mousePosition)).y;
             float charaX = SelChara.TempTilePos.x;
-
+            skillSpawner = ((SkillBase)SelAction).area;
 
             // 클릭 된 좌표가 선택된 캐릭터의 오른쪽 있다면 왼쪽 하이라이트 및 방향 선택
             if (charaX < clickX)
@@ -119,9 +125,16 @@ namespace KWY
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Right);
 
-                    //ray.Ray(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), (int)Direction.TopRight);
-                    //ray.MultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, true, ((SkillBase)SelAction).directions.Count);
-                    ray.CurvedMultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, true, ((SkillBase)SelAction).directions.Count);
+                    if(((SkillBase)SelAction).areaAttack)
+                    {
+                        Vector3Int v = new Vector3Int(clickX, clickY, 0);
+                        skillSpawner.Activate(map.CellToWorld(v));
+                        skillSpawner.Destroy(((SkillBase)SelAction).triggerTime);   // triggerTime만큼 스킬 지속후 삭제
+                    }
+                    else
+                    {
+                        ray.CurvedMultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, true, ((SkillBase)SelAction).directions.Count);
+                    }
 
                     turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                     SetSelClear();
@@ -143,9 +156,16 @@ namespace KWY
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Left);
 
-                    //ray.Ray(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), (int)Direction.TopLeft);
-                    //ray.MultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, false, ((SkillBase)SelAction).directions.Count);
-                    ray.CurvedMultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, false, ((SkillBase)SelAction).directions.Count);
+                    if (((SkillBase)SelAction).areaAttack)
+                    {
+                        Vector3Int v = new Vector3Int(clickX, clickY, 0);
+                        skillSpawner.Activate(map.CellToWorld(v));
+                        skillSpawner.Destroy(((SkillBase)SelAction).triggerTime);
+                    }
+                    else
+                    {
+                        ray.CurvedMultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, false, ((SkillBase)SelAction).directions.Count);
+                    }
 
                     turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                     SetSelClear();
@@ -294,7 +314,6 @@ namespace KWY
         void Update()
         {
         }
-
         #endregion
     }
 }
