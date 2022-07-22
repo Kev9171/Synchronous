@@ -1196,7 +1196,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1909958091}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: KWY.LobbyEvent, Assembly-CSharp
         m_MethodName: RaiseEventReady
         m_Mode: 1
@@ -1993,7 +1993,6 @@ MonoBehaviour:
   _skillManager: {fileID: 0}
   _buffManager: {fileID: 0}
   playerSkillManager: {fileID: 0}
-  _userManager: {fileID: 0}
   _moveManager: {fileID: 0}
 --- !u!4 &1438643930
 Transform:
@@ -3083,7 +3082,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1909958092}
-  - component: {fileID: 1909958091}
   m_Layer: 0
   m_Name: LobbyEvent
   m_TagString: Untagged
@@ -3091,20 +3089,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1909958091
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1909958090}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 77d959a9e40e29a4fb35446359699f9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ReadyBtn: {fileID: 842244962}
-  readyTxt: {fileID: 1768962506}
 --- !u!4 &1909958092
 Transform:
   m_ObjectHideFlags: 0

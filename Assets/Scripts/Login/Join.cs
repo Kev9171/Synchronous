@@ -38,6 +38,9 @@ namespace KWY
         [SerializeField]
         Sprite CheckNoImg;
 
+        [SerializeField]
+        GameObject SelectPanel;
+
         #region Private Fields
 
         private bool[] JoinCondition = new bool[3];
@@ -47,6 +50,7 @@ namespace KWY
         #region Constant Fields
 
         const string IdCheckFailed = "Unavaiable Id, check again!";
+        const string WelcomeUser = "Join completed! Login please.";
 
         #endregion
 
@@ -97,7 +101,7 @@ namespace KWY
             }
         }
 
-        public void OnEndEditPwAgain()
+        public void OnPwAgainValueChagned()
         {
             // 위 비밀 번호 확인
             if (PwInput.text == PwCheckInput.text)
@@ -136,20 +140,26 @@ namespace KWY
             }
             else
             {
+                IdCheckImg.sprite = CheckNoImg;
+                JoinCondition[0] = false;
+
                 // 팝업창 띄우기
                 GameObject canvas = GameObject.Find("Canvas");
                 PopupBuilder.ShowPopup(canvas.transform, IdCheckFailed);
-
-                IdCheckImg.sprite = CheckNoImg;
-                JoinCondition[0] = false;
             }
         }
 
         public void OnClickJoinBtn()
         {
-            // 가입 확인
-            Debug.Log("Join!!!");
-            
+            GameObject canvas = GameObject.Find("Canvas");
+            PopupBuilder.ShowPopup(canvas.transform, WelcomeUser, JoinedCompleteCallback, true);
+
+            SelectPanel.SetActive(true);
+        }
+
+        public void JoinedCompleteCallback()
+        {
+            gameObject.SetActive(false);
         }
 
         #endregion

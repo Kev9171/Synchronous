@@ -9,7 +9,7 @@ namespace KWY
         public void OnClickSettingBtn()
         {
             GameObject canvas = GameObject.Find("UICanvas");
-            PanelBuilder.ShowSettingPanel(canvas.transform, new Object { });
+            PopupBuilder.ShowSettingPanel(canvas.transform, new Object { });
         }
     }
 }

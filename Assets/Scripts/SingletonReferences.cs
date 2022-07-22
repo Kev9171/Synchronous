@@ -20,8 +20,5 @@ public class SingletonReferences : MonoBehaviour
     private KWY.PlayerSkillManager playerSkillManager;
 
     [SerializeField]
-    private KWY.UserManager _userManager;
-
-    [SerializeField]
     private KWY.MoveManager _moveManager;
 }

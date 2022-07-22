@@ -4,9 +4,30 @@ using UnityEngine;
 
 namespace KWY
 {
-    [CreateAssetMenu(fileName = "UserManager", menuName = "Singletons/UserManager")]
-    public class UserManager : SingletonScriptableObject<UserManager>
+    public class UserManager : MonoBehaviour
     {
+        static GameObject _userData;
+        static GameObject userData { get { return _userData; } }
+
+        static UserManager _instance;
+
+        public static UserManager Instance
+        {
+            get
+            {
+                if (!_instance)
+                {
+                    _userData = new GameObject
+                    {
+                        name = "UserData"
+                    };
+                    _instance = userData.AddComponent(typeof(UserManager)) as UserManager;
+                    DontDestroyOnLoad(_userData);
+                }
+                return _instance;
+            }
+        }
+
         private string _accountId; // °íÀ¯°ª
         private Sprite _userIcon;
         private int _userLevel;

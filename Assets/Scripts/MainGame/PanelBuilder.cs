@@ -56,18 +56,6 @@ namespace KWY
             return buffInfoPanel;
         }
 
-        public static void ShowSettingPanel(Transform parent, Object o)
-        {
-            GameObject settingPanel = GameObject.Instantiate(
-                Resources.Load(
-                    "Prefabs/UI/Game/SettingPanel",
-                    typeof(GameObject)
-                    )) as GameObject;
-
-            settingPanel.transform.SetParent(parent, false);
-            settingPanel.GetComponent<SettingPanel>().SetData(o);
-        }
-
         // 아직 미완성 인자 확인 필요
         public static void ShowWinPanel(Transform parent, Object o)
         {

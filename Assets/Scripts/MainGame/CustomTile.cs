@@ -32,7 +32,7 @@ namespace KWY {
             localTPos = position;
             worldTPos = tilemap.GetComponent<Tilemap>().CellToWorld(position);
             //tilePos = position;
-            charCount = getCharCount().Count;
+            charCount = getCharCount().Count; // 에디터 오픈 시 null error
             return base.StartUp(position, tilemap, go);
         }
 
