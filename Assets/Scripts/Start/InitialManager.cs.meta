@@ -1,9 +1,5 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Assets/Scripts/ConstantValue.cs.meta
-guid: cab30e3691e3e944d9a669a090a4687c
-========
-guid: a9573d8fedf87304e83fed9baf1b04fd
->>>>>>>> origin/K:Assets/Scripts/MainGame/CustomTile.cs.meta
+guid: 9085ea33a8cd56c46b80db9f53f7f51a
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2

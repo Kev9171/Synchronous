@@ -74,19 +74,19 @@ namespace KWY
 
         public void ClearHighlight()
         {
-            /*Vector3 pos = new Vector3(0, 0, 0);
-            Vector3Int range;
-            for (float i = -4; i < 5; i += 0.5f)
-            {
-                for (float j = -6; j < 6; j += 0.7f)
-                {
-                    pos.x = j;
-                    pos.y = i;
-                    range = hlMap.WorldToCell(pos);
-                    this.hlMap.SetTileFlags(range, TileFlags.None);
-                    this.hlMap.SetColor(range, transparent);
-                }
-            }*/
+            //Vector3 pos = new Vector3(0, 0, 0);
+            //Vector3Int range;
+            //for (float i = -4; i < 5; i += 0.5f)
+            //{
+            //    for (float j = -6; j < 6; j += 0.7f)
+            //    {
+            //        pos.x = j;
+            //        pos.y = i;
+            //        range = hlMap.WorldToCell(pos);
+            //        this.hlMap.SetTileFlags(range, TileFlags.None);
+            //        this.hlMap.SetColor(range, transparent);
+            //    }
+            //}
 
             foreach (var pos in hlMap.cellBounds.allPositionsWithin)
             {
@@ -98,6 +98,7 @@ namespace KWY
                     hlMap.SetColor(localPlace, transparent);
                 }
             }
+
         }
 
         private void Start()

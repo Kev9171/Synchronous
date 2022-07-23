@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Scripts/DataClasses/GamePlaySettingData.cs.meta
 guid: 1ebcd2992c966e444826980293f33dee
+========
+guid: 6f6ce30b351d9564a83b0286e5f7952a
+>>>>>>>> origin/K:Assets/Scripts/MainGame/PanelBuilder.cs.meta
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2

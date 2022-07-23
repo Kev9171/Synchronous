@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Scripts/Lobby/GameLobby.cs.meta
 guid: e683383331a66eb4a8b41f4f2cf9c090
+========
+guid: 1ebcd2992c966e444826980293f33dee
+>>>>>>>> origin/K:Assets/Scripts/DataClasses/GamePlaySettingData.cs.meta
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
