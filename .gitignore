@@ -80,3 +80,5 @@ ProjectSettings/EditorBuildSettings.asset
 
 Assets\Photon\PhotonUnityNetworking\Resources\PhotonServerSettings.asset
 UserSettings\EditorUserSettings.asset
+Assets/Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset
+UserSettings/EditorUserSettings.asset
