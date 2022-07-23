@@ -130,6 +130,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 141463992}
     m_Modifications:
+    - target: {fileID: 103546757369217082, guid: 2460382867b38be4199fa99d54ae47e4, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1445382690674112773, guid: 2460382867b38be4199fa99d54ae47e4, type: 3}
       propertyPath: m_Name
       value: Flappy
@@ -685,6 +689,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1692066141}
     m_Modifications:
+    - target: {fileID: 3435919291805832566, guid: 5415c2857bf979c4da96dd0893ed8283, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8399122764979910724, guid: 5415c2857bf979c4da96dd0893ed8283, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -1019,6 +1027,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1692066141}
     m_Modifications:
+    - target: {fileID: 103546757369217082, guid: 2460382867b38be4199fa99d54ae47e4, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1445382690674112773, guid: 2460382867b38be4199fa99d54ae47e4, type: 3}
       propertyPath: m_Name
       value: Flappy
@@ -1134,6 +1146,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1326943966758870590, guid: 321733babb0a6974f87b9f2df13e5837, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3782679816142068562, guid: 321733babb0a6974f87b9f2df13e5837, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -1689,6 +1705,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 141463992}
     m_Modifications:
+    - target: {fileID: 3435919291805832566, guid: 5415c2857bf979c4da96dd0893ed8283, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8399122764979910723, guid: 5415c2857bf979c4da96dd0893ed8283, type: 3}
       propertyPath: m_FlipX
       value: 1
@@ -1804,11 +1824,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2599970102110682174, guid: 853edebb3c649054299d76e93bafb548, type: 3}
       propertyPath: m_ColliderPaths.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5484015032998491275, guid: 853edebb3c649054299d76e93bafb548, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 853edebb3c649054299d76e93bafb548, type: 3}
@@ -1928,7 +1948,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerSkillBtnPrefab: {fileID: 2816787751648910935, guid: 4513d93a68b0a9e4496897189ea33e6f, type: 3}
-  data: {fileID: 0}
+  data: {fileID: 1447055416}
   canNotUseSkillColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1001 &1155410817
 PrefabInstance:
@@ -5583,7 +5603,6 @@ MonoBehaviour:
   _skillManager: {fileID: 11400000, guid: c1de5702fa954744cb8f34dda57c0090, type: 2}
   _buffManager: {fileID: 11400000, guid: 7cf82ee0358583b42943c697032a33a0, type: 2}
   playerSkillManager: {fileID: 11400000, guid: 685dfcb5bb0c68c4aa747a828431fcc9, type: 2}
-  _userManager: {fileID: 11400000, guid: b1c4c8f48f4e19b42b78a318f39bcb02, type: 2}
   _moveManager: {fileID: 11400000, guid: 9a188e2eec5bb9f4fa858ff3962ffe50, type: 2}
 --- !u!4 &1904048503
 Transform:
@@ -5666,6 +5685,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1326943966758870590, guid: 321733babb0a6974f87b9f2df13e5837, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3782679816142068562, guid: 321733babb0a6974f87b9f2df13e5837, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
