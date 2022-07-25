@@ -109,17 +109,20 @@ namespace KWY
         public void StartTimer()
         {
             time = 0;
+            CountDownText.gameObject.SetActive(true);
             StartCoroutine(Timer());
         }
 
         public void ResetTimer()
         {
             time = 0;
+            CountDownText.gameObject.SetActive(false);
         }
 
         public void StopTimer()
         {
             StopCoroutine(Timer());
+            CountDownText.gameObject.SetActive(false);
         }
 
         private void TimeOut()
@@ -169,9 +172,9 @@ namespace KWY
 
         public void OnLeaveRoomBtnClicked()
         {
-            PopupBuilder.ShowPopup(CanvasTransform, 
+            PopupBuilder.ShowPopup2(CanvasTransform, 
                 leaveRoomMsg,
-                OnLeaveRoomBtnClickedCallback, true);
+                OnLeaveRoomBtnClickedCallback);
         }
 
         public void OnSettingBtnClicked()
