@@ -27,6 +27,17 @@ namespace KWY
             popup.GetComponent<PopupPanel>().SetData(content, btnCallback, destroyGameobject);
         }
 
+        public static void ShowPopup2(Transform parent, string content, UnityAction okBtnCallback)
+        {
+            GameObject popup = GameObject.Instantiate(
+                Resources.Load("Prefabs/UI/PopupPanel2",
+                typeof(GameObject)
+                )) as GameObject;
+
+            popup.transform.SetParent(parent, false);
+            popup.GetComponent<PopupPanel2>().SetData(content, okBtnCallback);
+        }
+
         public static void ShowSettingPanel(Transform parent, Object o)
         {
             GameObject settingPanel = GameObject.Instantiate(

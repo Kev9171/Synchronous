@@ -3,6 +3,7 @@ using Photon.Realtime;
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 namespace KWY
@@ -18,6 +19,9 @@ namespace KWY
         [SerializeField]
         TMP_Text NoRoomText;
 
+        [SerializeField]
+        Animator ReloadBtnAnimator;
+
         private List<ListingRooms> _listings = new List<ListingRooms>();
         public void SetData(Object o)
         {
@@ -32,7 +36,6 @@ namespace KWY
         // 수동 새로고침
         private void LoadRoomList()
         {
-            Debug.Log("Room list updated");
             LoadingText.gameObject.SetActive(true);
 
             PhotonNetwork.GetCustomRoomList(new TypedLobby(ConstantValue.TYPPED_LOBBY_SQL_NAME, LobbyType.SqlLobby), ConstantValue.REFRESH_ROOM_SQL);
@@ -126,16 +129,23 @@ namespace KWY
             }
 
             LoadingText.gameObject.SetActive(false);
+            ReloadBtnAnimator.speed = 0.0f;
         }
 
         #endregion
 
-        IEnumerator RefreshRooms()
+        public void ReLoadRooms()
+        {
+            ReloadBtnAnimator.speed = 1.0f;
+            LoadRoomList();
+        }
+
+        /*IEnumerator RefreshRooms()
         {
             LoadRoomList();
             yield return new WaitForSeconds(5);
             StartCoroutine(RefreshRooms());
-        }
+        }*/
 
         #region Button Callbacks
 
@@ -151,7 +161,8 @@ namespace KWY
 
         private void Start()
         {
-            StartCoroutine(RefreshRooms());
+            //StartCoroutine(RefreshRooms());
+            ReLoadRooms();
         }
 
         #endregion

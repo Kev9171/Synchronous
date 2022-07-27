@@ -192,10 +192,10 @@ namespace KWY
                         //chara.transform.position += new Vector3(-0.1f, 0.5f, 0);
                         chara.GetComponent<BoxCollider2D>().offset -= offset;
 
-                        count++;
-
                         Debug.Log(chara.GetComponent<Character>().destination);
                         Debug.Log((Vector2)fTiles.nList[charsOnDes - 1].coordList[count] + ", " + (Vector2)fTiles.nList[charsOnDes - 2].coordList[count]);
+
+                        count++;
                     }
                 }
                 else
@@ -259,7 +259,7 @@ namespace KWY
             //}
             else
             {
-                Debug.LogFormat("{0} / {1} can not go to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, map.WorldToCell(des));         
+                Debug.LogFormat("{0} / {1} can not go to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, map.WorldToCell(des));
             }
         }
 
