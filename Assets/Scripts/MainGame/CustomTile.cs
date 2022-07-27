@@ -26,22 +26,25 @@ namespace KWY {
 
         private List<GameObject> characters;
 
+        
+
         public override bool StartUp(Vector3Int position, ITilemap tilemap, GameObject go)
         {
             //Debug.Log(position);
             localTPos = position;
             worldTPos = tilemap.GetComponent<Tilemap>().CellToWorld(position);
             //tilePos = position;
-            charCount = getCharCount().Count;
+            charCount = getInitialChar();
             return base.StartUp(position, tilemap, go);
         }
 
-        public List<GameObject> getCharCount()
+        public int getInitialChar()
         {
             int count = 0;
-            if(characters != null)
-                characters.Clear();
+            //if (characters != null)
+            //    characters.Clear();
 
+            characters = new List<GameObject>();
 
             Collider2D[] objects = Physics2D.OverlapCircleAll(worldTPos, 0.1f);//OverlapSphere(tilePos, 1f);
             if (objects.Length == 0 || objects == null)
@@ -53,7 +56,7 @@ namespace KWY {
             {
                 foreach (Collider2D k in objects)
                 {
-                    if(k.gameObject.name != "Tilemap")
+                    if (k.gameObject.name != "Tilemap")
                     {
                         characters.Add(k.gameObject);
                         Debug.Log(k.gameObject.name);
@@ -62,13 +65,54 @@ namespace KWY {
                 }
                 Debug.Log("캐릭터 수: " + count + "좌표 : " + localTPos);
             }
+
+
+            return count;
+        }
+
+        public List<GameObject> getCharList()
+        {
+            //int count = 0;
+            //if(characters != null)
+            //    characters.Clear();
+
+
+            //Collider2D[] objects = Physics2D.OverlapCircleAll(worldTPos, 0.1f);//OverlapSphere(tilePos, 1f);
+            //if (objects.Length == 0 || objects == null)
+            //{
+            //    // charCount = 0;
+            //    //Debug.Log("캐릭터 없음");
+            //}
+            //else
+            //{
+            //    foreach (Collider2D k in objects)
+            //    {
+            //        if(k.gameObject.name != "Tilemap")
+            //        {
+            //            characters.Add(k.gameObject);
+            //            Debug.Log(k.gameObject.name);
+            //            count++;
+            //        }
+            //    }
+            //    Debug.Log("캐릭터 수: " + count + "좌표 : " + localTPos);
+            //}
             
 
             return characters;
         }
 
-        public void setTileSize(Vector3Int position)
+        public int getCharCount()
         {
+            return charCount;
+        }
+
+        public void updateCharNum(int num, GameObject ch)
+        {
+            charCount += num;
+            if (num > 0)
+                characters.Add(ch);
+            else
+                characters.Remove(ch);
             //this.gameObject.GetComponentInParent<Tilemap>().GetTransformMatrix(position);
             
             //this.transform.SetTRS(new Vector3(position.x, position.y + 0.2f, position.z), this.transform.rotation , new Vector3Int(2, 2, 2));

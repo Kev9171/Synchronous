@@ -1,17 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-
+using UnityEngine.SceneManagement;
 
 namespace KWY
 {
-    [RequireComponent(typeof(CanvasRenderer))]
-    public class InitialManager : MonoBehaviour
+    public class LoginSceneManager : MonoBehaviour
     {
-        [SerializeField]
-        GameObject MainPanel;
-
         [SerializeField]
         GameObject InitialPanel;
 
@@ -24,6 +19,20 @@ namespace KWY
         [SerializeField]
         GameObject SelectPanel;
 
+        [SerializeField]
+        GameObject ClickToStart;
+
+        [SerializeField]
+        Transform CanvasTransform;
+
+        const string nextLevel = "StartScene";
+
+        public void AfterLogin()
+        {
+            InitialPanel.SetActive(false);
+            ClickToStart.SetActive(true);
+        }
+
         #region Button Elements Callbacks
 
         public void OnClickLoginBtn()
@@ -34,7 +43,6 @@ namespace KWY
 
         public void OnClickJoinBtn()
         {
-            Debug.Log("OnClickJoinBtn");
             SelectPanel.SetActive(false);
             JoinPanel.SetActive(true);
         }
@@ -46,15 +54,17 @@ namespace KWY
             SelectPanel.SetActive(true);
         }
 
+        public void OnClickMainPanel()
+        {
+            SceneManager.LoadScene(nextLevel);
+        }
+
         #endregion
 
         private void Start()
         {
-            MainPanel.SetActive(false);
             LoginPanel.SetActive(false);
             JoinPanel.SetActive(false);
-
-            InitialPanel.SetActive(true);
 
             SelectPanel.SetActive(true);
         }

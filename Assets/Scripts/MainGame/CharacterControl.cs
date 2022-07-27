@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 
+using System.Collections.Generic;
+
 namespace KWY
 {
     public class CharacterControl : MonoBehaviour
@@ -20,9 +22,6 @@ namespace KWY
 
         [SerializeField]
         TurnReady turnReady;
-
-        [SerializeField]
-        RayTest ray;
 
 
         public Character SelChara { get; private set; }
@@ -119,10 +118,6 @@ namespace KWY
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Right);
 
-                    //ray.Ray(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), (int)Direction.TopRight);
-                    //ray.MultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, true, ((SkillBase)SelAction).directions.Count);
-                    ray.CurvedMultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, true, ((SkillBase)SelAction).directions.Count);
-
                     turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                     SetSelClear();
 
@@ -142,10 +137,6 @@ namespace KWY
                 {
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Left);
-
-                    //ray.Ray(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), (int)Direction.TopLeft);
-                    //ray.MultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, false, ((SkillBase)SelAction).directions.Count);
-                    ray.CurvedMultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, false, ((SkillBase)SelAction).directions.Count);
 
                     turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                     SetSelClear();
@@ -171,6 +162,7 @@ namespace KWY
             SelAction = sb;
 
             highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? sb.areaEvenY : sb.areaOddY);
+
         }
 
         public void StartControl()
@@ -207,18 +199,17 @@ namespace KWY
             //else
             //map.SetTransformMatrix(SelChara.TempTilePos, groundTile);
 
-            TilemapControl fTiles = GameObject.Find("SecondTiles").GetComponent<TilemapControl>();
+            /*TilemapControl fTiles = GameObject.Find("SecondTiles").GetComponent<TilemapControl>();
 
             map.SetTileFlags(SelChara.TempTilePos, TileFlags.None);
             map.SetColor(SelChara.TempTilePos, new Color(1, 1, 1, 0));
 
-            Debug.Log(SelChara.TempTilePos);
-            Debug.Log(map.GetTile<CustomTile>(SelChara.TempTilePos));
-
             Sprite sprite = map.GetTile<CustomTile>(SelChara.TempTilePos).sprite;
-            fTiles.activateTile(map.CellToWorld(SelChara.TempTilePos), 2, sprite);
+            fTiles.activateTile(map.CellToWorld(SelChara.TempTilePos), 2, sprite);*/
 
             highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? SelAction.areaEvenY : SelAction.areaOddY);
+
+            
         }
 
         public void SetSelChara(CID cid)
@@ -243,6 +234,8 @@ namespace KWY
             mouseInput.Mouse.MouseClick.performed += OnClick;
             mouseInput.Mouse.MouseClick.performed -= OnClickSkillDirection;
             mouseInput.Mouse.MouseClick.performed -= OnClickMoveDirection;
+
+            Debug.Log("Character selected: " + cid);
         }
 
         public void HighlightCharacterClear()
@@ -289,13 +282,68 @@ namespace KWY
 
         #region Private Methods
 
+        void CharMoveSelect(InputAction.CallbackContext context)
+        {
+            /*Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
+            mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
+            Vector3Int gridPosition = map.WorldToCell(mousePosition);
+
+            CharacterActionData cad = data.GetActionData(SelChara.Cb.cid);
+
+            if (map.HasTile(gridPosition) && cad.Count < 3)
+            {
+                Vector2 deltaXY = ((Vector2Int)gridPosition) - SelChara.TempTilePos;
+                object[] arr = { "move", deltaXY.x, deltaXY.y };
+                
+                cad.AddAction(ActionType.Move, deltaXY.x, deltaXY.y);
+                // selChara.SetTilePos((Vector2Int)gridPosition); 필요?
+                Debug.Log("tile selected");
+            }
+            else if (!map.HasTile(gridPosition))
+                Debug.Log("no tile selected");
+            else
+            {
+                Debug.Log("더 이상 추가 불가");
+                foreach (KeyValuePair<int, object[]> item in cad.Actions)
+                {
+                    Debug.Log(item.Key + ", " + item.Value[0] + ", " + item.Value[1] + ", " + item.Value[2]);
+                }
+            }*/
+        }
+
+        void CharAttackSelect(InputAction.CallbackContext context)
+        {
+            /*Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
+            mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
+            Vector3Int gridPosition = map.WorldToCell(mousePosition);
+
+            CharacterActionData cad = data.GetActionData(SelChara.Cb.cid);
+
+            Vector2 deltaXY = ((Vector2Int)gridPosition) - SelChara.TempTilePos;
+            if (map.HasTile(gridPosition) && deltaXY.sqrMagnitude <= 2 && cad.Count < 3)
+            {
+                object[] arr = { "skill", deltaXY.x, deltaXY.y };
+                cad.AddAction(ActionType.Skill, SID.FireBall, SkillDicection.Left); // temp
+                Debug.Log("attack selected");
+            }
+            else if (deltaXY.sqrMagnitude > 2)
+                Debug.Log("outside the atk range");
+            else
+            {
+                Debug.Log("더 이상 추가 불가");
+                foreach (KeyValuePair<int, object[]> item in cad.Actions)
+                {
+                    Debug.Log(item.Key + ", " + item.Value[0] + ", " + item.Value[1] + ", " + item.Value[2]);
+                }
+            }*/
+        }
+
         #endregion
 
         #region MonoBehaviour CallBacks
 
         private void Awake()
         {
-            // 반드시 여기서 할당해야됨! (선언에서 하면 error)
             mouseInput = new MouseInput();
         }
         private void OnEnable()
@@ -309,11 +357,17 @@ namespace KWY
 
         private void Start()
         {
-            
+            StartControl();
         }
 
         void Update()
         {
+            if (mouseInput.Mouse.MouseClick.IsPressed())
+            {
+                //mouseInput.Mouse.MouseClick.performed -= CharMoveSelect;
+                //mouseInput.Mouse.MouseClick.performed -= CharAttackSelect;
+                //mouseInput.Mouse.MouseClick.performed += OnClick;
+            }
         }
 
         #endregion

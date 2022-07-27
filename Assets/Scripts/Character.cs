@@ -158,16 +158,18 @@ namespace KWY
 
             if (map.HasTile(map.WorldToCell(des)))
             {
+                map.GetTile<CustomTile>(map.WorldToCell(des)).updateCharNum(1, gameObject);
+                map.GetTile<CustomTile>(nowPos).updateCharNum(-1, gameObject);
+
+                //List<GameObject> charsOnDes = map.GetTile<CustomTile>(map.WorldToCell(des)).getCharList();
+                //List<GameObject> charsOnCur = map.GetTile<CustomTile>(nowPos).getCharList();
+
+                int charsOnDes = map.GetTile<CustomTile>(map.WorldToCell(des)).getCharCount();
+                int charsOnCur = map.GetTile<CustomTile>(nowPos).getCharCount();
+
                 destination = des;
-                nowMove = true;
 
-                //Matrix4x4 groundTile = Matrix4x4.TRS(new Vector3(0, 0f, 0), Quaternion.Euler(0f, 0f, 0f), Vector3.one);
-                //Matrix4x4 elevatedTile = Matrix4x4.TRS(new Vector3(0, 0.2f, 0), Quaternion.Euler(0f, 0f, 0f), Vector3.one/*scale 조정*/);
-
-                List<GameObject> charsOnDes = map.GetTile<CustomTile>(map.WorldToCell(des)).getCharCount();
-                List<GameObject> charsOnCur = map.GetTile<CustomTile>(nowPos).getCharCount();
-
-                if (charsOnDes.Count > 1)
+                if (charsOnDes > 1)
                 {
                     //map.SetTransformMatrix(map.WorldToCell(des), elevatedTile);
                     //hlMap.SetTransformMatrix(map.WorldToCell(des), elevatedTile);
@@ -175,17 +177,57 @@ namespace KWY
                     map.SetColor(map.WorldToCell(des), new Color(1, 1, 1, 0));
 
                     Sprite sprite = map.GetTile<CustomTile>(map.WorldToCell(des)).sprite;
-                    fTiles.activateTile(des, charsOnDes.Count, sprite);
+                    fTiles.activateTile(des, charsOnDes, sprite);
 
-                    foreach (GameObject chara in charsOnDes)
+                    List<GameObject> characters = map.GetTile<CustomTile>(map.WorldToCell(des)).getCharList();
+
+                    int count = 0;
+
+                    foreach (GameObject chara in characters)
                     {
-                        Vector3 charPos = chara.transform.position;
-                        chara.transform.position += new Vector3(-0.1f, 0.5f, 0);
-                        chara.GetComponent<BoxCollider>().center -= new Vector3(-0.1f, 0.5f, 0); //임시값; 벡터값 그룹 필요
+                        Vector3 charpos = chara.transform.position;
+                        Vector2 offset = (Vector2)fTiles.nList[charsOnDes - 1].coordList[count] - (Vector2)fTiles.nList[charsOnDes - 2].coordList[count];
+                        chara.GetComponent<Character>().destination += offset;
+                        chara.GetComponent<Character>().nowMove = true;
+                        //chara.transform.position += new Vector3(-0.1f, 0.5f, 0);
+                        chara.GetComponent<BoxCollider2D>().offset -= offset;
+
+                        Debug.Log(chara.GetComponent<Character>().destination);
+                        Debug.Log((Vector2)fTiles.nList[charsOnDes - 1].coordList[count] + ", " + (Vector2)fTiles.nList[charsOnDes - 2].coordList[count]);
+
+                        count++;
+                    }
+                }
+                else
+                {
+                    nowMove = true;
+
+                    Debug.Log(destination);
+                }
+
+                if (charsOnCur > 1)
+                {
+                    Sprite sprite = map.GetTile<CustomTile>(nowPos).sprite;
+                    fTiles.activateTile(map.CellToWorld(nowPos), charsOnCur, sprite);
+
+                    List<GameObject> characters = map.GetTile<CustomTile>(nowPos).getCharList();
+
+                    int count = 0;
+                    destination = des;
+                    foreach (GameObject chara in characters)
+                    {
+                        Vector3 charpos = chara.transform.position;
+                        Vector2 offset = (Vector2)fTiles.nList[charsOnCur - 1].coordList[count] - (Vector2)fTiles.nList[charsOnDes].coordList[count];
+                        chara.GetComponent<Character>().destination += offset;
+                        chara.GetComponent<Character>().nowMove = true;
+                        //chara.transform.position += new Vector3(-0.1f, 0.5f, 0);
+                        chara.GetComponent<BoxCollider2D>().offset -= offset;
+
+                        count++;
                     }
                 }
 
-                if (charsOnCur.Count < 2)
+                else if (charsOnCur == 1)
                 {
                     //map.SetTransformMatrix(map.WorldToCell(des), groundTile);
                     //hlMap.SetTransformMatrix(map.WorldToCell(des), groundTile);
@@ -194,10 +236,27 @@ namespace KWY
                     map.SetColor(nowPos, new Color(1, 1, 1, 1));
 
                     fTiles.deactivateTile(map.CellToWorld(nowPos));
+
+                    List<GameObject> characters = map.GetTile<CustomTile>(nowPos).getCharList();
+                    characters[0].GetComponent<Character>().destination = map.CellToWorld(nowPos);
+                    characters[0].GetComponent<Character>().nowMove = true;
+                    characters[0].GetComponent<BoxCollider2D>().offset = Vector2.zero;
+
                 }
 
                 Debug.LogFormat("{0} / {1} is moving to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, map.WorldToCell(des));
             }
+
+            //if (map.HasTile(map.WorldToCell(des)))
+            //{
+            //    destination = des;
+            //    nowMove = true;
+
+            //    //Matrix4x4 groundTile = Matrix4x4.TRS(new Vector3(0, 0f, 0), Quaternion.Euler(0f, 0f, 0f), Vector3.one);
+            //    //Matrix4x4 elevatedTile = Matrix4x4.TRS(new Vector3(0, 0.2f, 0), Quaternion.Euler(0f, 0f, 0f), Vector3.one/*scale 조정*/);
+
+            //    Debug.LogFormat("{0} / {1} is moving to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, map.WorldToCell(des));
+            //}
             else
             {
                 Debug.LogFormat("{0} / {1} can not go to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, map.WorldToCell(des));
@@ -218,6 +277,8 @@ namespace KWY
         {
             Cb = _characterBase;
             Buffs = new List<Buff>();
+
+            Debug.Log(this);
         }
 
         void Update()
@@ -230,7 +291,7 @@ namespace KWY
             }
             else
             {
-
+                
             }
         }
         #endregion

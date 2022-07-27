@@ -16,8 +16,15 @@ namespace KWY
         [SerializeField]
         Button LoginBtn;
 
+        [SerializeField]
+        LoginSceneManager loginScene;
+
+        [SerializeField]
+        Transform CanvasTransform;
+
         string loginFailedMsg = "User no found";
         string loginConditionFailedMsg = "Enter at least one word for id and password";
+        string loginSuccessMsg = "Welcome to Synchronous!";
 
         public void OnClickLoginBtn()
         {
@@ -34,17 +41,20 @@ namespace KWY
             // LoginJoinAPI 사용하여 로그인 확인
             bool ok = true;
 
+            // db 로부터 받은 데이터를 UserManager에 저장
+            // 아래 값은 임시
+            string accountId = "temp_id";
+            Sprite userIcon = null;
+            int userLevel = 1;
+            int userId = 12345;
+            UserManager.InitData(userIcon, accountId, userLevel, userId);
+
             if(ok)
             {
                 Debug.Log("Login Successed");
 
-                GameObject mainPanel = GameObject.Find("MainPanel");
-                if (mainPanel == null)
-                {
-                    Debug.LogError("Can not find the gameobject named mainPanel");
-                    return;
-                }
-                mainPanel.SetActive(true);
+                PopupBuilder.ShowPopup(CanvasTransform, loginSuccessMsg,
+                    loginScene.AfterLogin, true);
             }
             else
             {

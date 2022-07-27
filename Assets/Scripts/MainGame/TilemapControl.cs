@@ -14,6 +14,14 @@ namespace KWY
         [SerializeField]
         Sprite[] sprites;
 
+        [System.Serializable]
+        public class Coords
+        {
+            public List<Vector3> coordList;
+        }
+        [SerializeField]
+        public List<Coords> nList = new List<Coords>();
+
         private int checkTileIdx(Vector3 worldPos)
         {
             //Matrix4x4 newMatrix = Matrix4x4.Scale(newTilepos);
