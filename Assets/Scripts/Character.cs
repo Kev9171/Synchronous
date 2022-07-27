@@ -186,17 +186,23 @@ namespace KWY
                     foreach (GameObject chara in characters)
                     {
                         Vector3 charpos = chara.transform.position;
-                        chara.GetComponent<Character>().destination += (Vector2)fTiles.nList[charsOnDes - 1].coordList[count];
+                        Vector2 offset = (Vector2)fTiles.nList[charsOnDes - 1].coordList[count] - (Vector2)fTiles.nList[charsOnDes - 2].coordList[count];
+                        chara.GetComponent<Character>().destination += offset;
                         chara.GetComponent<Character>().nowMove = true;
                         //chara.transform.position += new Vector3(-0.1f, 0.5f, 0);
-                        chara.GetComponent<BoxCollider2D>().offset -= (Vector2)fTiles.nList[charsOnDes - 1].coordList[count];
+                        chara.GetComponent<BoxCollider2D>().offset -= offset;
 
                         count++;
+
+                        Debug.Log(chara.GetComponent<Character>().destination);
+                        Debug.Log((Vector2)fTiles.nList[charsOnDes - 1].coordList[count] + ", " + (Vector2)fTiles.nList[charsOnDes - 2].coordList[count]);
                     }
                 }
                 else
                 {
                     nowMove = true;
+
+                    Debug.Log(destination);
                 }
 
                 if (charsOnCur > 1)
@@ -211,10 +217,11 @@ namespace KWY
                     foreach (GameObject chara in characters)
                     {
                         Vector3 charpos = chara.transform.position;
-                        chara.GetComponent<Character>().destination += (Vector2)fTiles.nList[charsOnCur - 1].coordList[count];
+                        Vector2 offset = (Vector2)fTiles.nList[charsOnCur - 1].coordList[count] - (Vector2)fTiles.nList[charsOnDes].coordList[count];
+                        chara.GetComponent<Character>().destination += offset;
                         chara.GetComponent<Character>().nowMove = true;
                         //chara.transform.position += new Vector3(-0.1f, 0.5f, 0);
-                        chara.GetComponent<BoxCollider2D>().offset -= (Vector2)fTiles.nList[charsOnCur - 1].coordList[count];
+                        chara.GetComponent<BoxCollider2D>().offset -= offset;
 
                         count++;
                     }
