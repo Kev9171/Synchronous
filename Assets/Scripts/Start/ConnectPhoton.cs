@@ -17,6 +17,9 @@ namespace KWY
         [SerializeField]
         TMP_Text StatusMsg;
 
+        [SerializeField]
+        MasterManager _masterManager;
+
         const string connectingToServerMsg = "Connecting to Photon Server...";
         const string creatingRoomMsg = "Joining the room...";
         const string joingRoomMsg = "Creating the room...";
@@ -62,13 +65,13 @@ namespace KWY
         {
             StatusMsg.text = joingRoomMsg;
             StatusMsgPanel.SetActive(true);
+            // roomName should not be empty
             PhotonNetwork.JoinRoom(roomName);
         }
 
 
         private void QuitGame()
         {
-            Debug.Log("Quit game...");
             Application.Quit();
         }
 
@@ -89,7 +92,7 @@ namespace KWY
 
             // 연결 실패할 경우 오류 팝업 띄우기
             GameObject canvas = GameObject.Find("Canvas");
-            PopupBuilder.ShowPopup(canvas.transform, connectErrorMsg, QuitGame);
+            PopupBuilder.ShowErrorPopup(canvas.transform, ErrorCode.PHOTON_DISCONNECT, QuitGame);
         }
 
         public override void OnJoinedLobby()

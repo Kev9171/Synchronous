@@ -73,5 +73,36 @@ namespace KWY
             roomListPanel.transform.SetParent(parent, false);
             roomListPanel.GetComponent<RoomListingPanel>().SetData(o);
         }
+
+        public static void ShowGameLobbyHelpPopup(Transform parent, Object o)
+        {
+            GameObject gameLobbyHelpPanel = GameObject.Instantiate(
+                Resources.Load(
+                    "Prefabs/UI/GameLobbyHelpPopup",
+                    typeof(GameObject)
+                    )) as GameObject;
+
+            gameLobbyHelpPanel.transform.SetParent(parent, false);
+            gameLobbyHelpPanel.GetComponent<GameLobbyHelpPopup>().SetData(o);
+        }
+
+        public static void ShowErrorPopup(Transform parnet, ErrorCode eCode, UnityAction btnCallback = null)
+        {
+            GameObject errorPanel = GameObject.Instantiate(
+                Resources.Load(
+                    "Prefabs/UI/ErrorPanel",
+                    typeof(GameObject)
+                    )) as GameObject;
+
+            errorPanel.transform.SetParent(parnet, false);
+            if (btnCallback == null)
+            {
+                errorPanel.GetComponent<ErrorPanel>().SetData(eCode);
+            }
+            else
+            {
+                errorPanel.GetComponent<ErrorPanel>().SetData(eCode, btnCallback);
+            }
+        }
     }
 }

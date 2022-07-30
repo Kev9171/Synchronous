@@ -49,12 +49,12 @@ namespace KWY
         [SerializeField]
         Transform CanvasTransform;
 
-        [Tooltip("다음에 게임이 시작되면 로드될 scene")]
-        readonly private string nextLevel = "MainGameScene";
+        [SerializeField]
+        Timer TimerObject;
 
+        readonly private string nextLevel = "MainGameScene";
         readonly private string previousLevel = "StartScene";
 
-        private float time;
         float timeLimit;
 
         public bool myReady { get; set; } = false;
@@ -62,31 +62,33 @@ namespace KWY
 
         const string leaveRoomMsg = "Do you want to leave this room?";
 
-        public void ShowReadyStatus(bool isMe)
+        /// <summary>
+        /// 게임 로비에서 자신 또는 상대방
+        /// </summary>
+        /// <param name="status">최신화 할 ready 상태</param>
+        /// <param name="isMe">자신인지 아닌지</param>
+        public void SetReadyStatus(bool status, bool isMe = true)
         {
             if (isMe)
             {
-                myReady = true;
-                LeftReadyText.SetActive(true);
-            }
-            else
-            {
-                otherReady = true;
-                RightReadyText.SetActive(true);
-            }
-        }
+                myReady = status;
+                LeftReadyText.SetActive(status);
 
-        public void HideReadyStatus(bool isMe)
-        {
-            if (isMe)
-            {
-                myReady = false;
-                LeftReadyText.SetActive(false);
+                // ready 버튼 숨기기
+                ReadyBtn.gameObject.SetActive(!status);
+
+                // 취소 버튼 보이기
+                ReadyCancelBtn.gameObject.SetActive(status);
             }
             else
             {
-                otherReady = false;
-                RightReadyText.SetActive(false);
+                otherReady = status;
+                RightReadyText.SetActive(status);
+            }
+
+            if (!status)
+            {
+                StopTimer();
             }
         }
 
@@ -101,72 +103,50 @@ namespace KWY
 
         public void ClearEnteredPlayer()
         {
-            RightUserPanel.SetActive(false);
-        }
+            StopTimer();
 
-        #region CountDown
+            // 상대방 정보 없애기
+            RightUserPanel.SetActive(false);
+
+            // 상대 ready 취소 한 것처럼 보이기
+            SetReadyStatus(false, isMe: false);
+
+            // 자신의 ready 상태 해제
+            lobbyEvent.RaiseEventReady(false);
+        }
 
         public void StartTimer()
         {
-            time = 0;
             CountDownText.gameObject.SetActive(true);
-            StartCoroutine(Timer());
-        }
-
-        public void ResetTimer()
-        {
-            time = 0;
-            CountDownText.gameObject.SetActive(false);
+            TimerObject.StartTimer();
         }
 
         public void StopTimer()
         {
-            StopCoroutine(Timer());
             CountDownText.gameObject.SetActive(false);
+            TimerObject.StopTimer();
         }
 
         private void TimeOut()
         {
             // 게임 시작
-            PhotonNetwork.LoadLevel(nextLevel);
-        }
-
-        IEnumerator Timer()
-        {
-            while (true)
+            if (PhotonNetwork.IsMasterClient)
             {
-                float t = Mathf.Ceil(timeLimit - time);
-
-                if (t < 0)
-                {
-                    CountDownText.text = "0";
-                    TimeOut();
-                    break;
-                }
-                else
-                {
-                    CountDownText.text = t.ToString();
-                    time += 0.5f;
-                    yield return new WaitForSeconds(0.5f);
-                }
+                PhotonNetwork.LoadLevel(nextLevel);
             }
-        }
 
-        #endregion
+            Debug.Log("Game Start!");
+        }
 
         #region Button OnClick Callbacks
 
         public void OnReadyBtnClicked()
         {
-            ReadyBtn.gameObject.SetActive(false);
-            ReadyCancelBtn.gameObject.SetActive(true);
             lobbyEvent.RaiseEventReady(true);
         }
 
         public void OnReadyCancelBtnClicked()
-        {
-            ReadyCancelBtn.gameObject.SetActive(false);
-            ReadyBtn.gameObject.SetActive(true);
+        {            
             lobbyEvent.RaiseEventReady(false);
         }
 
@@ -184,7 +164,7 @@ namespace KWY
 
         public void OnHelpBtnClicked()
         {
-
+            PopupBuilder.ShowGameLobbyHelpPopup(CanvasTransform, null);
         }
 
         public void OnLeaveRoomBtnClickedCallback()
@@ -200,9 +180,6 @@ namespace KWY
 
         private void Start()
         {
-            // logic data에서 불러오기
-            timeLimit = 10f;
-
             LeftUserPanel.GetComponent<UserProfilePanel>().LoadNowUser();
 
             // join 한 경우 이미 들어와있는 플레이어 정보 로드
@@ -216,6 +193,20 @@ namespace KWY
                     }
                 }
             }
+
+            this.timeLimit = MasterManager.GameSettings.GameLobbyTimerTime;
+
+            TimerObject.InitTimer(timeLimit, TimeOut, CountDownText);
+        }
+
+        private void OnEnable()
+        {
+            PhotonNetwork.AutomaticallySyncScene = true;
+        }
+
+        private void OnDisable()
+        {
+            PhotonNetwork.AutomaticallySyncScene = false;
         }
 
         #endregion
