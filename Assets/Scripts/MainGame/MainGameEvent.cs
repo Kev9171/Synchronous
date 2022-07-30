@@ -18,16 +18,6 @@ namespace KWY
         [Tooltip("The button to send ready to start simulation to server")]
         [SerializeField] private Button readyBtn;
 
-
-        [Tooltip("The panel to show 'You win'")]
-        [SerializeField] private GameObject winPanel;
-
-        [Tooltip("The panel to show 'You lose'")]
-        [SerializeField] private GameObject losePanel;
-
-        [Tooltip("Gameobject that contains TurnReadyBtn functions")]
-        [SerializeField] private GameObject turnReady;
-
         [SerializeField]
         private GameManager gameManager;
 
@@ -173,8 +163,6 @@ namespace KWY
         /// <param name="eventData">Received data from the server</param>
         private void OnEvent(EventData eventData)
         {
-            UtilForDebug.LogData(eventData);
-
             switch (eventData.Code)
             {
                 case (byte)EvCode.ResTurnReady:
@@ -204,7 +192,7 @@ namespace KWY
             if (UserId == (string)data[0] && (bool) data[1])
             {
                 // 서버로 부터 ready에 대한 ok 사인이 왔을 때 변경함
-                turnReady.GetComponent<TurnReadyBtn>().SetReady((bool)data[1]);
+                readyBtn.GetComponent<TurnReadyBtn>().SetReady((bool)data[1]);
             }
 
             // check ' start simulation' through data[2]
@@ -233,9 +221,6 @@ namespace KWY
         /// <param name="eventData">Received data from the server</param>
         private void OnEventSimulEnd(EventData eventData)
         {
-            // 준비 상태 다시 초기화
-            turnReady.GetComponent<TurnReadyBtn>().ResetReady();
-
             gameManager.SetState(0);
         }
 
@@ -256,12 +241,16 @@ namespace KWY
             // 이겻을 경우
             if ((string)data == this.UserId)
             {
-                winPanel.SetActive(true);
+                // null 값은 임시
+                GameObject canvas = GameObject.Find("UICanvas");
+                PanelBuilder.ShowWinPanel(canvas.transform, null);
             }
             // 졌을 경우
             else
             {
-                losePanel.SetActive(true);
+                // null 값은 임시
+                GameObject canvas = GameObject.Find("UICanvas");
+                PanelBuilder.ShowLosePanel(canvas.transform, null);
             }
 
             // 게임 종료 후 할 내용들 작성
@@ -281,7 +270,6 @@ namespace KWY
             }
             catch (Exception e)
             {
-                Debug.Log(e);
                 Debug.LogError("Can not get UserId - Check the server connection");
             }
         }

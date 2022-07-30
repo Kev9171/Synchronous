@@ -12,9 +12,9 @@ namespace KWY
         private bool seletable = true;
 
         /// <summary>
-        /// 
+        /// Show skill panel of nth character (if nth == -1 show nothing)
         /// </summary>
-        /// <param name="nth">0 ~ 2</param>
+        /// <param name="nth">0 ~ 2 or -1</param>
         public void ShowSkillPanel(int nth)
         {
             if (!seletable)

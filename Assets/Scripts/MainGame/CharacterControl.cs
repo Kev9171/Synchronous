@@ -21,7 +21,7 @@ namespace KWY
         MapHighLighter highLighter;
 
         [SerializeField]
-        UIControlReady turnReadyUI;
+        TurnReady turnReady;
 
 
         public Character SelChara { get; private set; }
@@ -79,7 +79,7 @@ namespace KWY
                 // 이동 넣었을 경우 하이라이트를 위한 임시 좌표 변경
                 SelChara.SetTilePos(clickV);
 
-                turnReadyUI.UpdateCharaActions(SelChara.Cb.cid);
+                turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                 SetSelClear();
 
                 mouseInput.Mouse.MouseClick.performed += OnClick;
@@ -118,7 +118,7 @@ namespace KWY
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Right);
 
-                    turnReadyUI.UpdateCharaActions(SelChara.Cb.cid);
+                    turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                     SetSelClear();
 
                     mouseInput.Mouse.MouseClick.performed += OnClick;
@@ -138,7 +138,7 @@ namespace KWY
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Left);
 
-                    turnReadyUI.UpdateCharaActions(SelChara.Cb.cid);
+                    turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                     SetSelClear();
 
                     mouseInput.Mouse.MouseClick.performed += OnClick;
@@ -189,7 +189,27 @@ namespace KWY
         {
             SelAction = MoveManager.MoveData;
 
+            //Matrix4x4 groundTile = Matrix4x4.TRS(new Vector3(0, 0f, 0), Quaternion.Euler(0f, 0f, 0f), Vector3.one);
+            //Matrix4x4 elevatedTile = Matrix4x4.TRS(new Vector3(0, 0.2f, 0), Quaternion.Euler(0f, 0f, 0f), Vector3.one/*scale 조정*/);
+            //if (map.GetTile<CustomTile>(SelChara.TempTilePos).getCharCount() < 2)
+            //{
+            //    map.SetTransformMatrix(SelChara.TempTilePos, elevatedTile);
+            //    highLighter.ChangeTileHeight(SelChara.TempTilePos, elevatedTile);
+            //}
+            //else
+            //map.SetTransformMatrix(SelChara.TempTilePos, groundTile);
+
+            /*TilemapControl fTiles = GameObject.Find("SecondTiles").GetComponent<TilemapControl>();
+
+            map.SetTileFlags(SelChara.TempTilePos, TileFlags.None);
+            map.SetColor(SelChara.TempTilePos, new Color(1, 1, 1, 0));
+
+            Sprite sprite = map.GetTile<CustomTile>(SelChara.TempTilePos).sprite;
+            fTiles.activateTile(map.CellToWorld(SelChara.TempTilePos), 2, sprite);*/
+
             highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? SelAction.areaEvenY : SelAction.areaOddY);
+
+            
         }
 
         public void SetSelChara(CID cid)

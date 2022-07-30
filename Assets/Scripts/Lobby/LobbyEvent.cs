@@ -8,25 +8,20 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
+using TMPro;
+
 namespace KWY
 {
-    public class LobbyEvent : MonoBehaviourPun
+    public class LobbyEvent : MonoBehaviourPunCallbacks
     {
-        #region Private Serializable Fields
-        [Tooltip("The button to send ready to start the game to server")]
-        [SerializeField] private Button ReadyBtn;
-
-        [SerializeField] private Text readyTxt;
-
-        #endregion
+        [SerializeField]
+        GameLobby gameLobby;
 
         #region Private Fields
 
-        [Tooltip("다음에 게임이 시작되면 로드될 scene")]
-        readonly private string nextLevel = "MainGameScene";
-
         [Tooltip("Unique user id that the server determined")]
         private string UserId;
+
         #endregion
 
         #region Public Methods
@@ -34,12 +29,12 @@ namespace KWY
         /// <summary>
         /// Send to 'ready signal' to the Server; content: [ready?: bool]
         /// </summary>
-        public void RaiseEventReady()
+        public void RaiseEventReady(bool isReady)
         {
             byte evCode = (byte)EvCode.LobbyReady;
             object[] content = new object[]
             {
-                true
+                isReady
             };
 
             RaiseEventOptions raiseEventOptions = new RaiseEventOptions
@@ -72,8 +67,6 @@ namespace KWY
         /// <param name="eventData">Received data from the server</param>
         private void OnEvent(EventData eventData)
         {
-            UtilForDebug.LogData(eventData);
-
             switch (eventData.Code)
             {
                 case (byte)EvCode.ResLobbyReady:
@@ -95,20 +88,39 @@ namespace KWY
             UserId = PhotonNetwork.AuthValues.UserId; // temp
             object[] data = (object[])eventData.CustomData;
 
-            if (UserId == (string)data[0] && (bool)data[1])
+            // 자신에 대한 이벤트 일 경우
+            if (UserId == (string)data[0])
             {
-                // 임시로 ready 완료되면 버튼 blue로 변경
-                //ReadyBtn.GetComponent<Image>().color = Color.gray;
-                readyTxt.text = "준비 완료";
+                // ready 상태 최신화에 대한 ok 사인을 받았으면
+                if ((bool)data[1])
+                {
+                    
+                    gameLobby.SetReadyStatus((bool)data[2]);
+                }
+                else
+                {
+                    // error
+                }
+            }
+            // 상대방 id
+            else
+            {
+                // ready 상태 최신화에 대한 ok 사인을 받았으면
+                if ((bool)data[1])
+                {
+                    // 서버에서 최신화된 ready 상태 : data[2]
+                    gameLobby.SetReadyStatus((bool)data[2], isMe: false);
+                }
+                else
+                {
+                    // error
+                }
             }
 
             // check 'start game?' through data[2]
-            if ((bool)data[2])
+            if ((bool)data[3])
             {
-                Debug.Log("Start Game");
-
-                // load next level
-                PhotonNetwork.LoadLevel(nextLevel);
+                gameLobby.StartTimer();
             }
         }
 
@@ -131,14 +143,33 @@ namespace KWY
             }
         }
 
-        public void OnEnable()
+
+        public override void OnEnable()
         {
+            base.OnEnable();
             PhotonNetwork.NetworkingClient.EventReceived += OnEvent;
         }
 
-        public void OnDisable()
+        public override void OnDisable()
         {
+            base.OnDisable();
             PhotonNetwork.NetworkingClient.EventReceived -= OnEvent;
+        }
+
+        public override void OnPlayerEnteredRoom(Player newPlayer)
+        {
+            Debug.Log("New player entered the room: " + newPlayer.NickName); ;
+
+            gameLobby.SetEnteredPlayer(newPlayer);
+            base.OnPlayerEnteredRoom(newPlayer);
+        }
+
+        public override void OnPlayerLeftRoom(Player otherPlayer)
+        {
+            Debug.Log("New player left the room: " + otherPlayer.NickName); ;
+
+            gameLobby.ClearEnteredPlayer();
+            base.OnPlayerLeftRoom(otherPlayer);
         }
 
         #endregion
