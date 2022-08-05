@@ -6,8 +6,8 @@ using UnityEngine.Tilemaps;
 
 public class DeploymentTest : MonoBehaviour
 {
-    [SerializeField] Tilemap map;
-    public GameObject flappy;
+    [SerializeField] private Tilemap map;
+    //public GameObject flappy;
     private MouseInput mouseInput;
     private int deployCounter = 0;
 
@@ -32,7 +32,6 @@ public class DeploymentTest : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //OnMouseOver();
         DeployCharacter();
 
         //if (Input.GetMouseButtonDown(0))
@@ -55,33 +54,24 @@ public class DeploymentTest : MonoBehaviour
         //}
     }
 
-    //private void OnMouseOver()
-    //{
-    //    Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
-    //    mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
-    //    Vector3Int clickV = map.WorldToCell(mousePosition);
-    //    if (map.HasTile(clickV) && Input.GetKeyDown(KeyCode.Mouse0))
-    //    {
-    //        //Instantiate(DeploymentManager.instance)
-    //        Instantiate(flappy, mousePosition, Quaternion.identity);
-    //        Debug.Log(mousePosition.x + ", " + mousePosition.y);
-    //    }
-    //}
     private void DeployCharacter()
     {
         Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
         mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
         Vector3Int clickV = map.WorldToCell(mousePosition);
+        //Vector3Int clickV = map.GetCellCenterWorld()
         DeploymentManager dm = GameObject.FindObjectOfType<DeploymentManager>();
         if (map.HasTile(clickV) && Input.GetKeyDown(KeyCode.Mouse0))
         {
-            if (deployCounter < 5)
+            if (deployCounter < 5) // 배치 가능 캐릭터 수
             {
-                if (!EventSystem.current.IsPointerOverGameObject() && dm.ClickedBtn != null)
+                if (!EventSystem.current.IsPointerOverGameObject() && dm.ClickedBtn != null) // 맵이 아닌 아이콘을 클릭하기 위함
                 {
+                    mousePosition = map.GetCellCenterWorld(clickV);
                     GameObject deployedChar = (GameObject)Instantiate(dm.ClickedBtn.CharacterPrefab, mousePosition, Quaternion.identity);
                     deployedChar.GetComponent<SpriteRenderer>().sortingOrder = (int)mousePosition.x;
-                    dm.DeployLimit();
+                    Debug.Log(mousePosition);
+                    dm.DeployLimit(); // 버튼 클릭 비활성화
                     deployCounter++;
                 }
             }
