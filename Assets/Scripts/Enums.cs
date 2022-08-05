@@ -68,4 +68,10 @@ namespace KWY
         TopRight = 5,
         Base = 6
     }
+
+    public enum ErrorCode : int
+    {
+        PHOTON_DISCONNECT = 0,
+
+    }
 }

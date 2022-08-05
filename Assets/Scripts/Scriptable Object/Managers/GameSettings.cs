@@ -6,7 +6,7 @@ using UnityEngine;
 public class GameSettings : ScriptableObject
 {
     [SerializeField]
-    private string _gameVersion = "0.0.0";
+    private string _gameVersion;
     public string GameVersion
     {
         get
@@ -14,14 +14,24 @@ public class GameSettings : ScriptableObject
             return _gameVersion;
         }
     }
+
     [SerializeField]
-    private string _nickName = "Tester";
-    public string NickName
+    private string _assetVersion;
+    public string AssetVersion
     {
         get
         {
-            int value = Random.Range(0, 9999);
-            return _nickName + value.ToString();
+            return _assetVersion;
+        }
+    }
+
+    [SerializeField]
+    private float _gameLobbyTimerTime;
+    public float GameLobbyTimerTime
+    {
+        get
+        {
+            return _gameLobbyTimerTime;
         }
     }
 }

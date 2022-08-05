@@ -88,43 +88,39 @@ namespace KWY
             UserId = PhotonNetwork.AuthValues.UserId; // temp
             object[] data = (object[])eventData.CustomData;
 
-            if (UserId == (string)data[0] && (bool)data[1])
+            // 자신에 대한 이벤트 일 경우
+            if (UserId == (string)data[0])
             {
-                // ready 상태 버튼 보여주기
-                gameLobby.ShowReadyStatus(true);
+                // ready 상태 최신화에 대한 ok 사인을 받았으면
+                if ((bool)data[1])
+                {
+                    
+                    gameLobby.SetReadyStatus((bool)data[2]);
+                }
+                else
+                {
+                    // error
+                }
             }
-            // ready 유저가 자신이 아닐 경우 right setactive(true);
-            else if (UserId != (string)data[0] && (bool)data[1])
+            // 상대방 id
+            else
             {
-                gameLobby.ShowReadyStatus(false);
-            }
-            // ready 응답을 받았는데 이미 ready 일 경우 ready 취소
-            else if (UserId == (string)data[0] && (bool)data[1] && gameLobby.myReady)
-            {
-                gameLobby.myReady = false;
-
-                gameLobby.HideReadyStatus(true);
-                gameLobby.StopTimer();
-                gameLobby.ResetTimer();
-            }
-            else if (UserId != (string)data[0] && (bool)data[1] && gameLobby.otherReady)
-            {
-                gameLobby.otherReady = false;
-
-                gameLobby.HideReadyStatus(false);
-                gameLobby.StopTimer();
-                gameLobby.ResetTimer();
+                // ready 상태 최신화에 대한 ok 사인을 받았으면
+                if ((bool)data[1])
+                {
+                    // 서버에서 최신화된 ready 상태 : data[2]
+                    gameLobby.SetReadyStatus((bool)data[2], isMe: false);
+                }
+                else
+                {
+                    // error
+                }
             }
 
             // check 'start game?' through data[2]
-            if ((bool)data[2])
+            if ((bool)data[3])
             {
                 gameLobby.StartTimer();
-
-                Debug.Log("Start Game");
-
-                // load next level
-                //PhotonNetwork.LoadLevel(nextLevel);
             }
         }
 
