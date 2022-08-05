@@ -76,3 +76,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 5005634571131376312}
+  highlightColor: {r: 1, g: 0.61960787, b: 0.31764707, a: 1}

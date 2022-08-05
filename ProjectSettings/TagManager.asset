@@ -10,6 +10,7 @@ TagManager:
   - MainGameData
   - Enemy
   - Friendly
+  - Highlight
   layers:
   - Default
   - TransparentFX

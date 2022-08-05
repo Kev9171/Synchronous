@@ -8,8 +8,8 @@ namespace KWY
 {
     public class RayTest : MonoBehaviour
     {
+        public LayerMask layerMask;
         RaycastHit2D[] hits;
-        public LayerMask LayerMask;
         private List<Vector2> correction = new List<Vector2>();
         private List<Vector2> direction = new List<Vector2>();
         private Vector2 lastPos;
@@ -48,7 +48,7 @@ namespace KWY
             d = sb.distance[dir];
 
             Debug.DrawRay(bp, dp * d, Color.blue, 2f);
-            hits = Physics2D.RaycastAll(bp, dp, d, LayerMask);
+            hits = Physics2D.RaycastAll(bp, dp, d, layerMask);
 
             for (int i = 0; i < hits.Length; i++)
             {
@@ -110,35 +110,47 @@ namespace KWY
             d = sb.distance[num];
 
             Debug.DrawRay(bp, dp * d, Color.blue, 2f);
-            hits = Physics2D.RaycastAll(bp, dp, d, LayerMask);
 
+            //hits = Physics2D.RaycastAll(bp, dp, d, LayerMask);
+            //for (int i = 0; i < hits.Length; i++)
+            //{
+            //    RaycastHit2D hit = hits[i];
+            //    hit.transform.GetComponent<SpriteRenderer>().color = Color.red;
+            //    Debug.Log(hit.transform.name);
+            //}
+
+            
+            hits = Physics2D.RaycastAll(bp, dp, d, layerMask);
             for (int i = 0; i < hits.Length; i++)
             {
                 RaycastHit2D hit = hits[i];
                 hit.transform.GetComponent<SpriteRenderer>().color = Color.red;
                 Debug.Log(hit.transform.name);
             }
-
             lastPos = lastPos + dp * d;
         }
 
         public void CurvedMultipleRay(Vector2 basePos, SkillBase sb, List<Direction> dir, bool reversed, int rays)
         {
-            Debug.Log(rays);
-            if (reversed)
-            {
-                for (int i = 0; i < rays; i++)
-                {
-                    CurvedRay(basePos, sb, dir, i, true);
-                }
+            //if (reversed)
+            //{
+            //    for (int i = 0; i < rays; i++)
+            //    {
+            //        CurvedRay(basePos, sb, dir, i, reversed, highlight);
+            //    }
 
-            }
-            else
+            //}
+            //else
+            //{
+            //    for (int i = 0; i < rays; i++)
+            //    {
+            //        CurvedRay(basePos, sb, dir, i, reversed, highlight);
+            //    }
+            //}
+
+            for (int i = 0; i < rays; i++)
             {
-                for (int i = 0; i < rays; i++)
-                {
-                    CurvedRay(basePos, sb, dir, i, false);
-                }
+                CurvedRay(basePos, sb, dir, i, reversed);
             }
         }
 
