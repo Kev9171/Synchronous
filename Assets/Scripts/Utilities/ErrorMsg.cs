@@ -67,8 +67,6 @@ namespace KWY
             {
                 _eData = JsonUtility.FromJson<ErrorMsgData>(jsonText.text);
                 Debug.Log("Error msg file is loaded");
-
-                Debug.Log(_eData);
             }
         }
 
