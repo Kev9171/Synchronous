@@ -49,7 +49,6 @@ namespace KWY
                 return _eData;
             }
         }
-
         public void LoadErrorMsg()
         {
             // Error_Msg를 변수로 넣어주면 파일을 못 찾음 왜?
@@ -69,10 +68,6 @@ namespace KWY
                 
                 Debug.Log("Error msg file is loaded");
             }
-        }
-
-        private void Start()
-        {
         }
     }
 }
