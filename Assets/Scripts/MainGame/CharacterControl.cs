@@ -38,6 +38,8 @@ namespace KWY
         private int SelOk = 0; // 음수: left, 양수: right -> |2| 가 되었을 때 액션 확정
 
         private skillSpawner skillSpawner;
+
+        private int tempClickX, tempClickY = -int.MaxValue;
         #endregion
 
         #region Public Methods
@@ -95,7 +97,6 @@ namespace KWY
 
         public void OnClickSkillDirection(InputAction.CallbackContext context)
         {
-
             if (SelAction == null || !(SelAction is SkillBase))
             {
                 mouseInput.Mouse.MouseClick.performed += OnClick;
@@ -128,6 +129,16 @@ namespace KWY
                     highLighter.HighlightMap(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), true);
                 }
 
+                if (tempClickX == clickX && tempClickY == clickY)
+                {
+                    // 같은 위치를 클릭했을 경우
+                    SelOk = 1;
+                }
+                else
+                {
+                    SelOk = 0;
+                }
+
                 if (SelOk > 0)
                 {
                     // 확정
@@ -149,11 +160,6 @@ namespace KWY
 
                     mouseInput.Mouse.MouseClick.performed += OnClick;
                 }
-                else
-                {
-                    // 전에 다른 방향이었을 경우
-                    SelOk = 1;
-                }
             }
             else
             {
@@ -166,7 +172,16 @@ namespace KWY
                 {
                     highLighter.HighlightMap(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), false);
                 }
-                
+
+                if (tempClickX == clickX && tempClickY == clickY)
+                {
+                    SelOk = -1;
+                }
+                else
+                {
+                    SelOk = 0;
+                }
+
                 if (SelOk < 0)
                 {
                     // 확정
@@ -188,12 +203,10 @@ namespace KWY
 
                     mouseInput.Mouse.MouseClick.performed += OnClick;
                 }
-                else
-                {
-                    SelOk = -1;
-                }
             }
 
+            tempClickX = clickX;
+            tempClickY = clickY;
             // 일단 스킬로 인한 자신의 위치 변경 내용은 없음
         }
 
@@ -266,6 +279,9 @@ namespace KWY
             mouseInput.Mouse.MouseClick.performed += OnClick;
             mouseInput.Mouse.MouseClick.performed -= OnClickSkillDirection;
             mouseInput.Mouse.MouseClick.performed -= OnClickMoveDirection;
+
+            tempClickX = int.MaxValue;
+            tempClickY = int.MaxValue;
         }
 
         public void HighlightCharacterClear()
