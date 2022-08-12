@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Photon.Pun;
+using KWY;
 
 
 namespace KWY
@@ -10,9 +11,13 @@ namespace KWY
     public class TilemapControl : MonoBehaviour
     {
         [SerializeField]
+        Tilemap map;
+        [SerializeField]
         GameObject[] tiles;
         [SerializeField]
         Sprite[] sprites;
+
+        private Dictionary<Vector3Int, List<GameObject>> Characters = new Dictionary<Vector3Int, List<GameObject>>();
 
         [System.Serializable]
         public class Coords
@@ -22,7 +27,7 @@ namespace KWY
         [SerializeField]
         public List<Coords> nList = new List<Coords>();
 
-        private int checkTileIdx(Vector3 worldPos)
+        private int checkAltTileIdx(Vector3 worldPos)
         {
             //Matrix4x4 newMatrix = Matrix4x4.Scale(newTilepos);
             //tMap.SetTileFlags(curTilepos, TileFlags.None);
@@ -37,7 +42,7 @@ namespace KWY
             return -1;
         }
 
-        private int checkActiveTiles()
+        private int checkActiveAltTiles()
         {
             int count = 0;
             foreach (GameObject tile in tiles)
@@ -60,13 +65,30 @@ namespace KWY
             return -1;
         }
 
-        public void activateTile(Vector3 worldPos, int charNum, Sprite sprite)
+        public void activateAltTile(Vector3 worldPos, int charNum, Sprite sprite)
         {
-            int num = checkActiveTiles();
-            tiles[num].SetActive(true);
-            tiles[num].transform.position = new Vector3(worldPos.x, worldPos.y + 0.1f, worldPos.z);
-            tiles[num].transform.localScale = new Vector3(charNum, charNum, 1);
-            tiles[num].GetComponent<SpriteRenderer>().sprite = sprites[checkSpriteIdx(sprite)];
+            int num = checkActiveAltTiles();
+            if (num < 3)
+            {
+                Vector3 pos = new Vector3(worldPos.x, worldPos.y + 0.1f, worldPos.z);
+                int idx = checkAltTileIdx(pos);
+                if(idx == -1)
+                {
+                    tiles[num].SetActive(true);
+                    tiles[num].transform.position = pos;
+                    tiles[num].transform.localScale = new Vector3(charNum, charNum, 1);
+                    tiles[num].GetComponent<SpriteRenderer>().sprite = sprites[checkSpriteIdx(sprite)];
+                }
+                else
+                {
+                    tiles[idx].transform.localScale = new Vector3(charNum, charNum, 1);
+                }
+                
+            }
+            else
+            {
+                Debug.Log("over 3 tiles active");
+            }
 
             Tilemap hlMap = GameObject.Find("HighlightTilemap").GetComponent<Tilemap>();
             Matrix4x4 newPos = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0f, 0f, 0f), new Vector3(charNum - 0.6f, charNum - 0.6f, 1));
@@ -75,89 +97,143 @@ namespace KWY
             //Debug.Log(new Vector3(worldPos.x, worldPos.y + 0.1f, worldPos.z));
         }
 
-        public void deactivateTile(Vector3 worldPos)
+        public void deactivateAltTile(Vector3 worldPos)
         {
-            Vector3 tilePos = new Vector3(worldPos.x, worldPos.y + 0.1f, worldPos.z);
-            int num = checkTileIdx(tilePos);
+            Vector3 tilePos = new Vector3(worldPos.x, worldPos.y + 0.2f, worldPos.z);
+            int idx = checkAltTileIdx(tilePos);
             //tiles[num].transform.position.Set(worldPos.x, worldPos.y, worldPos.z);
             //tiles[num].GetComponent<SpriteRenderer>().sprite = sprites[checkSpriteIdx(sprite)];
-            tiles[num].SetActive(false);
+            if(idx != -1)
+            {
+                tiles[idx].transform.position = Vector3.zero;
+                tiles[idx].SetActive(false);
+            }
+            Debug.Log("no tile found");
 
             Tilemap hlMap = GameObject.Find("HighlightTilemap").GetComponent<Tilemap>();
             Matrix4x4 newPos = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0f, 0f, 0f), Vector3.one);
             hlMap.SetTransformMatrix(hlMap.WorldToCell(worldPos), newPos);
 
         }
+        public interface ILifecycleTile
+        {
+            void TileAwake(Vector3Int position, Tilemap tilemap);
+            void TileStart(Vector3Int position, Tilemap tilemap);
+        }
 
-        //private void HighlightTile(Vector3 baseWorldPos, int x, int y)
+        //private void Awake()
         //{
-        //    hlMap.SetColor(hlMap.WorldToCell(baseWorldPos), highlightColor);
-        //}
-
-        //private List<Vector2Int> ReverseX(List<Vector2Int> posList)
-        //{
-        //    List<Vector2Int> rv = new List<Vector2Int>();
-        //    foreach (var v in posList)
+        //    map = GetComponent<Tilemap>();
+        //    if (map == null)
         //    {
-        //        rv.Add(new Vector2Int(v.x * -1, v.y));
+        //        throw ProgramUtils.MissingComponentException(typeof(Tilemap));
         //    }
-
-        //    return rv;
-        //}
-
-        //public void HighlightMapXReverse(Vector3Int baseTilePos, List<Vector2Int> posList)
-        //{
-        //    ClearHighlight();
-
-        //    // 임시로 하이라이트 방향은 기본 오른쪽
-        //    // 마스터 클라이언트는 오른쪽으로 하이라이트,
-        //    // 아니면 왼쪽으로 하이라이트
-        //    foreach (Vector2Int pos in ReverseX(posList))
+        //    foreach (Vector3Int position in map.cellBounds.allPositionsWithin)
         //    {
-        //        Vector3Int v = new Vector3Int(baseTilePos.x + pos.x, baseTilePos.y + pos.y, 0);
-        //        if (hlMap.HasTile(v))
+        //        if (map.GetTile(position) is ILifecycleTile tile)
         //        {
-        //            hlMap.SetTileFlags(v, TileFlags.None);
-        //            hlMap.SetColor(v, highlightColor);
+        //            tile.TileAwake(position, map);
         //        }
         //    }
         //}
-
-        //public void HighlightMap(Vector3Int baseTilePos, List<Vector2Int> posList)
-        //{
-        //    ClearHighlight();
-
-        //    foreach (Vector2Int pos in posList)
-        //    {
-        //        Vector3Int v = new Vector3Int(baseTilePos.x + pos.x, baseTilePos.y + pos.y, 0);
-        //        if (hlMap.HasTile(v))
-        //        {
-        //            hlMap.SetTileFlags(v, TileFlags.None);
-        //            hlMap.SetColor(v, highlightColor);
-        //        }
-        //    }
-        //}
-
-        //public void ClearHighlight()
-        //{
-        //    Vector3 pos = new Vector3(0, 0, 0);
-        //    Vector3Int range;
-        //    for (float i = -4; i < 5; i += 0.5f)
-        //    {
-        //        for (float j = -6; j < 6; j += 0.7f)
-        //        {
-        //            pos.x = j;
-        //            pos.y = i;
-        //            range = hlMap.WorldToCell(pos);
-        //            this.hlMap.SetTileFlags(range, TileFlags.None);
-        //            this.hlMap.SetColor(range, transparent);
-        //        }
-        //    }
-        //}
-
         private void Start()
         {
+            SetTiles();
+            //Invoke("SetTiles", 2f);
             
+        }
+
+        private void SetTiles()
+        {
+            foreach (Vector3Int position in map.cellBounds.allPositionsWithin)
+            {
+                if (map.HasTile(position))
+                {
+                    List<GameObject> ch = new List<GameObject>();
+
+                    ch = getInitialChar(map.CellToWorld(position));
+                    if (ch.Count > 0)
+                        Debug.Log("at position: " + position);
+                    Characters.Add(position, ch);
+                    
+                    //CustomTile tile = map.GetTile(position) as CustomTile;
+                    //tile.getTilePos();
+                    //Debug.Log("normal/pos = "+position+", tilename = "+map.GetTile(position).name);
+                    //Debug.Log("custom/pos = " + position + ", tilename = " + map.GetTile<CustomTile>(position).name);
+                    //map.GetTile<CustomTile>(position).getTilePos();
+                    //Debug.Log("pos = " + position + ", tile = " + map.GetTile<CustomTile>(position).getTilePos());
+                }
+            }
+        }
+        public List<GameObject> getInitialChar(Vector3 position)
+        {
+            int count = 0;
+            //if (characters != null)
+            //    characters.Clear();
+
+            List<GameObject> ch = new List<GameObject>();
+
+            Collider2D[] objects = Physics2D.OverlapCircleAll(position, 0.1f);
+            //Collider[] objects = Physics.OverlapSphere(worldTPos, 0.1f);
+            //if(objects.Length>0)
+            //Debug.Log(objects.Length);
+
+            if (objects.Length > 0)
+            {
+                foreach (Collider2D k in objects)
+                {
+                    if (k.gameObject.name != "Tilemap" && k.gameObject.name != "HighlightTilemap")
+                    {
+                        ch.Add(k.gameObject);
+                        Debug.Log(k.gameObject.name);
+                        count++;
+                    }
+                    //Debug.Log(k.gameObject.name);
+                }
+                Debug.Log("캐릭터 수: " + count);
+                if (count > 0)
+                {
+                    //Debug.Log(gameObject.name);
+                    //gameObject.SetActive(false);
+                    //DestroyImmediate(gameObject, true);
+                }
+            }
+            else
+            {
+
+            }
+
+            return ch;
+        }
+
+        public void updateCharNum(Vector3Int pos, int num, GameObject ch)
+        {
+            //charCount += num;
+            if (num > 0)
+            {
+                Characters.TryGetValue(pos, out List < GameObject > charnum);
+                charnum.Add(ch);
+                Characters[pos] = charnum;
+                Debug.Log("added " + ch);
+            }
+            else
+            {
+                //Characters.
+                Characters.TryGetValue(pos, out List<GameObject> charnum);
+                if (charnum.Contains(ch))
+                {
+                    charnum.Remove(ch);
+                    Characters[pos] = charnum;
+                    Debug.Log("deleted " + ch);
+                }
+                else
+                    Debug.Log(ch + " not found");
+            }
+        }
+
+        public List<GameObject> getCharList(Vector3Int pos)
+        {
+            return Characters[pos];
         }
     }
 }
