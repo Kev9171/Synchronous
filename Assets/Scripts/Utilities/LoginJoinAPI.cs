@@ -8,14 +8,14 @@ using UnityEngine.Events;
 
 namespace KWY
 {
-    public class LoginJoinAPI
+    public class LoginJoinAPI : MonoBehaviour, ILoginJoinAPI
     {
-        /*static GameObject _webAPI;
+        static GameObject _webAPI;
 
         static GameObject WebAMI
         {
             get { return _webAPI; }
-        }*/
+        }
 
         // for Singleton
         static LoginJoinAPI _instance;
@@ -25,8 +25,12 @@ namespace KWY
             {
                 if (_instance == null)
                 {
-                    
-
+                    _webAPI = new GameObject
+                    {
+                        name = "WebAPI"
+                    };
+                    _instance = _webAPI.AddComponent(typeof(LoginJoinAPI)) as LoginJoinAPI;
+                    DontDestroyOnLoad(_webAPI);
                 }
                 return _instance;
             }
@@ -45,10 +49,13 @@ namespace KWY
             }
         }
 
+        const int timeout_seconds = 5;
+
         private void LoadAPIUrl()
         {
             // load json first
-            TextAsset jsonText = Resources.Load("WebLoginAPI") as TextAsset;
+            //TextAsset jsonText = Resources.Load("WebLoginAPI") as TextAsset;
+            TextAsset jsonText = Resources.Load("WebLoginAPI copy") as TextAsset;
 
             if (jsonText == null)
             {
@@ -63,7 +70,7 @@ namespace KWY
         }
 
 
-        public IEnumerator LoginPost(string id, string pw, UnityAction<bool> callback)
+        public IEnumerator LoginPost(string id, string pw, UnityAction<LoginResData> callback, UnityAction<ErrorCode> errorCallback)
         {
             string url = Urls.ip_url + "/" + Urls.login_url;
 
@@ -73,31 +80,33 @@ namespace KWY
             form.AddField("password", pw);
 
             UnityWebRequest uwr = UnityWebRequest.Post(url, form);
+            uwr.timeout = timeout_seconds;
 
             yield return uwr.SendWebRequest();
 
-            if (uwr.error == null)
+            if (uwr.result == UnityWebRequest.Result.Success)
             {
                 string result = uwr.downloadHandler.text;
-                Debug.Log(result);
 
                 LoginResData data = JsonUtility.FromJson<LoginResData>(result);
 
-                if (data.code != (int)ResCode.GOOD)
-                {
-                    // error
-                }
-
-                callback(data.message);
+                callback(data);
             }
-            // error occured
+            else if (uwr.result == UnityWebRequest.Result.ConnectionError)
+            {
+                errorCallback(ErrorCode.WEB_REQUEST_CONNECTION_ERROR);
+            }
+            else if (uwr.result == UnityWebRequest.Result.ProtocolError)
+            {
+                errorCallback(ErrorCode.WEB_REQUEST_PROTOCOL_ERROR);
+            }
             else
             {
-                // request error
-            }
+                errorCallback(ErrorCode.WEB_REQUEST_ERROR);
+            }            
         }
 
-        public IEnumerator IdCheckPost(string id, UnityAction<bool> callback)
+        public IEnumerator IdCheckPost(string id, UnityAction<IdCheckResData> callback, UnityAction<ErrorCode> errorCallback)
         {
             string url = Urls.ip_url + "/" + Urls.id_check_url;
 
@@ -106,31 +115,34 @@ namespace KWY
             form.AddField("id", id);
 
             UnityWebRequest uwr = UnityWebRequest.Post(url, form);
+            uwr.timeout = timeout_seconds;
 
             yield return uwr.SendWebRequest();
 
-            if (uwr.error == null)
+            if (uwr.result == UnityWebRequest.Result.Success)
             {
                 string result = uwr.downloadHandler.text;
                 Debug.Log(result);
 
                 IdCheckResData data = JsonUtility.FromJson<IdCheckResData>(result);
 
-                if (data.code != (int)ResCode.GOOD)
-                {
-                    // error
-                }
-
-                callback(data.message);
+                callback(data);
             }
-            // error occured
+            else if (uwr.result == UnityWebRequest.Result.ConnectionError)
+            {
+                errorCallback(ErrorCode.WEB_REQUEST_CONNECTION_ERROR);
+            }
+            else if (uwr.result == UnityWebRequest.Result.ProtocolError)
+            {
+                errorCallback(ErrorCode.WEB_REQUEST_PROTOCOL_ERROR);
+            }
             else
             {
-
+                errorCallback(ErrorCode.WEB_REQUEST_ERROR);
             }
         }
 
-        public IEnumerator NameCheckPost(string name, UnityAction<bool> callback)
+        public IEnumerator NameCheckPost(string name, UnityAction<NameCheckResData> callback, UnityAction<ErrorCode> errorCallback)
         {
             string url = Urls.ip_url + "/" + Urls.name_check_url;
 
@@ -139,61 +151,68 @@ namespace KWY
             form.AddField("name", name);
 
             UnityWebRequest uwr = UnityWebRequest.Post(url, form);
+            uwr.timeout = timeout_seconds;
 
             yield return uwr.SendWebRequest();
 
-            if (uwr.error == null)
+            if (uwr.result == UnityWebRequest.Result.Success)
             {
                 string result = uwr.downloadHandler.text;
                 Debug.Log(result);
 
                 NameCheckResData data = JsonUtility.FromJson<NameCheckResData>(result);
 
-                if (data.code != (int)ResCode.GOOD)
-                {
-                    // error
-                }
-
-                callback(data.message);
+                callback(data);
             }
-            // error occured
+            else if (uwr.result == UnityWebRequest.Result.ConnectionError)
+            {
+                errorCallback(ErrorCode.WEB_REQUEST_CONNECTION_ERROR);
+            }
+            else if (uwr.result == UnityWebRequest.Result.ProtocolError)
+            {
+                errorCallback(ErrorCode.WEB_REQUEST_PROTOCOL_ERROR);
+            }
             else
             {
-
+                errorCallback(ErrorCode.WEB_REQUEST_ERROR);
             }
         }
 
-        public IEnumerator JoinPost(string id, string name, string pw, UnityAction<bool, string> callback)
+        public IEnumerator JoinPost(string id, string name, string pw, UnityAction<JoinResData> callback, UnityAction<ErrorCode> errorCallback)
         {
             string url = Urls.ip_url + "/" + Urls.join_url;
 
             WWWForm form = new WWWForm();
 
+            form.AddField("id", id);
             form.AddField("name", name);
+            form.AddField("password", pw);
 
             UnityWebRequest uwr = UnityWebRequest.Post(url, form);
+            uwr.timeout = timeout_seconds;
 
             yield return uwr.SendWebRequest();
 
-            if (uwr.error == null)
+            if (uwr.result == UnityWebRequest.Result.Success)
             {
                 string result = uwr.downloadHandler.text;
                 Debug.Log(result);
 
                 JoinResData data = JsonUtility.FromJson<JoinResData>(result);
 
-                if (data.code != (int)ResCode.GOOD)
-                {
-                    // error
-                }
-
-                // if message is fales, uid is null
-                callback(data.message, data.uid);
+                callback(data);
             }
-            // error occured
+            else if (uwr.result == UnityWebRequest.Result.ConnectionError)
+            {
+                errorCallback(ErrorCode.WEB_REQUEST_CONNECTION_ERROR);
+            }
+            else if (uwr.result == UnityWebRequest.Result.ProtocolError)
+            {
+                errorCallback(ErrorCode.WEB_REQUEST_PROTOCOL_ERROR);
+            }
             else
             {
-
+                errorCallback(ErrorCode.WEB_REQUEST_ERROR);
             }
         }
     }

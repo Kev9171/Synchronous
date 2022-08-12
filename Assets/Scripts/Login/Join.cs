@@ -3,6 +3,10 @@ using UnityEngine.UI;
 
 using TMPro;
 
+using System;
+using System.Net.Mail;
+using System.Text.RegularExpressions;
+
 namespace KWY
 {
     [RequireComponent(typeof(CanvasRenderer))]
@@ -50,10 +54,16 @@ namespace KWY
         [SerializeField]
         GameObject SelectPanel;
 
+        [SerializeField]
+        Transform CanvasTransform;
+
+        [SerializeField]
+        GameObject LoadingPanel;
+
         #region Private Fields
 
         private bool[] JoinCondition = new bool[4];
-        const string pwReg = "";
+        Regex pwRegex = new Regex(@"[a-zA-Z0-9]{5,15}$");
 
         #endregion
 
@@ -63,6 +73,8 @@ namespace KWY
         const string WelcomeUser = "Join completed!\n\n Yout UID: ";
         const string JoinFailed = "Joining is not available now.";
         const string NameCheckFailed = "Unavaiable Name, check again!";
+        const string NotEmailId = "Id should be email-format.";
+        string inputFailedMsg = "Enter at least one word for id and password";
 
         #endregion
 
@@ -93,12 +105,9 @@ namespace KWY
 
         public void OnPwValueChanged()
         {
-            // todo
+            string pw = PwInput.text.Trim();
 
-            bool ok = true; // temp
-
-
-            // 정규식 확인
+            bool ok = pwRegex.IsMatch(pw);
 
             // 맞으면 again pw input field 활성화
             if (ok)
@@ -128,7 +137,7 @@ namespace KWY
         public void OnPwAgainValueChagned()
         {
             // 위 비밀 번호 확인
-            if (PwInput.text == PwCheckInput.text)
+            if (PwInput.text.Trim() == PwCheckInput.text.Trim())
             {
                 JoinCondition[3] = true;
                 PwAgainCheckImg.sprite = CheckOkImg;
@@ -164,41 +173,66 @@ namespace KWY
 
         public void OnClickIdCheckBtn()
         {
-            string id = IdInput.text;
+            string id = IdInput.text.Trim();
+
+            try
+            {
+                MailAddress m = new MailAddress(id);
+            }
+            catch(Exception)
+            {
+                // email 아님
+                // 팝업창 띄우기
+                PopupBuilder.ShowPopup(CanvasTransform, NotEmailId);
+                return;
+            }
+
+            ShowLoadingPanel();
 
             // for test
-            CheckIdCallback(true);
+            //CheckIdCallback(new IdCheckResData((int)ResCode.TRUE, "OK"));
 
             // original code
-            //StartCoroutine(LoginJoinAPI.Instance.IdCheckPost(id, CheckIdCallback));
+            StartCoroutine(LoginJoinAPI.Instance.IdCheckPost(id, CheckIdCallback, ErrorCallback));
         }
 
         public void OnClickNameCheckBtn()
         {
-            string name = NameInput.text;
+            string name = NameInput.text.Trim();
+
+            if (name == "")
+            {
+                PopupBuilder.ShowPopup(CanvasTransform, inputFailedMsg);
+                return;
+            }
+
+            ShowLoadingPanel();
 
             // for test
-            CheckNameCallback(true);
+            //CheckNameCallback(new NameCheckResData((int)ResCode.TRUE, "OK"));
 
             // original code
-            //StartCoroutine(LoginJoinAPI.Instance.IdCheckPost(name, CheckNameCallback));
+            StartCoroutine(LoginJoinAPI.Instance.NameCheckPost(name, CheckNameCallback, ErrorCallback));
         }
 
         public void OnClickJoinBtn()
         {
+            ShowLoadingPanel();
+
             // for test
-            JoinCallback(true, "111");
+            //JoinCallback(new JoinResData((int)ResCode.TRUE, "OK", 111));
 
             // original code
-            /*string id = IdInput.text;
-            string name = NameInput.text;
-            string pw = PwInput.text;
+            string id = IdInput.text.Trim();
+            string name = NameInput.text.Trim();
+            string pw = PwInput.text.Trim();
 
-            StartCoroutine(LoginJoinAPI.Instance.JoinPost(id, name, pw, JoinCallback));*/
+            StartCoroutine(LoginJoinAPI.Instance.JoinPost(id, name, pw, JoinCallback, ErrorCallback));
         }
 
         public void JoinedCompleteCallback()
         {
+            SelectPanel.SetActive(true);
             gameObject.SetActive(false);
         }
 
@@ -206,15 +240,27 @@ namespace KWY
 
         #region Callback methods for LoginJoinAPI
 
-        public void CheckIdCallback(bool message)
+        public void CheckIdCallback(IdCheckResData data)
         {
-            if (message)
+            HideLoadingPanel();
+
+            int code = data.code;
+
+            // 서버로 부터 에러메세지 받거나 응답이 없을 경우
+            if (code == (int)ResCode.ERROR)
+            {
+                // 일단 log 만...
+                Debug.LogError(data.message);
+            }
+            // 사용 가능 아이디일 경우
+            else if (code == (int)ResCode.TRUE)
             {
                 IdCheckImg.sprite = CheckOkImg;
                 JoinCondition[0] = true;
 
                 CheckJoinable();
             }
+            // 중복 아이디일 경우
             else
             {
                 IdCheckImg.sprite = CheckNoImg;
@@ -223,14 +269,22 @@ namespace KWY
                 JoinBtn.interactable = false;
 
                 // 팝업창 띄우기
-                GameObject canvas = GameObject.Find("Canvas");
-                PopupBuilder.ShowPopup(canvas.transform, IdCheckFailed);
+                PopupBuilder.ShowPopup(CanvasTransform, IdCheckFailed);
             }
         }
 
-        public void CheckNameCallback(bool message)
+        public void CheckNameCallback(NameCheckResData data)
         {
-            if (message)
+            HideLoadingPanel();
+
+            int code = data.code;
+
+            if (code == (int)ResCode.ERROR)
+            {
+                // 일단 log 만...
+                Debug.LogError(data.message);
+            }
+            else if (code == (int)ResCode.TRUE)
             {
                 NameCheckImg.sprite = CheckOkImg;
                 JoinCondition[1] = true;
@@ -245,28 +299,49 @@ namespace KWY
                 JoinBtn.interactable = false;
 
                 // 팝업창 띄우기
-                GameObject canvas = GameObject.Find("Canvas");
-                PopupBuilder.ShowPopup(canvas.transform, NameCheckFailed);
+                PopupBuilder.ShowPopup(CanvasTransform, NameCheckFailed);
             }
         }
 
-        public void JoinCallback(bool message, string uid)
+        public void JoinCallback(JoinResData data)
         {
-            if (message)
-            {
-                GameObject canvas = GameObject.Find("Canvas");
-                PopupBuilder.ShowPopup(canvas.transform, WelcomeUser + uid, JoinedCompleteCallback, true);
+            HideLoadingPanel();
 
-                SelectPanel.SetActive(true);
+            int code = data.code;
+
+            if (code == (int)ResCode.ERROR)
+            {
+                // 일단 log 만...
+                Debug.LogError(data.message);
+            }
+            else if (code == (int)ResCode.TRUE)
+            {
+                PopupBuilder.ShowPopup(CanvasTransform, WelcomeUser + data.uid, JoinedCompleteCallback, true);
             }
             else
             {
-                GameObject canvas = GameObject.Find("Canvas");
-                PopupBuilder.ShowPopup(canvas.transform, JoinFailed);
+                PopupBuilder.ShowPopup(CanvasTransform, JoinFailed);
             }
         }
 
+        public void ErrorCallback(ErrorCode code)
+        {
+            HideLoadingPanel();
+
+            PopupBuilder.ShowErrorPopup(CanvasTransform, code);
+        }
+
         #endregion
+
+        private void ShowLoadingPanel()
+        {
+            LoadingPanel.SetActive(true);
+        }
+
+        private void HideLoadingPanel()
+        {
+            LoadingPanel.SetActive(false);
+        }
 
         private void OnEnable()
         {
@@ -278,6 +353,8 @@ namespace KWY
 
             JoinBtn.interactable = false;
             PwCheckInput.interactable = false;
+
+            LoadingPanel.SetActive(false);
         }
     }
 }

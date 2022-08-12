@@ -11,41 +11,29 @@ namespace KWY
     {
         public List<ErrorMsgStruct> data;
 
-        // 단순히 탐색 (에러 종료 몇 안되니까 전부 탐색...?)
-        public string[] GetData(ErrorCode e)
+        // 에러 몇개 안되니까 다 탐색해도 느리진 안겠죠...?
+        public string getMsg(ErrorCode code)
         {
-            foreach(ErrorMsgStruct s in data)
+            foreach(var s in data)
             {
-                if (s.ErrorNum == (int)e)
+                if (s.error_code == (int) code)
                 {
-                    return new string[] { s.ErrorCode, s.ErrorContent };
+                    return s.error_msg;
                 }
             }
+            Debug.LogError($"There is no such error code: {code}");
             return null;
         }
 
         public override string ToString()
         {
             string s = "";
-            foreach(ErrorMsgStruct e in data)
+
+            foreach(var v in data)
             {
-                s += e + ", ";
+                s += v + ", ";
             }
-
             return s;
-        }
-    }
-
-    [Serializable]
-    public class ErrorMsgStruct
-    {
-        public int ErrorNum;
-        public string ErrorCode;
-        public string ErrorContent;
-
-        public override string ToString()
-        {
-            return string.Format("[ErroNum: {0}, ErrorCode: {1}, ErrorContent: {2}]", ErrorNum, ErrorCode, ErrorContent);
         }
     }
 }

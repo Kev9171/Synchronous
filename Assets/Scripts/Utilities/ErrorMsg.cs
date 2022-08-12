@@ -66,13 +66,13 @@ namespace KWY
             else
             {
                 _eData = JsonUtility.FromJson<ErrorMsgData>(jsonText.text);
+                
                 Debug.Log("Error msg file is loaded");
             }
         }
 
         private void Start()
         {
-            LoadErrorMsg();
         }
     }
 }

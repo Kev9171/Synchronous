@@ -22,36 +22,55 @@ namespace KWY
         [SerializeField]
         Transform CanvasTransform;
 
-        string loginFailedMsg = "User no found";
-        string loginConditionFailedMsg = "Enter at least one word for id and password";
-        string loginSuccessMsg = "Welcome to Synchronous!";
+        [SerializeField]
+        GameObject LoadingPanel;
+
+        const string loginFailedMsg = "User no found";
+        const string loginConditionFailedMsg = "Enter at least one word for id and password";
+        const string loginSuccessMsg = "Welcome to Synchronous!";
 
         public void OnClickLoginBtn()
         {
-            string id = IdInput.text;
-            string pw = PwInput.text;
+            string id = IdInput.text.Trim();
+            string pw = PwInput.text.Trim();
 
             if (id == "" || pw == "")
             {
-                GameObject canvas = GameObject.Find("Canvas");
-                PopupBuilder.ShowPopup(canvas.transform, loginConditionFailedMsg);
+                PopupBuilder.ShowPopup(CanvasTransform, loginConditionFailedMsg);
                 return;
             }
 
-            // LoginJoinAPI 사용하여 로그인 확인
-            bool ok = true;
+            ShowLoadingPanel();
 
-            // db 로부터 받은 데이터를 UserManager에 저장
-            // 아래 값은 임시
-            string accountId = "temp_id";
-            Sprite userIcon = null;
-            int userLevel = 1;
-            int userId = 12345;
-            UserManager.InitData(userIcon, accountId, userLevel, userId);
+            // for test
+            //LoginCallback(new LoginResData((int)ResCode.TRUE, "OK", 111, "test-email", 1, "temp name", null));
 
-            if(ok)
+            // original code
+            StartCoroutine(LoginJoinAPI.Instance.LoginPost(id, pw, LoginCallback, ErrorCallback));
+        }
+
+        public void LoginCallback(LoginResData data)
+        {
+            HideLoadingPanel();
+
+            int code = data.code;
+
+            if (code == (int)ResCode.ERROR)
+            {
+                // 일단 log 만...
+                Debug.LogError(data.message);
+            }
+            else if (code == (int)ResCode.TRUE)
             {
                 Debug.Log("Login Successed");
+
+                // db 로부터 받은 데이터를 UserManager에 저장
+                // 아래 값은 임시
+                string accountId = data.id;
+                Sprite userIcon = null; // 받은 url로 다시 요청해서 이미지 가져와야함@@
+                int userLevel = data.level;
+                ulong userId = data.uid;
+                UserManager.InitData(userIcon, accountId, userLevel, userId);
 
                 PopupBuilder.ShowPopup(CanvasTransform, loginSuccessMsg,
                     loginScene.AfterLogin, true);
@@ -62,6 +81,31 @@ namespace KWY
                 GameObject canvas = GameObject.Find("Canvas");
                 PopupBuilder.ShowPopup(canvas.transform, loginFailedMsg);
             }
+        }
+
+        public void ErrorCallback(ErrorCode code)
+        {
+            HideLoadingPanel();
+
+            PopupBuilder.ShowErrorPopup(CanvasTransform, code);
+        }
+
+        private void ShowLoadingPanel()
+        {
+            LoadingPanel.SetActive(true);
+        }
+
+        private void HideLoadingPanel()
+        {
+            LoadingPanel.SetActive(false);
+        }
+
+        private void OnEnable()
+        {
+            IdInput.text = "";
+            PwInput.text = "";
+
+            LoadingPanel.SetActive(false);
         }
     }
 }
