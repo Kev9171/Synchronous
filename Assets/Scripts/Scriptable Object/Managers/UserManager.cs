@@ -32,11 +32,13 @@ namespace KWY
         private Sprite _userIcon;
         private int _userLevel;
         private ulong _userId;
+        private string _userName;
 
         public static string AccountId { get { return Instance._accountId; } }
         public static Sprite UserIcon { get { return Instance._userIcon; } }
         public static int UserLevel { get { return Instance._userLevel; } }
         public static ulong UserId { get { return Instance._userId; } }
+        public static string UserName { get { return Instance._userName; } }
 
         /// <summary>
         /// It should be called when login is successful; before using the instance; 
@@ -45,12 +47,14 @@ namespace KWY
         /// <param name="accountId">user unique id allocated from the server</param>
         /// <param name="userLevel">user level</param>
         /// <param name="userId">user id</param>
-        public static void InitData(Sprite userIcon, string accountId, int userLevel, ulong userId)
+        /// <param name="userName">user name</param>
+        public static void InitData(Sprite userIcon, string accountId, int userLevel, ulong userId, string userName)
         {
             Instance._accountId = accountId;
             Instance._userIcon = userIcon;
             Instance._userLevel = userLevel;
             Instance._userId = userId;
+            Instance._userName = userName;
         }
 
     }

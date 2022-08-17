@@ -82,6 +82,8 @@ namespace KWY
             UnityWebRequest uwr = UnityWebRequest.Post(url, form);
             uwr.timeout = timeout_seconds;
 
+            Debug.Log($"Request - [url: {url}, id: {id}, password: {pw}");
+
             yield return uwr.SendWebRequest();
 
             if (uwr.result == UnityWebRequest.Result.Success)
@@ -89,6 +91,7 @@ namespace KWY
                 string result = uwr.downloadHandler.text;
 
                 LoginResData data = JsonUtility.FromJson<LoginResData>(result);
+                Debug.Log($"Response - {data}");
 
                 callback(data);
             }
@@ -117,14 +120,16 @@ namespace KWY
             UnityWebRequest uwr = UnityWebRequest.Post(url, form);
             uwr.timeout = timeout_seconds;
 
+            Debug.Log($"Request - [url: {url}, id: {id}]");
+
             yield return uwr.SendWebRequest();
 
             if (uwr.result == UnityWebRequest.Result.Success)
             {
                 string result = uwr.downloadHandler.text;
-                Debug.Log(result);
 
                 IdCheckResData data = JsonUtility.FromJson<IdCheckResData>(result);
+                Debug.Log($"Response - {data}");
 
                 callback(data);
             }
@@ -153,14 +158,16 @@ namespace KWY
             UnityWebRequest uwr = UnityWebRequest.Post(url, form);
             uwr.timeout = timeout_seconds;
 
+            Debug.Log($"Request - [url: {url}, name: {name}]");
+
             yield return uwr.SendWebRequest();
 
             if (uwr.result == UnityWebRequest.Result.Success)
             {
                 string result = uwr.downloadHandler.text;
-                Debug.Log(result);
 
                 NameCheckResData data = JsonUtility.FromJson<NameCheckResData>(result);
+                Debug.Log($"Response - {data}");
 
                 callback(data);
             }
@@ -191,14 +198,16 @@ namespace KWY
             UnityWebRequest uwr = UnityWebRequest.Post(url, form);
             uwr.timeout = timeout_seconds;
 
+            Debug.Log($"Request - [url: {url}, id: {id}, name: {name}, password: {pw}]");
+
             yield return uwr.SendWebRequest();
 
             if (uwr.result == UnityWebRequest.Result.Success)
             {
                 string result = uwr.downloadHandler.text;
-                Debug.Log(result);
 
                 JoinResData data = JsonUtility.FromJson<JoinResData>(result);
+                Debug.Log($"Response - {data}");
 
                 callback(data);
             }
@@ -213,6 +222,115 @@ namespace KWY
             else
             {
                 errorCallback(ErrorCode.WEB_REQUEST_ERROR);
+            }
+        }
+
+        public IEnumerator LogoutPost(string id, UnityAction<LogoutResData> callback, UnityAction<ErrorCode> errorCallback)
+        {
+            string url = Urls.ip_url + "/" + Urls.logout_url;
+
+            WWWForm form = new WWWForm();
+
+            form.AddField("id", id);
+
+            UnityWebRequest uwr = UnityWebRequest.Post(url, form);
+            uwr.timeout = timeout_seconds;
+
+            Debug.Log($"Request - [url: {url}, id: {id}]");
+
+            yield return uwr.SendWebRequest();
+
+            if (uwr.result == UnityWebRequest.Result.Success)
+            {
+                string result = uwr.downloadHandler.text;
+
+                LogoutResData data = JsonUtility.FromJson<LogoutResData>(result);
+                Debug.Log($"Response - {data}");
+
+                callback(data);
+            }
+            else if (uwr.result == UnityWebRequest.Result.ConnectionError)
+            {
+                errorCallback(ErrorCode.WEB_REQUEST_CONNECTION_ERROR);
+            }
+            else if (uwr.result == UnityWebRequest.Result.ProtocolError)
+            {
+                errorCallback(ErrorCode.WEB_REQUEST_PROTOCOL_ERROR);
+            }
+            else
+            {
+                errorCallback(ErrorCode.WEB_REQUEST_ERROR);
+            }
+        }
+
+        public IEnumerator LogoutPost(string id, UnityAction callback, UnityAction errorCallback)
+        {
+            string url = Urls.ip_url + "/" + Urls.logout_url;
+
+            WWWForm form = new WWWForm();
+
+            form.AddField("id", id);
+
+            UnityWebRequest uwr = UnityWebRequest.Post(url, form);
+            uwr.timeout = timeout_seconds;
+
+            Debug.Log($"Request - [url: {url}, id: {id}]");
+
+            yield return uwr.SendWebRequest();
+
+            if (uwr.result == UnityWebRequest.Result.Success)
+            {
+                string result = uwr.downloadHandler.text;
+
+                LogoutResData data = JsonUtility.FromJson<LogoutResData>(result);
+                Debug.Log($"Response - {data}");
+
+                callback();
+            }
+            else if (uwr.result == UnityWebRequest.Result.ConnectionError)
+            {
+                errorCallback();
+            }
+            else if (uwr.result == UnityWebRequest.Result.ProtocolError)
+            {
+                errorCallback();
+            }
+            else
+            {
+                errorCallback();
+            }
+        }
+
+        public IEnumerator LogoutPost(string id)
+        {
+            string url = Urls.ip_url + "/" + Urls.logout_url;
+
+            WWWForm form = new WWWForm();
+
+            form.AddField("id", id);
+
+            UnityWebRequest uwr = UnityWebRequest.Post(url, form);
+            uwr.timeout = timeout_seconds;
+
+            Debug.Log($"Request - [url: {url}, id: {id}]");
+
+            yield return uwr.SendWebRequest();
+
+            if (uwr.result == UnityWebRequest.Result.Success)
+            {
+                string result = uwr.downloadHandler.text;
+
+                LogoutResData data = JsonUtility.FromJson<LogoutResData>(result);
+                Debug.Log($"Response - {data}");
+            }
+            else if (uwr.result == UnityWebRequest.Result.ConnectionError)
+            {
+            }
+            else if (uwr.result == UnityWebRequest.Result.ProtocolError)
+            {
+            }
+            else
+            {
             }
         }
     }

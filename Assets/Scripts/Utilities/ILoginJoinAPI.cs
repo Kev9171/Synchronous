@@ -11,5 +11,6 @@ namespace KWY
         IEnumerator IdCheckPost(string id, UnityAction<IdCheckResData> callback, UnityAction<ErrorCode> errorCallback);
         IEnumerator NameCheckPost(string name, UnityAction<NameCheckResData> callback, UnityAction<ErrorCode> errorCallback);
         IEnumerator JoinPost(string id, string name, string pw, UnityAction<JoinResData> callback, UnityAction<ErrorCode> errorCallback);
+        IEnumerator LogoutPost(string id, UnityAction<LogoutResData> callback, UnityAction<ErrorCode> errorCallback);
     }
 }

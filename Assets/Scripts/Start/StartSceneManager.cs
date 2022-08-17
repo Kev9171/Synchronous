@@ -36,6 +36,9 @@ namespace KWY
         [SerializeField]
         List<Button> MenuBtns;
 
+        [SerializeField]
+        Button LogoutBtn;
+
         const string createRoomContent = "Enter the name of room you want to create.";
         const string joinRoomContent = "Enter the name of room you want to join.";
         const string roomNameEmptyContent = "Enter more than 1 word.";
@@ -43,7 +46,7 @@ namespace KWY
         public void LoadUserInfo()
         {
             UserIcon.sprite = UserManager.UserIcon;
-            UserName.text = UserManager.AccountId;
+            UserName.text = UserManager.UserName;
         }
 
         #region Button Callbacks
@@ -94,7 +97,12 @@ namespace KWY
             // 포함하는 클래스로 게임 정상 종료 시키기
 
             // temp
-            PopupBuilder.ShowPopup2(CanvasTransform, reallyQuitGameContent, Application.Quit);
+            PopupBuilder.ShowPopup2(CanvasTransform, reallyQuitGameContent, OnQuitOkCallback);
+        }
+
+        public void OnQuitOkCallback()
+        {
+            StartCoroutine(LoginJoinAPI.Instance.LogoutPost(UserManager.AccountId, Application.Quit, Application.Quit));
         }
 
         public void OnCreateRoomBtnCallback(string roomName)
@@ -144,6 +152,8 @@ namespace KWY
             {
                 b.gameObject.AddComponent<MenuBtnEventTrigeer>();
             }
+
+            LogoutBtn.gameObject.AddComponent<MenuBtnEventTrigeer>();
         }
 
         #endregion

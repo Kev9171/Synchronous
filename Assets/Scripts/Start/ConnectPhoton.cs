@@ -36,7 +36,7 @@ namespace KWY
             StatusMsgPanel.SetActive(true);
 
             PhotonNetwork.AutomaticallySyncScene = true; // 사용자 간 가장 쉬운 loading scene 방법
-            PhotonNetwork.NickName = UserManager.AccountId;
+            PhotonNetwork.NickName = UserManager.UserName;
             PhotonNetwork.GameVersion = MasterManager.GameSettings.GameVersion;
             PhotonNetwork.ConnectUsingSettings();
         }
@@ -89,6 +89,9 @@ namespace KWY
         public override void OnDisconnected(DisconnectCause cause)
         {
             Debug.Log("Failed to connect to Photon: " + cause.ToString(), this);
+
+            // 로그아웃 요청
+            StartCoroutine(LoginJoinAPI.Instance.LogoutPost(UserManager.AccountId));
 
             // 연결 실패할 경우 오류 팝업 띄우기
             GameObject canvas = GameObject.Find("Canvas");
