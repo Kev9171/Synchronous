@@ -97,11 +97,11 @@ namespace KWY
             errorPanel.transform.SetParent(parnet, false);
             if (btnCallback == null)
             {
-                errorPanel.GetComponent<ErrorPanel>().SetData(eCode);
+                errorPanel.GetComponent<ErrorPopup>().SetData(eCode);
             }
             else
             {
-                errorPanel.GetComponent<ErrorPanel>().SetData(eCode, btnCallback);
+                errorPanel.GetComponent<ErrorPopup>().SetData(eCode, btnCallback);
             }
         }
     }

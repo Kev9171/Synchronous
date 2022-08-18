@@ -6,7 +6,7 @@ using TMPro;
 
 namespace KWY
 {
-    public class ErrorPanel : MonoBehaviour, IInstantiatableUI
+    public class ErrorPopup : MonoBehaviour, IInstantiatableUI
     {
         [SerializeField]
         TMP_Text ErrorContentText;
@@ -19,7 +19,7 @@ namespace KWY
 
         public void SetData(ErrorCode eCode)
         {
-            string[] s = ErrorMsg.Instance.eData.GetData(eCode);
+            string s = ErrorMsg.Instance.eData.getMsg(eCode);
 
             if (s == null)
             {
@@ -27,8 +27,8 @@ namespace KWY
             }
             else
             {
-                ErrorCodeText.text = s[0];
-                ErrorContentText.text = s[1];
+                ErrorCodeText.text = eCode.ToString();
+                ErrorContentText.text = s;
             }
 
             OkBtn.onClick.AddListener(OnClickClose);
@@ -36,7 +36,7 @@ namespace KWY
 
         public void SetData(ErrorCode eCode, UnityAction btnCallback)
         {
-            string[] s = ErrorMsg.Instance.eData.GetData(eCode);
+            string s = ErrorMsg.Instance.eData.getMsg(eCode);
 
             if (s == null)
             {
@@ -44,8 +44,8 @@ namespace KWY
             }
             else
             {
-                ErrorCodeText.text = s[0];
-                ErrorContentText.text = s[1];
+                ErrorCodeText.text = eCode.ToString();
+                ErrorContentText.text = s;
             }
 
             OkBtn.onClick.AddListener(btnCallback);
