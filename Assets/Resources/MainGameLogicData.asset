@@ -15,6 +15,6 @@ MonoBehaviour:
   playerInitialMp: 3
   playerMPIncrement: 2
   characterMPIncrement: 3
-  timeLimit: 20
+  timeLimit: 30
   actionLogShowingTime: 2.5
   simulationIntervalSeconds: 1

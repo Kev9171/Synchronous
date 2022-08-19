@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 1326943966758870565}
   - component: {fileID: 429383500999419485}
   - component: {fileID: 3782679816142068562}
+  - component: {fileID: 6207119017085088076}
   m_Layer: 0
   m_Name: Flappy2
   m_TagString: Untagged
@@ -183,6 +184,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _characterBase: {fileID: 11400000, guid: 9cc1e36a50a670d4289b912bc85d48df, type: 2}
   movementSpeed: 0
+  TilePos: {x: 0, y: 0, z: 0}
 --- !u!61 &3782679816142068562
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -190,10 +192,10 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1326943966758870567}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -209,3 +211,24 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.7, y: 0.7}
   m_EdgeRadius: 0
+--- !u!50 &6207119017085088076
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1326943966758870567}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0

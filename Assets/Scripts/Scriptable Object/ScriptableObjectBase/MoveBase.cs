@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace KWY
@@ -5,7 +6,7 @@ namespace KWY
     [CreateAssetMenu(fileName = "MoveAction", menuName = "MoveAction/MoveBase")]
     public class MoveBase : ActionBase
     {
-        public  int distance;
+        public int distance;
 
         public override string ToString()
         {
