@@ -72,6 +72,9 @@ namespace KWY
     public enum ErrorCode : int
     {
         PHOTON_DISCONNECT = 0,
-
+        WEB_REQUEST_CONNECTION_ERROR = 101,
+        WEB_REQUEST_PROTOCOL_ERROR = 102,
+        WEB_REQUEST_ERROR = 103,
+        CANNOT_FIND_FILE = 201,
     }
 }

@@ -1,15 +1,24 @@
 {
-    "data":[
+    "data": [
         {
-            "ErrorNum": 0,
-            "ErrorCode": "E100",
-            "ErrorContent": "Photon - Disconnected"
+            "error_code": 0,
+            "error_msg": "Photon - Disconnected"
         },
         {
-            "ErrorNum": 1,
-            "ErrorCode": "E200",
-            "ErrorContent": "Can not read files"
+            "error_code": 201,
+            "error_msg": "Can not read files"
+        },
+        {
+            "error_code": 101,
+            "error_msg": "Can not read files"
+        },
+        {
+            "error_code": 102,
+            "error_msg": "Can not read files"
+        },
+        {
+            "error_code": 103,
+            "error_msg": "Can not read files"
         }
     ]
-    
 }
