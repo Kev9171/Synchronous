@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 using System.Collections;
 
@@ -197,6 +198,9 @@ namespace KWY
             this.timeLimit = MasterManager.GameSettings.GameLobbyTimerTime;
 
             TimerObject.InitTimer(timeLimit, TimeOut, CountDownText);
+
+            LeaveRoomBtn.gameObject.AddComponent<GameLobbyBtnEventTrigeer>();
+            ReadyBtn.gameObject.AddComponent<GameLobbyBtnEventTrigeer>();
         }
 
         private void OnEnable()
@@ -210,5 +214,19 @@ namespace KWY
         }
 
         #endregion
+    }
+
+    public class GameLobbyBtnEventTrigeer : EventTrigger
+    {
+        public override void OnPointerEnter(PointerEventData eventData)
+        {
+            gameObject.GetComponent<RectTransform>().localScale = new Vector3(1.05f, 1.05f, 1.05f);
+            base.OnPointerEnter(eventData);
+        }
+        public override void OnPointerExit(PointerEventData eventData)
+        {
+            gameObject.GetComponent<RectTransform>().localScale = new Vector3(1.0f, 1.0f, 1.0f);
+            base.OnPointerExit(eventData);
+        }
     }
 }
