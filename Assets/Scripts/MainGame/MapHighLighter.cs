@@ -19,6 +19,8 @@ namespace KWY
         private Color transparent = new Color(1, 1, 1, 0);
         private Vector3 lastPos;
         private List<Direction> allDirection = new List<Direction>();
+        private float xCor = 0.65f;  //¸Ê1 -> ¸Ê2 x°ª º¸Á¤Ä¡
+        private float yCor = 0.7f / 0.65f;  // ¸Ê1 -> ¸Ê2 y°ª º¸Á¤Ä¡
         private void HighlightTile(Vector3 baseWorldPos, int x, int y)
         {
             hlMap.SetColor(hlMap.WorldToCell(baseWorldPos), highlightColor);
@@ -100,28 +102,28 @@ namespace KWY
                     switch (dp)
                     {
                         case 0:
-                            hlMap.SetTileFlags(hlMap.WorldToCell(lastPos + new Vector3(-0.5f, 0.5f) * j), TileFlags.None);
-                            hlMap.SetColor(hlMap.WorldToCell(lastPos + new Vector3(-0.5f, 0.5f, 0) * j), highlightColor);
+                            hlMap.SetTileFlags(hlMap.WorldToCell(lastPos + new Vector3(-0.5f * xCor, 0.5f * yCor) * j), TileFlags.None);
+                            hlMap.SetColor(hlMap.WorldToCell(lastPos + new Vector3(-0.5f * xCor, 0.5f * yCor) * j), highlightColor);
                             break;
                         case 1:
-                            hlMap.SetTileFlags(hlMap.WorldToCell(lastPos + Vector3.left * j), TileFlags.None);
-                            hlMap.SetColor(hlMap.WorldToCell(lastPos + Vector3.left * j), highlightColor);
+                            hlMap.SetTileFlags(hlMap.WorldToCell(lastPos + Vector3.left * xCor * j), TileFlags.None);
+                            hlMap.SetColor(hlMap.WorldToCell(lastPos + Vector3.left * xCor * j), highlightColor);
                             break;
                         case 2:
-                            hlMap.SetTileFlags(hlMap.WorldToCell(lastPos + new Vector3(-0.5f, -0.5f) * j), TileFlags.None);
-                            hlMap.SetColor(hlMap.WorldToCell(lastPos + new Vector3(-0.5f, -0.5f) * j), highlightColor);
+                            hlMap.SetTileFlags(hlMap.WorldToCell(lastPos + new Vector3(-0.5f * xCor, -0.5f * yCor) * j), TileFlags.None);
+                            hlMap.SetColor(hlMap.WorldToCell(lastPos + new Vector3(-0.5f * xCor, -0.5f * yCor) * j), highlightColor);
                             break;
                         case 3:
-                            hlMap.SetTileFlags(hlMap.WorldToCell(lastPos + new Vector3(0.5f, -0.5f) * j), TileFlags.None);
-                            hlMap.SetColor(hlMap.WorldToCell(lastPos + new Vector3(0.5f, -0.5f) * j), highlightColor);
+                            hlMap.SetTileFlags(hlMap.WorldToCell(lastPos + new Vector3(0.5f * xCor, -0.5f * yCor) * j), TileFlags.None);
+                            hlMap.SetColor(hlMap.WorldToCell(lastPos + new Vector3(0.5f * xCor, -0.5f * yCor) * j), highlightColor);
                             break;
                         case 4:
-                            hlMap.SetTileFlags(hlMap.WorldToCell(lastPos + Vector3.right * j), TileFlags.None);
-                            hlMap.SetColor(hlMap.WorldToCell(lastPos + Vector3.right * j), highlightColor);
+                            hlMap.SetTileFlags(hlMap.WorldToCell(lastPos + Vector3.right * xCor * j), TileFlags.None);
+                            hlMap.SetColor(hlMap.WorldToCell(lastPos + Vector3.right * xCor * j), highlightColor);
                             break;
                         case 5:
-                            hlMap.SetTileFlags(hlMap.WorldToCell(lastPos + new Vector3(0.5f, 0.5f) * j), TileFlags.None);
-                            hlMap.SetColor(hlMap.WorldToCell(lastPos + new Vector3(0.5f, 0.5f) * j), highlightColor);
+                            hlMap.SetTileFlags(hlMap.WorldToCell(lastPos + new Vector3(0.5f * xCor, 0.5f * yCor) * j), TileFlags.None);
+                            hlMap.SetColor(hlMap.WorldToCell(lastPos + new Vector3(0.5f * xCor, 0.5f * yCor) * j), highlightColor);
                             break;
                         case 6:
                             break;
@@ -130,22 +132,22 @@ namespace KWY
                 switch (dp)
                 {
                     case 0:
-                        lastPos = lastPos + new Vector3(-0.5f, 0.5f) * d;
+                        lastPos = lastPos + new Vector3(-0.5f * xCor, 0.5f * yCor) * d;
                         break;
                     case 1:
-                        lastPos = lastPos + Vector3.left * d;
+                        lastPos = lastPos + Vector3.left * xCor * d;
                         break;
                     case 2:
-                        lastPos = lastPos + new Vector3(-0.5f, -0.5f) * d;
+                        lastPos = lastPos + new Vector3(-0.5f * xCor, -0.5f * yCor) * d;
                         break;
                     case 3:
-                        lastPos = lastPos + new Vector3(0.5f, -0.5f) * d;
+                        lastPos = lastPos + new Vector3(0.5f * xCor, -0.5f * yCor) * d;
                         break;
                     case 4:
-                        lastPos = lastPos + Vector3.right * d;
+                        lastPos = lastPos + Vector3.right * xCor * d;
                         break;
                     case 5:
-                        lastPos = lastPos + new Vector3(0.5f, 0.5f) * d;
+                        lastPos = lastPos + new Vector3(0.5f * xCor, 0.5f * yCor) * d;
                         break;
                     case 6:
                         break;
@@ -166,58 +168,58 @@ namespace KWY
                     continue;
                 }
 
-                hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(-0.5f, 0.5f) * i), TileFlags.None);
-                hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(-0.5f, 0.5f) * i), highlightColor);
+                hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(-0.5f * xCor, 0.5f * yCor) * i), TileFlags.None);
+                hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(-0.5f * xCor, 0.5f * yCor) * i), highlightColor);
 
                 for (int j = 1; j <= i - 1; j++)
                 {
-                    hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(-0.5f, 0.5f) * i + Vector3.right * j), TileFlags.None);
-                    hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(-0.5f, 0.5f) * i + Vector3.right * j), highlightColor);
+                    hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(-0.5f * xCor, 0.5f * yCor) * i + Vector3.right * xCor * j), TileFlags.None);
+                    hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(-0.5f * xCor, 0.5f * yCor) * i + Vector3.right * xCor * j), highlightColor);
                 }
 
-                hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(0.5f, 0.5f) * i), TileFlags.None);
-                hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(0.5f, 0.5f) * i), highlightColor);
+                hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(0.5f * xCor, 0.5f * yCor) * i), TileFlags.None);
+                hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(0.5f * xCor, 0.5f * yCor) * i), highlightColor);
 
                 for (int j = 1; j <= i - 1; j++)
                 {
-                    hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(0.5f, 0.5f) * i + new Vector3(0.5f, -0.5f) * j), TileFlags.None);
-                    hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(0.5f, 0.5f) * i + new Vector3(0.5f, -0.5f) * j), highlightColor);
+                    hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(0.5f * xCor, 0.5f * yCor) * i + new Vector3(0.5f * xCor, -0.5f * yCor) * j), TileFlags.None);
+                    hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(0.5f * xCor, 0.5f * yCor) * i + new Vector3(0.5f * xCor, -0.5f * yCor) * j), highlightColor);
                 }
 
-                hlMap.SetTileFlags(hlMap.WorldToCell(basePos + Vector3.right * i), TileFlags.None);
-                hlMap.SetColor(hlMap.WorldToCell(basePos + Vector3.right * i), highlightColor);
+                hlMap.SetTileFlags(hlMap.WorldToCell(basePos + Vector3.right * xCor * i), TileFlags.None);
+                hlMap.SetColor(hlMap.WorldToCell(basePos + Vector3.right * xCor * i), highlightColor);
 
                 for (int j = 1; j <= i - 1; j++)
                 {
-                    hlMap.SetTileFlags(hlMap.WorldToCell(basePos + Vector3.right * i + new Vector3(-0.5f, -0.5f) * j), TileFlags.None);
-                    hlMap.SetColor(hlMap.WorldToCell(basePos + Vector3.right * i + new Vector3(-0.5f, -0.5f) * j), highlightColor);
+                    hlMap.SetTileFlags(hlMap.WorldToCell(basePos + Vector3.right * xCor * i + new Vector3(-0.5f * xCor, -0.5f * yCor) * j), TileFlags.None);
+                    hlMap.SetColor(hlMap.WorldToCell(basePos + Vector3.right * xCor * i + new Vector3(-0.5f * xCor, -0.5f * yCor) * j), highlightColor);
                 }
 
-                hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(0.5f, -0.5f) * i), TileFlags.None);
-                hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(0.5f, -0.5f) * i), highlightColor);
+                hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(0.5f * xCor, -0.5f * yCor) * i), TileFlags.None);
+                hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(0.5f * xCor, -0.5f * yCor) * i), highlightColor);
 
                 for (int j = 1; j <= i - 1; j++)
                 {
-                    hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(0.5f, -0.5f) * i + Vector3.left * j), TileFlags.None);
-                    hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(0.5f, -0.5f) * i + Vector3.left * j), highlightColor);
+                    hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(0.5f * xCor, -0.5f * yCor) * i + Vector3.left * xCor * j), TileFlags.None);
+                    hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(0.5f * xCor, -0.5f * yCor) * i + Vector3.left * xCor * j), highlightColor);
                 }
 
-                hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(-0.5f, -0.5f) * i), TileFlags.None);
-                hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(-0.5f, -0.5f) * i), highlightColor);
+                hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(-0.5f * xCor, -0.5f * yCor) * i), TileFlags.None);
+                hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(-0.5f * xCor, -0.5f * yCor) * i), highlightColor);
 
                 for (int j = 1; j <= i - 1; j++)
                 {
-                    hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(-0.5f, -0.5f) * i + new Vector3(-0.5f, 0.5f)  * j), TileFlags.None);
-                    hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(-0.5f, -0.5f) * i + new Vector3(-0.5f, 0.5f) * j), highlightColor);
+                    hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(-0.5f * xCor, -0.5f * yCor) * i + new Vector3(-0.5f * xCor, 0.5f * yCor)  * j), TileFlags.None);
+                    hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(-0.5f * xCor, -0.5f * yCor) * i + new Vector3(-0.5f * xCor, 0.5f * yCor) * j), highlightColor);
                 }
 
-                hlMap.SetTileFlags(hlMap.WorldToCell(basePos + Vector3.left * i), TileFlags.None);
-                hlMap.SetColor(hlMap.WorldToCell(basePos + Vector3.left * i), highlightColor);
+                hlMap.SetTileFlags(hlMap.WorldToCell(basePos + Vector3.left * xCor * i), TileFlags.None);
+                hlMap.SetColor(hlMap.WorldToCell(basePos + Vector3.left * xCor * i), highlightColor);
 
                 for (int j = 1; j <= i - 1; j++)
                 {
-                    hlMap.SetTileFlags(hlMap.WorldToCell(basePos + Vector3.left * i + new Vector3(0.5f, 0.5f) * j), TileFlags.None);
-                    hlMap.SetColor(hlMap.WorldToCell(basePos + Vector3.left * i + new Vector3(0.5f, 0.5f) * j), highlightColor);
+                    hlMap.SetTileFlags(hlMap.WorldToCell(basePos + Vector3.left * xCor * i + new Vector3(0.5f * xCor, 0.5f * yCor) * j), TileFlags.None);
+                    hlMap.SetColor(hlMap.WorldToCell(basePos + Vector3.left * xCor * i + new Vector3(0.5f * xCor, 0.5f * yCor) * j), highlightColor);
                 }
             }
         }
@@ -226,9 +228,9 @@ namespace KWY
         {
             Vector3 pos = new Vector3(0, 0, 0);
             Vector3Int range;
-            for (float i = -4; i < 5; i += 0.5f)
+            for (float i = -4; i < 5; i += 0.4f)
             {
-                for (float j = -6; j < 6; j += 0.7f)
+                for (float j = -6; j < 6; j += 0.5f)
                 {
                     pos.x = j;
                     pos.y = i;

@@ -13,6 +13,8 @@ namespace KWY
         private List<Vector2> correction = new List<Vector2>();
         private List<Vector2> direction = new List<Vector2>();
         private Vector2 lastPos;
+        private float xCor = 0.65f;  //맵1 -> 맵2 x값 보정치
+        private float yCor = 0.7f / 0.65f;  // 맵1 -> 맵2 y값 보정치
 
         public void Ray(Vector2 basePos, SkillBase sb, int dir, bool reversed)
         {
@@ -159,20 +161,20 @@ namespace KWY
             // 보정치 저장
             // 왼쪽 위 대각선, 왼쪽, 왼쪽 아래 대각선, 오른쪽 아래 대각선, 오른쪽, 오른쪽 위 대각선 순서
             correction.Add(Vector2.zero);
-            correction.Add(new Vector2(0, 0.1f));
+            correction.Add(new Vector2(0, 0.1f * yCor));
             correction.Add(Vector2.zero);
             correction.Add(Vector2.zero);
-            correction.Add(new Vector2(0, 0.1f));
+            correction.Add(new Vector2(0, 0.1f * yCor));
             correction.Add(Vector2.zero);
 
             // 방향벡터 저장
             // 위와 순서 동일
-            direction.Add(new Vector2(-0.5f, 0.5f));
-            direction.Add(Vector2.left);
-            direction.Add(new Vector2(-0.5f, -0.5f));
-            direction.Add(new Vector2(0.5f, -0.5f));
-            direction.Add(Vector2.right);
-            direction.Add(new Vector2(0.5f, 0.5f));
+            direction.Add(new Vector2(-0.5f * xCor, 0.5f * yCor));
+            direction.Add(new Vector2(-1f * xCor, 0));
+            direction.Add(new Vector2(-0.5f * xCor, -0.5f * yCor));
+            direction.Add(new Vector2(0.5f * xCor, -0.5f * yCor));
+            direction.Add(new Vector2(1f * xCor, 0));
+            direction.Add(new Vector2(0.5f * xCor, 0.5f * yCor));
         }
     }
 
