@@ -83,6 +83,10 @@ namespace KWY
             {
                 maxTimeLine = (t > maxTimeLine) ? t : maxTimeLine;
             }
+            foreach(Character ch in data.Characters)
+            {
+                ch.ResetTempPos();
+            }
 
             StartCoroutine(StartAction(-1));
         }

@@ -107,8 +107,10 @@ namespace KWY
             {
                 tiles[idx].transform.position = Vector3.zero;
                 tiles[idx].SetActive(false);
+                Debug.Log("alt tile deleted");
             }
-            Debug.Log("no tile found");
+            else
+                Debug.Log("no tile found");
 
             Tilemap hlMap = GameObject.Find("HighlightTilemap").GetComponent<Tilemap>();
             Matrix4x4 newPos = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0f, 0f, 0f), Vector3.one);
