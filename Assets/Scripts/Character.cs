@@ -25,7 +25,7 @@ namespace KWY
 
         [SerializeField] private float movementSpeed;
         private Vector2 destination;
-        private Vector3Int TilePos;
+        public Vector3Int TilePos;
 
         private Tilemap map, hlMap;
         private TilemapControl TCtrl;
@@ -109,7 +109,7 @@ namespace KWY
         public void ResetTempPos()
         {
             map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
-            TempTilePos = map.WorldToCell(transform.position);
+            TempTilePos = TilePos;
         }
 
         public override string ToString()
@@ -172,6 +172,11 @@ namespace KWY
                 Debug.Log("nowpos = " + nowPos + ", despos = " + map.WorldToCell(des));
                 Debug.Log(gameObject.name + ": desNum->" + charsOnDes + ", curNum->" + charsOnCur);
 
+                if (map.CellToWorld(nowPos).x < des.x)
+                    gameObject.GetComponent<SpriteRenderer>().flipX = false;
+                else if(map.CellToWorld(nowPos).x > des.x)
+                    gameObject.GetComponent<SpriteRenderer>().flipX = true;
+
                 if (charsOnDes > 1)
                 {
                     //map.SetTransformMatrix(map.WorldToCell(des), elevatedTile);
@@ -205,6 +210,7 @@ namespace KWY
                 else
                 {
                     nowMove = true;
+                    gameObject.GetComponent<BoxCollider2D>().offset = Vector2.zero;
 
                     Debug.Log("noone on tile");
                 }
@@ -212,7 +218,9 @@ namespace KWY
                 if (charsOnCur > 1)
                 {
                     Sprite sprite = map.GetTile<CustomTile>(nowPos).sprite;
-                    TCtrl.activateAltTile(map.CellToWorld(nowPos), charsOnCur, sprite);
+                    Vector3 vec = map.CellToWorld(nowPos);
+                    vec.y += 0.1f;
+                    TCtrl.activateAltTile(vec, charsOnCur, sprite);
 
                     List<GameObject> characters = TCtrl.getCharList(nowPos);
 
