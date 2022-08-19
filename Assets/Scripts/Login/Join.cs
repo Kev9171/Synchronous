@@ -190,10 +190,10 @@ namespace KWY
             ShowLoadingPanel();
 
             // for test
-            //CheckIdCallback(new IdCheckResData((int)ResCode.TRUE, "OK"));
+            CheckIdCallback(new IdCheckResData((int)ResCode.TRUE, "OK"));
 
             // original code
-            StartCoroutine(LoginJoinAPI.Instance.IdCheckPost(id, CheckIdCallback, ErrorCallback));
+            //StartCoroutine(LoginJoinAPI.Instance.IdCheckPost(id, CheckIdCallback, ErrorCallback));
         }
 
         public void OnClickNameCheckBtn()
@@ -209,10 +209,10 @@ namespace KWY
             ShowLoadingPanel();
 
             // for test
-            //CheckNameCallback(new NameCheckResData((int)ResCode.TRUE, "OK"));
+            CheckNameCallback(new NameCheckResData((int)ResCode.TRUE, "OK"));
 
             // original code
-            StartCoroutine(LoginJoinAPI.Instance.NameCheckPost(name, CheckNameCallback, ErrorCallback));
+            //StartCoroutine(LoginJoinAPI.Instance.NameCheckPost(name, CheckNameCallback, ErrorCallback));
         }
 
         public void OnClickJoinBtn()
@@ -220,14 +220,14 @@ namespace KWY
             ShowLoadingPanel();
 
             // for test
-            //JoinCallback(new JoinResData((int)ResCode.TRUE, "OK", 111));
+            JoinCallback(new JoinResData((int)ResCode.TRUE, "OK", 111));
 
             // original code
             string id = IdInput.text.Trim();
             string name = NameInput.text.Trim();
             string pw = PwInput.text.Trim();
 
-            StartCoroutine(LoginJoinAPI.Instance.JoinPost(id, name, pw, JoinCallback, ErrorCallback));
+            //StartCoroutine(LoginJoinAPI.Instance.JoinPost(id, name, pw, JoinCallback, ErrorCallback));
         }
 
         public void JoinedCompleteCallback()
