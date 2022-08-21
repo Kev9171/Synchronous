@@ -22,7 +22,7 @@ namespace KWY
         public void LoadNowUser()
         {
             userIcon.sprite = UserManager.UserIcon;
-            userNameText.text = UserManager.AccountId;
+            userNameText.text = UserManager.UserName;
         }
     }
 }

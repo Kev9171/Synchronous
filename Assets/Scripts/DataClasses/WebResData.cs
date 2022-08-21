@@ -27,6 +27,11 @@ namespace KWY
             name = f;
             imageUrl = g;
         }
+
+        public override string ToString()
+        {
+            return $"[code: {code}, message: {message}, uid: {uid}, id: {id}, level: {level}, name: {name}, imageUrl: {imageUrl}]]";
+        }
     }
 
     [Serializable]
@@ -40,6 +45,11 @@ namespace KWY
         {
             code = a;
             message = b;
+        }
+
+        public override string ToString()
+        {
+            return $"[code: {code}, message: {message}]";
         }
     }
 
@@ -55,6 +65,11 @@ namespace KWY
             code = a;
             message = b;
         }
+
+        public override string ToString()
+        {
+            return $"[code: {code}, message: {message}]";
+        }
     }
 
     [Serializable]
@@ -69,6 +84,29 @@ namespace KWY
             code = a;
             message = b;
             uid = c;
+        }
+
+        public override string ToString()
+        {
+            return $"[code: {code}, message: {message}, uid: {uid}]";
+        }
+    }
+
+    [Serializable]
+    public class LogoutResData
+    {
+        public int code;
+        public string message;
+
+        public LogoutResData(int a, string b)
+        {
+            code = a;
+            message = b;
+        }
+
+        public override string ToString()
+        {
+            return $"[code: {code}, message: {message}]";
         }
     }
 
