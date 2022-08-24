@@ -16,9 +16,9 @@ GameObject:
   - component: {fileID: 8399122764979910751}
   - component: {fileID: 7138371582899994663}
   - component: {fileID: 3435919291805832566}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Knight
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -183,6 +183,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _characterBase: {fileID: 11400000, guid: f30847bdd2f685e47aed92d6b0c1b32d, type: 2}
   movementSpeed: 0
+  TilePos: {x: 0, y: 0, z: 0}
 --- !u!61 &3435919291805832566
 BoxCollider2D:
   m_ObjectHideFlags: 0

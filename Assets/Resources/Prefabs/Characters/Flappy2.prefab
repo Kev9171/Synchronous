@@ -16,9 +16,9 @@ GameObject:
   - component: {fileID: 1326943966758870565}
   - component: {fileID: 429383500999419485}
   - component: {fileID: 3782679816142068562}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Flappy2
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -183,6 +183,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _characterBase: {fileID: 11400000, guid: 9cc1e36a50a670d4289b912bc85d48df, type: 2}
   movementSpeed: 0
+  TilePos: {x: 0, y: 0, z: 0}
 --- !u!61 &3782679816142068562
 BoxCollider2D:
   m_ObjectHideFlags: 0

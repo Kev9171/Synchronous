@@ -43,10 +43,10 @@ namespace KWY
             ShowLoadingPanel();
 
             // for test
-            //LoginCallback(new LoginResData((int)ResCode.TRUE, "OK", 111, "test-email", 1, "temp name", null));
+            LoginCallback(new LoginResData((int)ResCode.TRUE, "OK", 111, "test-email", 1, "temp name", null));
 
             // original code
-            StartCoroutine(LoginJoinAPI.Instance.LoginPost(id, pw, LoginCallback, ErrorCallback));
+            //StartCoroutine(LoginJoinAPI.Instance.LoginPost(id, pw, LoginCallback, ErrorCallback));
         }
 
         public void LoginCallback(LoginResData data)

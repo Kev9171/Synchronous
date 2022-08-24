@@ -292,7 +292,9 @@ namespace KWY
             Buffs = new List<Buff>();
 
             map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
+            //Debug.Log(map.name + " found.");
             hlMap = GameObject.Find("HighlightTilemap").GetComponent<Tilemap>();
+            //Debug.Log(hlMap.name + " found.");
             TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
 
             TilePos = map.WorldToCell(transform.position);
