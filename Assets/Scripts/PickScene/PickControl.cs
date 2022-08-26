@@ -292,10 +292,10 @@ namespace KWY
                     }
                 }
             }
-            //foreach (Vector3Int pos in deployPosition)
-            //{
-            //    Debug.Log(pos);
-            //}
+            foreach (Vector3Int pos in deployPosition)
+            {
+                Debug.Log(pos);
+            }
         }
 
         public void OnClick(InputAction.CallbackContext context)
@@ -358,25 +358,26 @@ namespace KWY
             {
                 if (deployPosition != null)
                 {
-                    for (int i = 4; i >= deployCounter; i--)
+                    for (int i = 4; i > deployCounter; i--)
                     {
-                        var randomNum = Random.Range(0, deployPosition.Count);
+                        Debug.Log(deployCounter);
+                        var randomNum = Random.Range(0, deployPosition.Count - 1);
                         //Debug.Log(randomNum);
                         randomNumList.Add(randomNum);
                         if (randomNumList.Contains(randomNum))
                         {
-                            randomNum = Random.Range(0, deployPosition.Count);
+                            randomNum = Random.Range(0, deployPosition.Count - 1);
                             //Debug.Log(randomNum);
                         }
                         var randomPosition = deployPosition[randomNum];
-                        bool keyCheck = characters.ContainsKey(deployPosition[randomNum]);
+                        bool keyCheck = characters.ContainsKey(randomPosition);
                         if (keyCheck == false)
                         {
                             //Vector2 posAdaptation = map.GetCellCenterWorld(randomPosition); // 타일 한 칸에 한 캐릭터만 배치
                             //posAdaptation.y += (float)0.1; // 타일 한 칸의 중앙에 캐릭터 배치
                             //randomPosition.y -= (int)0.2;
-                            var randomNum2 = Random.Range(0, character.Length);
-                            newCharacters[deployCounter] = Instantiate(character[randomNum2], randomPosition, Quaternion.identity); // Vector3Int.FloorToInt(posAdaptation)
+                            var randomNum2 = Random.Range(0, character.Length - 1); //
+                            newCharacters[deployCounter] = Instantiate(character[randomNum2], map.CellToWorld(randomPosition), Quaternion.identity); // Vector3Int.FloorToInt(posAdaptation)
                             newCharacters[deployCounter].transform.parent = ClientCharacters.transform;
                             newCharacters[deployCounter].GetComponent<SpriteRenderer>().flipX = true;
                             newCharacters[deployCounter].GetComponent<BoxCollider2D>().enabled = true;

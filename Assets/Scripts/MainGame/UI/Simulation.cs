@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 namespace KWY
 {
@@ -131,7 +132,8 @@ namespace KWY
 
         IEnumerator DoCharaMove(int cid, Vector2Int v)
         {
-            data.WholeCharacters[cid].MoveTo(v);
+            //data.WholeCharacters[cid].MoveTo(v);
+            data.WholeCharacters[cid].photonView.RPC("MoveTo", RpcTarget.All, v.x, v.y);
             showActions.ShowMoveLog(cid);
             yield return null;
         }

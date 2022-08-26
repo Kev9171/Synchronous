@@ -150,8 +150,11 @@ namespace KWY
 
         #region Simulation Functions
 
-        public void MoveTo(Vector2Int dir)
+        [PunRPC]
+        public void MoveTo(int x, int y)
         {
+            Vector2Int dir = new Vector2Int(x, y);
+
             Vector2Int realDir = TransFromY(dir);
             Vector3Int nowPos = TilePos;
             Vector3 des = map.CellToWorld(new Vector3Int(nowPos.x + realDir.x, nowPos.y + realDir.y, nowPos.z));
