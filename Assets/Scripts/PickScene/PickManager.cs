@@ -5,6 +5,7 @@ using Photon.Pun;
 using UnityEngine.Tilemaps;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Photon.Realtime;
 
 namespace KWY
 {
@@ -119,7 +120,7 @@ namespace KWY
             this.ClickedBtn = characterBtn;
         }
 
-        public void PickChance()
+        public void PickClear()
         {
             ClickedBtn = null;
         }
@@ -162,7 +163,10 @@ namespace KWY
             //simulation.StartSimulationState();
         }
 
-        
+        private void SetNewMaster(Player newMaster)
+        {
+            PhotonNetwork.SetMasterClient(newMaster);
+        }
 
         #endregion
 
@@ -170,10 +174,11 @@ namespace KWY
 
         private void Start()
         {
-            data.LoadData();
+            //data.LoadData();
             //SetState(0);
             ClearHighlight();
             Chance = 3;
+            SetNewMaster(PhotonNetwork.LocalPlayer);
         }
 
         private void Update()

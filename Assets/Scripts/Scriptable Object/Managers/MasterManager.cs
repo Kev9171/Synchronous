@@ -15,4 +15,16 @@ public class MasterManager : SingletonScriptableObject<MasterManager>
             return Instance._gameSettings;
         }
     }
+
+    // Test
+    [SerializeField]
+    private TestSettings _testSettings;
+
+    public static TestSettings TestSettings
+    {
+        get
+        {
+            return Instance._testSettings;
+        }
+    }
 }

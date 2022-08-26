@@ -1,0 +1,8 @@
+{
+    "ip_url": "http://3.34.179.224:8888",
+    "login_url": "synchronous/login",
+    "join_url": "synchronous/join",
+    "id_check_url": "synchronous/checkid",
+    "name_check_url": "synchronous/checkname",
+    "logout_url": "synchronous/logout"
+}

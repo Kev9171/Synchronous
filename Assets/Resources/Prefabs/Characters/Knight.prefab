@@ -16,12 +16,8 @@ GameObject:
   - component: {fileID: 8399122764979910751}
   - component: {fileID: 7138371582899994663}
   - component: {fileID: 3435919291805832566}
-<<<<<<< HEAD
-  m_Layer: 6
-=======
   - component: {fileID: 825598373496930106}
-  m_Layer: 0
->>>>>>> main
+  m_Layer: 6
   m_Name: Knight
   m_TagString: Enemy
   m_Icon: {fileID: 0}

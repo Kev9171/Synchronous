@@ -53,7 +53,7 @@ namespace KWY
         [SerializeField]
         Timer TimerObject;
 
-        readonly private string nextLevel = "MainGameScene";
+        readonly private string nextLevel = "PickScene"; // MainGameScene
         readonly private string previousLevel = "StartScene";
 
         float timeLimit;

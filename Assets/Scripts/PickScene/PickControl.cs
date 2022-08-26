@@ -10,22 +10,29 @@ namespace KWY
 {
     public class PickControl : Singleton<PickControl>
     {
-        [SerializeField] PickSceneData data;
+        //[SerializeField] PickSceneData data;
         [SerializeField] Tilemap map;
         [SerializeField] PickManager pickManager;
         [SerializeField] TilemapControl tilemapControl;
         [SerializeField] GameObject ClientCharacters, MasterClientCharacters;
         // [SerializeField] TurnReady turnReady;
 
-        public GameObject[] character;
-        public int deployCounter;
-        public GameObject[] newCharacters = new GameObject[3];
+        public GameObject[] character; // 임시 prefabs
+        private int deployCounter; // 배치된 캐릭터 수
+        [SerializeField] private GameObject[] pCharas = new GameObject[3];
+        private GameObject[] firstDeployed = new GameObject[3]; // 배치된 캐릭터 최초 저장
+
+        private List<Character> pCharacters = new List<Character>(); // 게임 진행 중 캐릭터 정보를 가지고 있는 리스트
+        private Dictionary<CID, GameObject> pCharacterObjects = new Dictionary<CID, GameObject>();
+
+        private Dictionary<CID, Vector3Int> deployRPC = new Dictionary<CID, Vector3Int>();
+
         public Dictionary<Vector3Int, GameObject> characters = new Dictionary<Vector3Int, GameObject>();
-        public List<Vector3Int> deployPosition = new List<Vector3Int>();
+        public List<Vector3Int> deployablePosition = new List<Vector3Int>();
         private List<int> randomNumList = new List<int>();
 
-        public Character SelChara { get; private set; }
-        public ActionBase SelAction { get; private set; }
+        //public Character SelChara { get; private set; }
+        //public ActionBase SelAction { get; private set; }
 
         #region Private Fields
 
@@ -36,134 +43,18 @@ namespace KWY
 
         #region Public Methods
 
-        //public void OnChooseSkillDirectionMode()
+        //public void SetSelSkill(SID sid)
         //{
-        //    // 캐릭터 선택 후 맵에 있는 캐릭터 클릭으로 캐릭터 선택할 수 있는 거 잠시 빼기
-        //    mouseInput.Mouse.MouseClick.performed -= OnClick;
-
-        //    // 방향 정할 수 있는 이벤트 넣기
-        //    mouseInput.Mouse.MouseClick.performed += OnClickSkillDirection;
+        //    SelAction = SkillManager.GetData(sid);
         //}
 
-        //public void OnChooseMoveDirectionmode()
+        //public void SetSelSkill(SkillBase sb)
         //{
-        //    // 캐릭터 선택 후 맵에 있는 캐릭터 클릭으로 캐릭터 선택할 수 있는 거 잠시 빼기
-        //    mouseInput.Mouse.MouseClick.performed -= OnClick;
+        //    SelAction = sb;
 
-        //    // 방향 정할 수 있는 이벤트 넣기
-        //    mouseInput.Mouse.MouseClick.performed += OnClickMoveDirection;
+        //    //highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? sb.areaEvenY : sb.areaOddY);
+
         //}
-
-        //public void OnClickMoveDirection(InputAction.CallbackContext context)
-        //{
-        //    if (SelChara == null || !(SelAction is MoveBase)) return;
-
-        //    Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
-
-        //    // 바로 WorldToCell 함수에 집어넣지 말것! (???)
-        //    mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
-
-        //    // 사용 x
-        //    // Vector3Int clickV = map.WorldToCell(mouseInput.Mouse.MouseClick.performed += OnClickMoveDirection;);
-
-        //    // 클릭 된 좌표 맵 좌표로 변환
-        //    Vector3Int clickV = map.WorldToCell(mousePosition);
-        //    Vector3Int charaV = SelChara.TempTilePos;
-
-        //    Vector2Int deltaXY = (Vector2Int)clickV - (Vector2Int)charaV;
-
-        //    if (map.HasTile(clickV) && (SelChara.TempTilePos.y % 2 == 0 ? SelAction.areaEvenY : SelAction.areaOddY).Contains(deltaXY))
-        //    {
-        //        data.CharaActionData[SelChara.Cb.cid].AddMoveAction(ActionType.Move, (int)deltaXY.x, (int)deltaXY.y, SelChara.TempTilePos.y%2!=0);
-
-        //        // 이동 넣었을 경우 하이라이트를 위한 임시 좌표 변경
-        //        SelChara.SetTilePos(clickV);
-
-        //        //turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
-        //        SetSelClear();
-
-        //        mouseInput.Mouse.MouseClick.performed += OnClick;
-        //    }
-        //}
-
-
-        //public void OnClickSkillDirection(InputAction.CallbackContext context)
-        //{
-
-        //    if (SelAction == null || !(SelAction is SkillBase))
-        //    {
-        //        mouseInput.Mouse.MouseClick.performed += OnClick;
-        //        mouseInput.Mouse.MouseClick.performed -= OnClickSkillDirection;
-
-        //        SelChara = null;
-        //        SelAction = null;
-
-        //        return;
-        //    }
-
-        //    Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
-
-        //    // 클릭 된 좌표 맵 좌표로 변환
-        //    float clickX = map.WorldToCell(Camera.main.ScreenToWorldPoint(mousePosition)).x;
-        //    float charaX = SelChara.TempTilePos.x;
-
-
-        //    // 클릭 된 좌표가 선택된 캐릭터의 오른쪽 있다면 왼쪽 하이라이트 및 방향 선택
-        //    if (charaX < clickX)
-        //    {
-        //        //highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y%2==0 ? ((SkillBase)SelAction).areaEvenY : ((SkillBase)SelAction).areaOddY);
-
-        //        if (SelOk > 0)
-        //        {
-        //            // 확정
-        //            data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Right);
-
-        //            //turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
-        //            SetSelClear();
-
-        //            mouseInput.Mouse.MouseClick.performed += OnClick;
-        //        }
-        //        else
-        //        {
-        //            // 전에 다른 방향이었을 경우
-        //            SelOk = 1;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        //highLighter.HighlightMapXReverse(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? SelAction.areaEvenY : SelAction.areaOddY);
-
-        //        if (SelOk < 0)
-        //        {
-        //            // 확정
-        //            data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Left);
-
-        //            //turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
-        //            SetSelClear();
-
-        //            mouseInput.Mouse.MouseClick.performed += OnClick;
-        //        }
-        //        else
-        //        {
-        //            SelOk = -1;
-        //        }
-        //    }
-
-        //    // 일단 스킬로 인한 자신의 위치 변경 내용은 없음
-        //}
-
-        public void SetSelSkill(SID sid)
-        {
-            SelAction = SkillManager.GetData(sid);
-        }
-
-        public void SetSelSkill(SkillBase sb)
-        {
-            SelAction = sb;
-
-            //highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? sb.areaEvenY : sb.areaOddY);
-
-        }
 
         public void StartControl()
         {
@@ -172,8 +63,8 @@ namespace KWY
 
         public void SetSelClear()
         {
-            SelChara = null;
-            SelAction = null;
+            //SelChara = null;
+            //SelAction = null;
             SelOk = 0;
 
             mouseInput.Mouse.MouseClick.performed -= OnClick;
@@ -185,38 +76,10 @@ namespace KWY
             HighlightCharacterClear();
         }
 
-        public void SetSelMove()
-        {
-            SelAction = MoveManager.MoveData;
-
-            //Matrix4x4 groundTile = Matrix4x4.TRS(new Vector3(0, 0f, 0), Quaternion.Euler(0f, 0f, 0f), Vector3.one);
-            //Matrix4x4 elevatedTile = Matrix4x4.TRS(new Vector3(0, 0.2f, 0), Quaternion.Euler(0f, 0f, 0f), Vector3.one/*scale 조정*/);
-            //if (map.GetTile<CustomTile>(SelChara.TempTilePos).getCharCount() < 2)
-            //{
-            //    map.SetTransformMatrix(SelChara.TempTilePos, elevatedTile);
-            //    highLighter.ChangeTileHeight(SelChara.TempTilePos, elevatedTile);
-            //}
-            //else
-            //map.SetTransformMatrix(SelChara.TempTilePos, groundTile);
-
-            /*TilemapControl fTiles = GameObject.Find("SecondTiles").GetComponent<TilemapControl>();
-
-            map.SetTileFlags(SelChara.TempTilePos, TileFlags.None);
-            map.SetColor(SelChara.TempTilePos, new Color(1, 1, 1, 0));
-
-            Sprite sprite = map.GetTile<CustomTile>(SelChara.TempTilePos).sprite;
-            fTiles.activateTile(map.CellToWorld(SelChara.TempTilePos), 2, sprite);*/
-
-            //highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? SelAction.areaEvenY : SelAction.areaOddY);
-
-            
-        }
-
         public void SetSelChara(CID cid)
         {
-            SelChara = null;
-
-            Character c = data.GetCharacter(cid);
+            //SelChara = null;
+            Character c = GetCertainCharacter(cid);
 
 
             if (c == null)
@@ -225,9 +88,9 @@ namespace KWY
                 return;
             }
 
-            SelAction = null;
+            //SelAction = null;
 
-            SelChara = c;
+            //SelChara = c;
             //showingSkillManager.ShowSkillPanel(data.GetCharacterNth(cid));
             HighlightCharacter(cid);
             //highLighter.ClearHighlight();
@@ -241,27 +104,39 @@ namespace KWY
 
         public void HighlightCharacterClear()
         {
-            foreach (CID c in data.CharacterObjects.Keys)
+            foreach (CID c in pCharacterObjects.Keys)
             {
-                data.CharacterObjects[c].transform.localScale = new Vector3(0.7f, 0.7f, 1);
+                pCharacterObjects[c].transform.localScale = new Vector3(0.7f, 0.7f, 1);
             }
         }
 
         public void HighlightCharacter(CID cid)
         {
-            foreach(CID c in data.CharacterObjects.Keys)
+            foreach (CID c in pCharacterObjects.Keys)
             {
                 if (c == cid)
                 {
-                    data.CharacterObjects[c].transform.localScale = new Vector3(1, 1, 1);
+                    pCharacterObjects[c].transform.localScale = new Vector3(1, 1, 1);
                 }
                 else
                 {
-                    data.CharacterObjects[c].transform.localScale = new Vector3(0.7f, 0.7f, 1);
+                    pCharacterObjects[c].transform.localScale = new Vector3(0.7f, 0.7f, 1);
                 }
-                
+
             }
-            
+
+        }
+
+        public Character GetCertainCharacter(CID cid)
+        {
+            foreach (Character c in pCharacters)
+            {
+                if (c.Cb.cid == cid)
+                {
+                    return c;
+                }
+            }
+            return null;
         }
 
         public void UndeployCharacter(CID cid)
@@ -279,7 +154,7 @@ namespace KWY
                     {
                         //Vector3 posAdaptation = map.GetCellCenterWorld(position); // 타일 한 칸에 한 캐릭터만 배치
                         //posAdaptation.y += (float)0.1; // 타일 한 칸의 중앙에 캐릭터 배치
-                        deployPosition.Add(position); // Vector3Int.FloorToInt(posAdaptation)
+                        deployablePosition.Add(position); // Vector3Int.FloorToInt(posAdaptation)
                     }
                 }
                 else
@@ -288,14 +163,14 @@ namespace KWY
                     {
                         //Vector3 posAdaptation = map.GetCellCenterWorld(position); // 타일 한 칸에 한 캐릭터만 배치
                         //posAdaptation.y += (float)0.1; // 타일 한 칸의 중앙에 캐릭터 배치
-                        deployPosition.Add(position); // Vector3Int.FloorToInt(posAdaptation)
+                        deployablePosition.Add(position); // Vector3Int.FloorToInt(posAdaptation)
                     }
                 }
             }
-            foreach (Vector3Int pos in deployPosition)
-            {
-                Debug.Log(pos);
-            }
+            //foreach (Vector3Int pos in deployPosition)
+            //{
+            //    Debug.Log(pos);
+            //}
         }
 
         public void OnClick(InputAction.CallbackContext context)
@@ -308,27 +183,34 @@ namespace KWY
             {
                 CID cid = hit.collider.gameObject.GetComponent<Character>().Cb.cid;
                 SetSelChara(cid);
-                //Destroy();
+
+                // Test
+                //Destroy(hit.collider.gameObject);
+                //pCharacterObjects.Remove(pCharacters[deployCounter].Cb.cid);
+                //deployCounter--;
             }
             if (hit.collider == null) // Instantiate하면 Box Collider 2D 옵션이 꺼져 있음
             {
                 mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
                 Vector3Int clickV = map.WorldToCell(mousePosition);
-                bool keyExists = characters.ContainsKey(clickV);
+                bool keyExists = deployRPC.ContainsValue(clickV);
                 if (PickManager.Instance.ClickedBtn != null && map.HasTile(clickV) && keyExists == false && deployCounter < 3)
                 {
                     mousePosition = map.GetCellCenterWorld(clickV); // 타일 한 칸에 한 캐릭터만 배치
                     mousePosition.y += (float)0.1; // 타일 한 칸의 중앙에 캐릭터 배치
-                    Debug.Log(mousePosition);
                     if (PhotonNetwork.IsMasterClient)
                     {
                         if (mousePosition.x < 0 && map.GetSprite(clickV).name == "tileWater_full")
                         {
-                            newCharacters[deployCounter] = Instantiate(PickManager.Instance.ClickedBtn.CharacterPrefab, mousePosition, Quaternion.identity);
-                            newCharacters[deployCounter].transform.parent = MasterClientCharacters.transform;
-                            newCharacters[deployCounter].GetComponent<BoxCollider2D>().enabled = true;
-                            PickManager.Instance.PickChance();
-                            characters.Add(clickV, newCharacters[deployCounter]);
+                            firstDeployed[deployCounter] = Instantiate(PickManager.Instance.ClickedBtn.CharacterPrefab, mousePosition, Quaternion.identity);
+                            pCharacters.Add(firstDeployed[deployCounter].GetComponent<Character>());
+                            pCharacterObjects.Add(pCharacters[deployCounter].Cb.cid, firstDeployed[deployCounter]);
+
+                            firstDeployed[deployCounter].transform.parent = MasterClientCharacters.transform;
+                            firstDeployed[deployCounter].GetComponent<BoxCollider2D>().enabled = true;
+                            PickManager.Instance.PickClear(); // 버튼 Prefab 해제
+                            // characters.Add(clickV, firstDeployed[deployCounter]);
+                            deployRPC.Add(pCharacters[deployCounter].Cb.cid, clickV); // CID와 위치 정보 저장
                             deployCounter++;
                         }
                     }
@@ -336,13 +218,17 @@ namespace KWY
                     {
                         if (mousePosition.x > 0 && map.GetSprite(clickV).name == "tileWater_full")
                         {
-                            newCharacters[deployCounter] = Instantiate(PickManager.Instance.ClickedBtn.CharacterPrefab, mousePosition, Quaternion.identity);
-                            newCharacters[deployCounter].transform.parent = ClientCharacters.transform;
-                            newCharacters[deployCounter].GetComponent<SpriteRenderer>().flipX = true;
-                            newCharacters[deployCounter].GetComponent<BoxCollider2D>().enabled = true;
-                            PickManager.Instance.PickChance(); // 버튼 Prefab 해제
-                            characters.Add(clickV, newCharacters[deployCounter]);
+                            firstDeployed[deployCounter] = Instantiate(PickManager.Instance.ClickedBtn.CharacterPrefab, mousePosition, Quaternion.identity);
+                            pCharacters.Add(firstDeployed[deployCounter].GetComponent<Character>());
+                            pCharacterObjects.Add(pCharacters[deployCounter].Cb.cid, firstDeployed[deployCounter]);
+
+                            firstDeployed[deployCounter].transform.parent = ClientCharacters.transform;
+                            firstDeployed[deployCounter].GetComponent<SpriteRenderer>().flipX = true;
+                            firstDeployed[deployCounter].GetComponent<BoxCollider2D>().enabled = true;
+                            PickManager.Instance.PickClear(); // 버튼 Prefab 해제
+                            deployRPC.Add(pCharacters[deployCounter].Cb.cid, clickV); // CID와 위치 정보 저장
                             deployCounter++;
+
                         }
                     }
                     //Debug.Log(pickManager.ClickedBtn.CharacterPrefab.name + " placed at " + mousePosition);
@@ -354,39 +240,76 @@ namespace KWY
 
         public void RandomDeployCharacter()
         {
-            if (deployCounter < 3)
+            if (deployCounter == 0)
             {
-                if (deployPosition != null)
+                for (int i = 4; i >= deployCounter; i--)
                 {
-                    for (int i = 4; i > deployCounter; i--)
+                    var randomNum = Random.Range(0, deployablePosition.Count - 1);
+                    randomNumList.Add(randomNum);
+                    if (randomNumList.Contains(randomNum))
                     {
-                        Debug.Log(deployCounter);
-                        var randomNum = Random.Range(0, deployPosition.Count - 1);
-                        //Debug.Log(randomNum);
-                        randomNumList.Add(randomNum);
-                        if (randomNumList.Contains(randomNum))
+                        randomNum = Random.Range(0, deployablePosition.Count - 1);
+                    }
+                    var randomPosition = deployablePosition[randomNum];
+                    bool keyCheck = deployRPC.ContainsValue(randomPosition);
+                    if (keyCheck == false)
+                    {
+                        var posAdaptation = map.CellToWorld(randomPosition);
+                        posAdaptation.y += (float)0.1;
+
+                        var randomNum2 = Random.Range(0, character.Length - 1);
+                        if (pCharacterObjects.ContainsKey(character[randomNum2].GetComponent<Character>().Cb.cid))
                         {
-                            randomNum = Random.Range(0, deployPosition.Count - 1);
-                            //Debug.Log(randomNum);
+                            
                         }
-                        var randomPosition = deployPosition[randomNum];
-                        bool keyCheck = characters.ContainsKey(randomPosition);
-                        if (keyCheck == false)
-                        {
-                            //Vector2 posAdaptation = map.GetCellCenterWorld(randomPosition); // 타일 한 칸에 한 캐릭터만 배치
-                            //posAdaptation.y += (float)0.1; // 타일 한 칸의 중앙에 캐릭터 배치
-                            //randomPosition.y -= (int)0.2;
-                            var randomNum2 = Random.Range(0, character.Length - 1); //
-                            newCharacters[deployCounter] = Instantiate(character[randomNum2], map.CellToWorld(randomPosition), Quaternion.identity); // Vector3Int.FloorToInt(posAdaptation)
-                            newCharacters[deployCounter].transform.parent = ClientCharacters.transform;
-                            newCharacters[deployCounter].GetComponent<SpriteRenderer>().flipX = true;
-                            newCharacters[deployCounter].GetComponent<BoxCollider2D>().enabled = true;
-                            characters.Add(randomPosition, newCharacters[deployCounter]);
-                            deployCounter++;
-                        }
+                        firstDeployed[deployCounter] = Instantiate(character[randomNum2], posAdaptation, Quaternion.identity); // Vector3Int.FloorToInt(posAdaptation)
+                        pCharacters.Add(firstDeployed[deployCounter].GetComponent<Character>());
+                        pCharacterObjects.Add(pCharacters[deployCounter].Cb.cid, firstDeployed[deployCounter]);
+                        
+
+
+                        firstDeployed[deployCounter].transform.parent = ClientCharacters.transform;
+                        firstDeployed[deployCounter].GetComponent<SpriteRenderer>().flipX = true;
+                        firstDeployed[deployCounter].GetComponent<BoxCollider2D>().enabled = true;
+                        deployRPC.Add(pCharacters[deployCounter].Cb.cid, Vector3Int.FloorToInt(posAdaptation)); // CID와 위치 정보 저장
+                        deployCounter++;
                     }
                 }
             }
+            if (0 < deployCounter && deployCounter < 3)
+            {
+                for (int i = 4; i > deployCounter; i--)
+                {
+                    var randomNum = Random.Range(0, deployablePosition.Count - 1);
+                    randomNumList.Add(randomNum);
+                    while (randomNumList.Contains(randomNum))
+                    {
+                        randomNum = Random.Range(0, deployablePosition.Count - 1);
+                    }
+                    var randomPosition = deployablePosition[randomNum];
+                    bool keyCheck = deployRPC.ContainsValue(randomPosition);
+                    if (keyCheck == false)
+                    {
+                        var posAdaptation = map.CellToWorld(randomPosition);
+                        posAdaptation.y += (float)0.1;
+                        var randomNum2 = Random.Range(0, character.Length - 1);
+                        
+                        firstDeployed[deployCounter] = Instantiate(character[randomNum2], posAdaptation, Quaternion.identity); // Vector3Int.FloorToInt(posAdaptation)
+                        pCharacters.Add(firstDeployed[deployCounter].GetComponent<Character>());
+                        pCharacterObjects.Add(pCharacters[deployCounter].Cb.cid, firstDeployed[deployCounter]);
+
+                        firstDeployed[deployCounter].transform.parent = ClientCharacters.transform;
+                        firstDeployed[deployCounter].GetComponent<SpriteRenderer>().flipX = true;
+                        firstDeployed[deployCounter].GetComponent<BoxCollider2D>().enabled = true;
+                        deployRPC.Add(pCharacters[deployCounter].Cb.cid, Vector3Int.FloorToInt(posAdaptation)); // CID와 위치 정보 저장
+                        deployCounter++;
+                    }
+                }
+            }
+            //foreach (CID cid in deployRPC.Keys)
+            //{
+            //    Debug.Log(deployRPC.Keys + ", " + deployRPC.Values);
+            //}
             
         }
 

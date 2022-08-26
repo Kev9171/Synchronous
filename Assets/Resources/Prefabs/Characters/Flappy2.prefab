@@ -16,12 +16,8 @@ GameObject:
   - component: {fileID: 1326943966758870565}
   - component: {fileID: 429383500999419485}
   - component: {fileID: 3782679816142068562}
-<<<<<<< HEAD
-  m_Layer: 6
-=======
   - component: {fileID: 6207119017085088076}
-  m_Layer: 0
->>>>>>> main
+  m_Layer: 6
   m_Name: Flappy2
   m_TagString: Enemy
   m_Icon: {fileID: 0}
