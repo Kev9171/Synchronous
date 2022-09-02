@@ -31,10 +31,8 @@ namespace KWY
         [SerializeField]
         private Simulation simulation;
 
-        int time = 0;
-        int tMax;
         ActionData nowActionData;
-        STATE nowState = 0;
+        STATE nowState = STATE.StandBy;
 
         #region Public Methods
 
@@ -55,15 +53,15 @@ namespace KWY
             }
         }
 
-        public void SetState(int state, params object[] data)
+        public void SetState(STATE state, params object[] data)
         {
             switch(state)
             {
-                case 0: // turn ready
+                case STATE.TurnReady: // turn ready
                     TurnReadyState();
                     nowState = STATE.TurnReady;
                     break;
-                case 1: // start simul
+                case STATE.Simul: // start simul
                     nowState = STATE.Simul;
                     if (PhotonNetwork.IsMasterClient)
                     {
@@ -73,7 +71,7 @@ namespace KWY
                     else
                         SimulationState();
                     break;
-                case 2: // game over
+                case STATE.GameOver: // game over
                     nowState = STATE.GameOver;
                     break;
             }
@@ -94,11 +92,11 @@ namespace KWY
             // player
             if (data.turnNum == 1)
             {
-                UpdatePlayerMP((Resources.Load("MainGameLogicData", typeof(LogicData)) as LogicData).playerInitialMp);
+                UpdatePlayerMP(LogicData.Instance.PlayerInitialMp);
             }
             else
             {
-                UpdatePlayerMP((Resources.Load("MainGameLogicData", typeof(LogicData)) as LogicData).playerMPIncrement);
+                UpdatePlayerMP(LogicData.Instance.PlayerMPIncrement);
             }
 
             // 순서 확인 필요
@@ -133,7 +131,7 @@ namespace KWY
             turnReady.Init();
             simulation.Init();
 
-            SetState(0);
+            SetState(STATE.TurnReady);
         }
 
         #endregion

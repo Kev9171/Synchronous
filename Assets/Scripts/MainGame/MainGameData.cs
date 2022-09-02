@@ -12,10 +12,6 @@ namespace KWY
         [SerializeField]
         GameObject[] tCharas = new GameObject[6];
 
-        [SerializeField]
-        LogicData logicData;
-
-
         #region Immutable Variables
 
         [Tooltip("Player Name or Player NickName")]
@@ -123,20 +119,9 @@ namespace KWY
 
         public void LoadData()
         {
-            if (logicData == null)
-            {
-                // 할당안되있으면 직접 로드
-                logicData = Resources.Load<LogicData>("MainGameLogicData");
-                Debug.Log("Logic Data is loaded from resources");
-                if (logicData == null)
-                {
-                    Debug.LogError("Logic Data is null");
-                    return;
-                }
-            }
 
-            this.TimeLimit = logicData.timeLimit;
-            this.PlayerMp = logicData.playerInitialMp;
+            this.TimeLimit = LogicData.Instance.TimeLimit;
+            this.PlayerMp = LogicData.Instance.PlayerInitialMp;
 
             turnNum = 1;
 

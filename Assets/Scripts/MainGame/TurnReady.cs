@@ -58,7 +58,7 @@ namespace KWY
 
         public void Init()
         {
-            timeLimit = (Resources.Load("MainGameLogicData", typeof(LogicData)) as LogicData).timeLimit;
+            timeLimit = LogicData.Instance.TimeLimit;
             ResetUI();
 
             int idx = 0;

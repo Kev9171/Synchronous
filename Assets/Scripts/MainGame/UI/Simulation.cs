@@ -159,16 +159,8 @@ namespace KWY
 
         private void Awake()
         {
-            LogicData logicData = Resources.Load(
-                "MainGameLogicData", typeof(LogicData)) as LogicData;
 
-            if (logicData == null)
-            {
-                Debug.LogError("Can not find LogicData at 'Resources/MainGameLogicData");
-                return;
-            }
-
-            simulationIntervalSeconds = logicData.simulationIntervalSeconds;
+            simulationIntervalSeconds = LogicData.Instance.SimulationIntervalSeconds;
         }
 
         #endregion
