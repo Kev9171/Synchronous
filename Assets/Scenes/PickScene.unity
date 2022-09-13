@@ -123,49 +123,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &219286666
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 219286668}
-  - component: {fileID: 219286667}
-  m_Layer: 0
-  m_Name: TestConnect
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &219286667
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 219286666}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 677ae075f9281014db8f0528e45e14bc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &219286668
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 219286666}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.4276905, y: -0.257124, z: -0.8615831}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 11
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &391674102
 GameObject:
   m_ObjectHideFlags: 0
@@ -355,19 +312,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   map: {fileID: 853653200}
-  pickManager: {fileID: 776724095}
-  tilemapControl: {fileID: 391674104}
   ClientCharacters: {fileID: 1085658494}
   MasterClientCharacters: {fileID: 1058716710}
-  character:
+  deployableList:
   - {fileID: 1445382690674112773, guid: 2460382867b38be4199fa99d54ae47e4, type: 3}
   - {fileID: 1326943966758870567, guid: 321733babb0a6974f87b9f2df13e5837, type: 3}
   - {fileID: 8399122764979910749, guid: 5415c2857bf979c4da96dd0893ed8283, type: 3}
-  pCharas:
-  - {fileID: 1445382690674112773, guid: 2460382867b38be4199fa99d54ae47e4, type: 3}
-  - {fileID: 1326943966758870567, guid: 321733babb0a6974f87b9f2df13e5837, type: 3}
-  - {fileID: 8399122764979910749, guid: 5415c2857bf979c4da96dd0893ed8283, type: 3}
-  deployablePosition: []
+  charArray:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  deployPositionList: []
 --- !u!1 &776724092
 GameObject:
   m_ObjectHideFlags: 0
@@ -3765,7 +3727,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ecbd8132539bce40aa6e496981f7077, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startTime: 3
+  startTime: 5
   timerText: {fileID: 1470976216}
 --- !u!4 &1902646913
 Transform:

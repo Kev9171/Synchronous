@@ -62,29 +62,29 @@ namespace KWY
 
         #region Public Methods
 
-        public void SetState(int state, params object[] data)
-        {
-            switch(state)
-            {
-                case 0: // turn ready
-                    TurnReadyState();
-                    nowState = STATE.TurnReady;
-                    break;
-                case 1: // start simul
-                    nowState = STATE.Simul;
-                    if (PhotonNetwork.IsMasterClient)
-                    {
-                        SimulationState();
-                        //simulation.StartSimulation(new ActionData((Dictionary<int, object[]>)data[0]));
-                    } 
-                    else
-                        SimulationState();
-                    break;
-                case 2: // game over
-                    nowState = STATE.GameOver;
-                    break;
-            }
-        }
+        //public void SetState(int state, params object[] data)
+        //{
+        //    switch(state)
+        //    {
+        //        case 0: // turn ready
+        //            TurnReadyState();
+        //            nowState = STATE.TurnReady;
+        //            break;
+        //        case 1: // start simul
+        //            nowState = STATE.Simul;
+        //            if (PhotonNetwork.IsMasterClient)
+        //            {
+        //                SimulationState();
+        //                //simulation.StartSimulation(new ActionData((Dictionary<int, object[]>)data[0]));
+        //            } 
+        //            else
+        //                SimulationState();
+        //            break;
+        //        case 2: // game over
+        //            nowState = STATE.GameOver;
+        //            break;
+        //    }
+        //}
 
         public void ClearHighlight()
         {
