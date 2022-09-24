@@ -33,8 +33,7 @@ namespace KWY
 
         ActionData nowActionData;
         STATE nowState = STATE.StandBy;
-
-        #region Public Methods
+        
 
         /// <summary>
         /// 플레이어 MP 값 변경이 이 함수를 통해서 가능 (UI 업데이트 포함하는 함수)
@@ -77,9 +76,7 @@ namespace KWY
             }
         }
 
-        #endregion
 
-        #region Private Methods
 
         private void TurnReadyState()
         {
@@ -120,14 +117,11 @@ namespace KWY
             simulation.StartSimulationState();
         }
 
-        #endregion
 
         #region MonoBehaviour CallBacks
 
         private void Start()
         {
-            data.LoadData();
-
             turnReady.Init();
             simulation.Init();
 

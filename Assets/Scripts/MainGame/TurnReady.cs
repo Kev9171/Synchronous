@@ -35,8 +35,8 @@ namespace KWY
         [SerializeField]
         private SelSkillPanel[] selSkillPanels = new SelSkillPanel[3];
 
-        [SerializeField]
-        private CharacterPanel[] characterPanels = new CharacterPanel[3];
+        //[SerializeField]
+        //private CharacterPanel[] characterPanels = new CharacterPanel[3];
 
         [SerializeField]
         private PlayerMPPanel playerMpPanel;
@@ -47,7 +47,7 @@ namespace KWY
         [SerializeField]
         private CharacterControl characterControl;
 
-        private Dictionary<CID, CharacterPanel> charaPanels = new Dictionary<CID, CharacterPanel>();
+        //private Dictionary<CID, CharacterPanel> charaPanels = new Dictionary<CID, CharacterPanel>();
 
         private float time;
         private float timeLimit;
@@ -68,12 +68,12 @@ namespace KWY
             }
 
             idx = 0;
-            foreach (Character c in data.Characters)
+            /*foreach (Character c in data.Characters)
             {
                 characterPanels[idx].SetData(c.Cb, c.Buffs);
                 charaPanels.Add(c.Cb.cid, characterPanels[idx]);
                 idx++;
-            }
+            }*/
 
             data.Characters[0].GetComponent<Collider2D>().enabled = true;
             data.Characters[1].GetComponent<Collider2D>().enabled = true;
@@ -84,10 +84,10 @@ namespace KWY
         {
             // 각 캐릭터 정보에 따라 캐릭터 정보 표시 UI 업데이트
             int idx = 0;
-            foreach (Character c in data.Characters)
+            /*foreach (Character c in data.Characters)
             {
                 characterPanels[idx++].UpdateUI(c);
-            }
+            }*/
 
             // Update Mp Panel
             playerMpPanel.UpdateUI();
@@ -153,7 +153,7 @@ namespace KWY
         {
             for (int i = 0; i < data.CharaActionData[cid].Count; i++)
             {
-                object[] t = (object[])data.CharaActionData[cid].Actions[i];
+                /*object[] t = (object[])data.CharaActionData[cid].Actions[i];
                 if (ActionType.Move == (ActionType)(t[0]))
                 {
                     charaPanels[cid].SetSelActionImg(i, MoveManager.MoveData.icon);
@@ -161,7 +161,7 @@ namespace KWY
                 else
                 {
                     charaPanels[cid].SetSelActionImg(i, SkillManager.GetData((SID)(t[1])).icon);
-                }
+                }*/
             }
         }
 

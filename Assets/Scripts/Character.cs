@@ -7,13 +7,18 @@ using UnityEngine.Tilemaps;
 
 namespace KWY
 {
-    public class Character :MonoBehaviourPunCallbacks, IPunObservable 
+    public class Character : MonoBehaviourPunCallbacks, IPunObservable, ISubject
     {
         [SerializeField]
         CharacterBase _characterBase;
 
+        List<IObserverCharacter<Character>> observers = new List<IObserverCharacter<Character>>();
+
+
+        private List<Buff> _buffs = new List<Buff>();
+
         public CharacterBase Cb { get; private set; }
-        public List<Buff> Buffs { get; private set; }
+        public List<Buff> Buffs { get { return _buffs; } }
         public float Hp { get; private set; }
         public float Mp { get; private set; }
         public bool BreakDown { get; private set; }
@@ -35,7 +40,7 @@ namespace KWY
         public Character(CharacterBase cb)
         {
             Cb = cb;
-            Buffs = new List<Buff>();
+            //Buffs = new List<Buff>();
             Hp = cb.hp;
             Mp = 0;
             BreakDown = false;
@@ -44,7 +49,7 @@ namespace KWY
         public Character(CharacterBase cb, Vector3Int pos)
         {
             Cb = cb;
-            Buffs = new List<Buff>();
+            //Buffs = new List<Buff>();
             Hp = cb.hp;
             Mp = 0;
             BreakDown = false;
@@ -292,7 +297,7 @@ namespace KWY
         private void Awake()
         {
             Cb = _characterBase;
-            Buffs = new List<Buff>();
+            _buffs = new List<Buff>();
 
             map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
             hlMap = GameObject.Find("HighlightTilemap").GetComponent<Tilemap>();
@@ -302,7 +307,7 @@ namespace KWY
             //map.GetTile<CustomTile>(map.WorldToCell(transform.position)).updateCharNum(1, gameObject);
             //map.GetTile<CustomTile>(map.WorldToCell(transform.position)).getTilePos();
 
-            Debug.Log(this+"'s pos = "+map.WorldToCell(transform.position));
+            //Debug.Log(this+"'s pos = "+map.WorldToCell(transform.position));
         }
 
         void Update()
@@ -320,6 +325,46 @@ namespace KWY
         }
         #endregion
 
+        #region IObserver Methods
+
+        public void AddObserver(IObserverCharacter<Character> o)
+        {
+            if (observers.IndexOf(o) < 0)
+            {
+                observers.Add(o);
+            }
+            else
+            {
+                Debug.LogWarning($"The observer already exists in list: {o}");
+            }
+        }
+
+        public void RemoveObserver(IObserverCharacter<Character> o)
+        {
+            int idx = observers.IndexOf(o);
+            if (idx >= 0)
+            {
+                observers.RemoveAt(idx); // O(n)
+            }
+            else
+            {
+                Debug.LogError($"Can not remove the observer; It does not exist in list: {o}");
+            }
+        }
+
+        public void NotifyObservers()
+        {
+            foreach (IObserverCharacter<Character> o in observers)
+            {
+                o.OnNotify(this);
+            }
+        }
+
+        public void RemoveAllObservers()
+        {
+            observers.Clear();
+        }
+        #endregion
 
     }
 }
