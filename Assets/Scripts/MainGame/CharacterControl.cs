@@ -24,6 +24,10 @@ namespace KWY
         [SerializeField]
         RayTest ray;
 
+        //[SerializeField]
+        //skillSpawner skillSpawner;
+
+
         public Character SelChara { get; private set; }
         public ActionBase SelAction { get; private set; }
 
@@ -32,7 +36,9 @@ namespace KWY
         MouseInput mouseInput;
 
         private int SelOk = 0; // 음수: left, 양수: right -> |2| 가 되었을 때 액션 확정
-        private SkillSpawner skillSpawner;
+
+        private skillSpawner skillSpawner;
+
         private int tempClickX, tempClickY = -int.MaxValue;
         #endregion
 
@@ -138,7 +144,8 @@ namespace KWY
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Right);
 
-                    if (((SkillBase)SelAction).areaAttack)
+<<<<<<< Updated upstream
+                    if(((SkillBase)SelAction).areaAttack)
                     {
                         Vector3Int v = new Vector3Int(clickX, clickY, 0);
                         skillSpawner.Activate(map.CellToWorld(v));
@@ -148,6 +155,9 @@ namespace KWY
                     {
                         ray.CurvedMultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, true, ((SkillBase)SelAction).directions.Count);
                     }
+=======
+                    SelChara.SelTilePos.Set(clickX, clickY, 0);
+>>>>>>> Stashed changes
 
                     turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                     SetSelClear();
@@ -181,17 +191,7 @@ namespace KWY
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Left);
 
-                    if (((SkillBase)SelAction).areaAttack)
-                    {
-                        Vector3Int v = new Vector3Int(clickX, clickY, 0);
-                        skillSpawner.Activate(map.CellToWorld(v));
-                        skillSpawner.Destroy(((SkillBase)SelAction).triggerTime);
-                    }
-                    else
-                    {
-                        ray.CurvedMultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, false, ((SkillBase)SelAction).directions.Count);
-                    }
-
+                    SelChara.SelTilePos.Set(clickX, clickY, 0);
                     turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                     SetSelClear();
 
@@ -213,6 +213,7 @@ namespace KWY
         {
             SelAction = sb;
 
+            //highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? sb.areaEvenY : sb.areaOddY);
             if (((SkillBase)SelAction).areaAttack)
             {
                 highLighter.HighlightMap(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction));
@@ -318,10 +319,16 @@ namespace KWY
 
         #endregion
 
+
+        #region Private Methods
+
+        #endregion
+
         #region MonoBehaviour CallBacks
 
         private void Awake()
         {
+            // 반드시 여기서 할당해야됨! (선언에서 하면 error)
             mouseInput = new MouseInput();
         }
         private void OnEnable()
@@ -335,19 +342,12 @@ namespace KWY
 
         private void Start()
         {
-            StartControl();
+            
         }
 
         void Update()
         {
-            if (mouseInput.Mouse.MouseClick.IsPressed())
-            {
-                //mouseInput.Mouse.MouseClick.performed -= CharMoveSelect;
-                //mouseInput.Mouse.MouseClick.performed -= CharAttackSelect;
-                //mouseInput.Mouse.MouseClick.performed += OnClick;
-            }
         }
-
         #endregion
     }
 }

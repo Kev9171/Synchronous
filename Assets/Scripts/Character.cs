@@ -18,20 +18,19 @@ namespace KWY
         public float Mp { get; private set; }
         public bool BreakDown { get; private set; }
         public Vector3Int TempTilePos { get; private set; }
-
-        public Vector3 worldPos { get; private set; }
+        public Vector3Int SelTilePos { get; private set; }
 
         public static readonly float MaxMp = 10;
 
         [SerializeField] private float movementSpeed;
         private Vector2 destination;
-        public Vector3Int TilePos;
 
-        private Tilemap map, hlMap;
-        private TilemapControl TCtrl;
+        private Tilemap map;
 
         private bool nowMove = false;
 
+        private SkillSpawner skillSpawner;
+        [SerializeField] private RayTest ray;
         public Character(CharacterBase cb)
         {
             Cb = cb;
@@ -49,7 +48,6 @@ namespace KWY
             Mp = 0;
             BreakDown = false;
             TempTilePos = pos;
-            Debug.Log("position: "+pos);
         }
 
         public void DamageHP(float damage)
@@ -109,7 +107,7 @@ namespace KWY
         public void ResetTempPos()
         {
             map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
-            TempTilePos = TilePos;
+            TempTilePos = map.WorldToCell(transform.position);
         }
 
         public override string ToString()
@@ -150,138 +148,41 @@ namespace KWY
 
         #region Simulation Functions
 
-        [PunRPC]
-        public void MoveTo(int x, int y)
+        public void MoveTo(Vector2Int dir)
         {
-            Vector2Int dir = new Vector2Int(x, y);
+            map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
 
             Vector2Int realDir = TransFromY(dir);
-            Vector3Int nowPos = TilePos;
+            Vector3Int nowPos = map.WorldToCell(this.transform.position);
             Vector3 des = map.CellToWorld(new Vector3Int(nowPos.x + realDir.x, nowPos.y + realDir.y, nowPos.z));
-            TilePos = map.WorldToCell(des);
-            des.y += 0.1f;
 
             if (map.HasTile(map.WorldToCell(des)))
             {
-                TCtrl.updateCharNum(map.WorldToCell(des), 1, gameObject);
-                TCtrl.updateCharNum(nowPos, -1, gameObject);
-
-                int charsOnDes = TCtrl.getCharList(map.WorldToCell(des)).Count;
-                int charsOnCur = TCtrl.getCharList(nowPos).Count;
-
-                worldPos = des;
                 destination = des;
-                //nowMove = true;
-                Debug.Log("nowpos = " + nowPos + ", despos = " + map.WorldToCell(des));
-                Debug.Log(gameObject.name + ": desNum->" + charsOnDes + ", curNum->" + charsOnCur);
-
-                if (map.CellToWorld(nowPos).x < des.x)
-                    gameObject.GetComponent<SpriteRenderer>().flipX = false;
-                else if(map.CellToWorld(nowPos).x > des.x)
-                    gameObject.GetComponent<SpriteRenderer>().flipX = true;
-
-                if (charsOnDes > 1)
-                {
-                    //map.SetTransformMatrix(map.WorldToCell(des), elevatedTile);
-                    //hlMap.SetTransformMatrix(map.WorldToCell(des), elevatedTile);
-                    map.SetTileFlags(map.WorldToCell(des), TileFlags.None);
-                    map.SetColor(map.WorldToCell(des), new Color(1, 1, 1, 0));
-
-                    Sprite sprite = map.GetTile<CustomTile>(map.WorldToCell(des)).sprite;
-                    TCtrl.activateAltTile(des, charsOnDes, sprite);
-
-                    List<GameObject> characters = TCtrl.getCharList(map.WorldToCell(des));
-
-                    int count = 0;
-
-                    //nowMove = true;
-                    foreach (GameObject chara in characters)
-                    {
-                        //chara.GetComponent<Character>().worldPos = des;
-                        Vector2 offset = TCtrl.nList[charsOnDes - 1].coordList[count];
-                        chara.GetComponent<Character>().destination = (Vector2)chara.GetComponent<Character>().worldPos + offset;
-                        chara.GetComponent<Character>().nowMove = true;
-                        //chara.transform.position += new Vector3(-0.1f, 0.5f, 0);
-                        chara.GetComponent<BoxCollider2D>().offset = -offset;
-
-                        //Debug.Log(chara.GetComponent<Character>().destination);
-                        //Debug.Log((Vector2)fTiles.nList[charsOnDes - 1].coordList[count] + ", " + (Vector2)fTiles.nList[charsOnDes - 2].coordList[count]);
-
-                        count++;
-                    }
-                }
-                else
-                {
-                    nowMove = true;
-                    gameObject.GetComponent<BoxCollider2D>().offset = Vector2.zero;
-
-                    Debug.Log("noone on tile");
-                }
-
-                if (charsOnCur > 1)
-                {
-                    Sprite sprite = map.GetTile<CustomTile>(nowPos).sprite;
-                    Vector3 vec = map.CellToWorld(nowPos);
-                    vec.y += 0.1f;
-                    TCtrl.activateAltTile(vec, charsOnCur, sprite);
-
-                    List<GameObject> characters = TCtrl.getCharList(nowPos);
-
-                    int count = 0;
-                    destination = des;
-                    foreach (GameObject chara in characters)
-                    {
-                        Vector3 charpos = chara.transform.position;
-                        Vector2 offset = TCtrl.nList[charsOnCur - 1].coordList[count];
-                        chara.GetComponent<Character>().destination = (Vector2)chara.GetComponent<Character>().worldPos + offset;
-                        chara.GetComponent<Character>().nowMove = true;
-                        //chara.transform.position += new Vector3(-0.1f, 0.5f, 0);
-                        chara.GetComponent<BoxCollider2D>().offset = -offset;
-
-                        count++;
-                    }
-                }
-
-                else if (charsOnCur == 1)
-                {
-                    //map.SetTransformMatrix(map.WorldToCell(des), groundTile);
-                    //hlMap.SetTransformMatrix(map.WorldToCell(des), groundTile);
-
-                    map.SetTileFlags(nowPos, TileFlags.None);
-                    map.SetColor(nowPos, new Color(1, 1, 1, 1));
-
-                    TCtrl.deactivateAltTile(map.CellToWorld(nowPos));
-
-                    List<GameObject> characters = TCtrl.getCharList(nowPos);
-                    characters[0].GetComponent<Character>().destination = map.CellToWorld(nowPos);
-                    characters[0].GetComponent<Character>().nowMove = true;
-                    characters[0].GetComponent<BoxCollider2D>().offset = Vector2.zero;
-                    GetComponent<BoxCollider2D>().offset = Vector2.zero;
-
-                }
-
+                nowMove = true;
                 Debug.LogFormat("{0} / {1} is moving to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, map.WorldToCell(des));
             }
-
-            //if (map.HasTile(map.WorldToCell(des)))
-            //{
-            //    destination = des;
-            //    nowMove = true;
-
-            //    //Matrix4x4 groundTile = Matrix4x4.TRS(new Vector3(0, 0f, 0), Quaternion.Euler(0f, 0f, 0f), Vector3.one);
-            //    //Matrix4x4 elevatedTile = Matrix4x4.TRS(new Vector3(0, 0.2f, 0), Quaternion.Euler(0f, 0f, 0f), Vector3.one/*scale 조정*/);
-
-            //    Debug.LogFormat("{0} / {1} is moving to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, map.WorldToCell(des));
-            //}
             else
             {
-                Debug.LogFormat("{0} / {1} can not go to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, map.WorldToCell(des));
+                Debug.LogFormat("{0} / {1} can not go to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, map.WorldToCell(des));         
             }
         }
 
         public void SpellSkill(SID sid, SkillDicection direction)
         {
             nowMove = false;
+            SkillBase SelSkill = SkillManager.GetData(sid);
+            if (SelSkill.areaAttack)
+            {
+                skillSpawner = SelSkill.area;
+                Vector3Int v = new Vector3Int(SelTilePos.x, SelTilePos.y, 0);
+                skillSpawner.Activate(map.CellToWorld(v));
+                skillSpawner.Destroy(SkillManager.GetData(sid).triggerTime);   // triggerTime만큼 스킬 지속후 삭제
+            }
+            else
+            {
+                ray.CurvedMultipleRay(map.CellToWorld(TempTilePos), SelSkill, SelSkill.directions, true, SelSkill.directions.Count);
+            }
             Debug.LogFormat("{0} / {1} spells {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, sid);
         }
 
@@ -294,6 +195,10 @@ namespace KWY
             Cb = _characterBase;
             Buffs = new List<Buff>();
 
+<<<<<<< Updated upstream
+            // for test
+            //Buffs.Add(new Buff(BuffManager.GetData(BID.Burn), 2));
+=======
             map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
             hlMap = GameObject.Find("HighlightTilemap").GetComponent<Tilemap>();
             TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
@@ -302,7 +207,12 @@ namespace KWY
             //map.GetTile<CustomTile>(map.WorldToCell(transform.position)).updateCharNum(1, gameObject);
             //map.GetTile<CustomTile>(map.WorldToCell(transform.position)).getTilePos();
 
+            Hp = Cb.hp; 
+            Mp = 0;
+            BreakDown = false;
+
             Debug.Log(this+"'s pos = "+map.WorldToCell(transform.position));
+>>>>>>> Stashed changes
         }
 
         void Update()
@@ -310,12 +220,10 @@ namespace KWY
             if (nowMove)
             {
                 transform.position = Vector3.Lerp(gameObject.transform.position, destination, 0.7f);
-                if (transform.position == new Vector3(destination.x, destination.y, 0))
-                    nowMove = false;
             }
             else
             {
-                
+
             }
         }
         #endregion

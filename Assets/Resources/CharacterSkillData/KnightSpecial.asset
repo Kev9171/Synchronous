@@ -45,4 +45,10 @@ MonoBehaviour:
   - 2
   directions: 
   areaAttack: 1
+<<<<<<< Updated upstream
+  area: {fileID: 6941316062329348292, guid: 56967bfc002d4c841898d7a595737b53, type: 3}
+=======
   area: {fileID: 6941316062329348292, guid: 683939de26b66f745999e25866b13f7b, type: 3}
+  isDamage: 0
+  value: 20
+>>>>>>> Stashed changes

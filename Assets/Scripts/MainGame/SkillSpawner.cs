@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SkillSpawner : MonoBehaviour
+public class skillSpawner : MonoBehaviour
 {
     public GameObject target;
     private List<GameObject> clone = new List<GameObject>(); // 클론이 저장되는 곳
@@ -21,9 +21,10 @@ public class SkillSpawner : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Enemy")
+        if(collision.gameObject.tag == "Enemy")
         {
-            collision.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+            //collision.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+            collision.gameObject.GetComponent<Character>().DamageHP(5);
         }
     }
 }

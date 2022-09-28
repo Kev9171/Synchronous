@@ -13,8 +13,8 @@ namespace KWY
         private List<Vector2> correction = new List<Vector2>();
         private List<Vector2> direction = new List<Vector2>();
         private Vector2 lastPos;
-        private float xCor = 0.65f * 1.5f;  //¸Ê1 -> ¸Ê2 x°ª º¸Á¤Ä¡
-        private float yCor = 0.7f * 1.5f / 0.65f;  // ¸Ê1 -> ¸Ê2 y°ª º¸Á¤Ä¡
+        private float xCor = 0.65f;  //¸Ê1 -> ¸Ê2 x°ª º¸Á¤Ä¡
+        private float yCor = 0.7f / 0.65f;  // ¸Ê1 -> ¸Ê2 y°ª º¸Á¤Ä¡
 
         public void Ray(Vector2 basePos, SkillBase sb, int dir, bool reversed)
         {
@@ -121,13 +121,16 @@ namespace KWY
             //    Debug.Log(hit.transform.name);
             //}
 
-
+            
             hits = Physics2D.RaycastAll(bp, dp, d, layerMask);
             for (int i = 0; i < hits.Length; i++)
             {
                 RaycastHit2D hit = hits[i];
-                hit.transform.GetComponent<SpriteRenderer>().color = Color.red;
-                Debug.Log(hit.transform.name);
+                //hit.transform.GetComponent<SpriteRenderer>().color = Color.red;
+                if(sb.isDamage)
+                {
+                    hit.transform.GetComponent<Character>().DamageHP(sb.value);
+                }
             }
             lastPos = lastPos + dp * d;
         }

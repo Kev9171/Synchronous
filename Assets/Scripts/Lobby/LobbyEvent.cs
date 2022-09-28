@@ -8,20 +8,25 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-using TMPro;
-
 namespace KWY
 {
-    public class LobbyEvent : MonoBehaviourPunCallbacks
+    public class LobbyEvent : MonoBehaviourPun
     {
-        [SerializeField]
-        GameLobby gameLobby;
+        #region Private Serializable Fields
+        [Tooltip("The button to send ready to start the game to server")]
+        [SerializeField] private Button ReadyBtn;
+
+        [SerializeField] private Text readyTxt;
+
+        #endregion
 
         #region Private Fields
 
+        [Tooltip("다음에 게임이 시작되면 로드될 scene")]
+        readonly private string nextLevel = "MainGameScene";
+
         [Tooltip("Unique user id that the server determined")]
         private string UserId;
-
         #endregion
 
         #region Public Methods
@@ -29,12 +34,12 @@ namespace KWY
         /// <summary>
         /// Send to 'ready signal' to the Server; content: [ready?: bool]
         /// </summary>
-        public void RaiseEventReady(bool isReady)
+        public void RaiseEventReady()
         {
             byte evCode = (byte)EvCode.LobbyReady;
             object[] content = new object[]
             {
-                isReady
+                true
             };
 
             RaiseEventOptions raiseEventOptions = new RaiseEventOptions
@@ -88,13 +93,17 @@ namespace KWY
             UserId = PhotonNetwork.AuthValues.UserId; // temp
             object[] data = (object[])eventData.CustomData;
 
-            // 자신에 대한 이벤트 일 경우
-            if (UserId == (string)data[0])
+            if (UserId == (string)data[0] && (bool)data[1])
             {
+<<<<<<< Updated upstream
+                // 임시로 ready 완료되면 버튼 blue로 변경
+                //ReadyBtn.GetComponent<Image>().color = Color.gray;
+                readyTxt.text = "준비 완료";
+=======
                 // ready 상태 최신화에 대한 ok 사인을 받았으면
                 if ((bool)data[1])
                 {
-                    
+                    Debug.Log(data[2]);
                     gameLobby.SetReadyStatus((bool)data[2]);
                 }
                 else
@@ -115,12 +124,16 @@ namespace KWY
                 {
                     // error
                 }
+>>>>>>> Stashed changes
             }
 
             // check 'start game?' through data[2]
-            if ((bool)data[3])
+            if ((bool)data[2])
             {
-                gameLobby.StartTimer();
+                Debug.Log("Start Game");
+
+                // load next level
+                PhotonNetwork.LoadLevel(nextLevel);
             }
         }
 
@@ -143,33 +156,14 @@ namespace KWY
             }
         }
 
-
-        public override void OnEnable()
+        public void OnEnable()
         {
-            base.OnEnable();
             PhotonNetwork.NetworkingClient.EventReceived += OnEvent;
         }
 
-        public override void OnDisable()
+        public void OnDisable()
         {
-            base.OnDisable();
             PhotonNetwork.NetworkingClient.EventReceived -= OnEvent;
-        }
-
-        public override void OnPlayerEnteredRoom(Player newPlayer)
-        {
-            Debug.Log("New player entered the room: " + newPlayer.NickName); ;
-
-            gameLobby.SetEnteredPlayer(newPlayer);
-            base.OnPlayerEnteredRoom(newPlayer);
-        }
-
-        public override void OnPlayerLeftRoom(Player otherPlayer)
-        {
-            Debug.Log("New player left the room: " + otherPlayer.NickName); ;
-
-            gameLobby.ClearEnteredPlayer();
-            base.OnPlayerLeftRoom(otherPlayer);
         }
 
         #endregion

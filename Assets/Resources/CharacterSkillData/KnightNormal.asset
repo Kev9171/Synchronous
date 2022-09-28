@@ -27,3 +27,17 @@ MonoBehaviour:
   casters: 03000000
   skillExplanation: lalalalalalalalalal
   skillExImg: {fileID: 21300000, guid: bf2dcaafd8fd28b42b2d603724e7a75c, type: 3}
+<<<<<<< Updated upstream
+  distance:
+  - 2
+  directions: 01000000
+  areaAttack: 0
+  area: {fileID: 0}
+=======
+  distance: []
+  directions: 
+  areaAttack: 0
+  area: {fileID: 0}
+  isDamage: 1
+  value: 10
+>>>>>>> Stashed changes

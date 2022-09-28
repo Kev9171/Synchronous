@@ -16,7 +16,13 @@ namespace KWY
         public List<float> distance = new List<float>();
         public List<Direction> directions = new List<Direction>();
         public bool areaAttack;
+<<<<<<< Updated upstream:Assets/Scripts/ScriptableObjectBase/SkillBase.cs
+        public skillSpawner area;
+=======
         public SkillSpawner area;
+        public bool isDamage;
+        public int value; // 데미지 또는 버프의 수치
+>>>>>>> Stashed changes:Assets/Scripts/Scriptable Object/ScriptableObjectBase/SkillBase.cs
 
         public override string ToString()
         {
