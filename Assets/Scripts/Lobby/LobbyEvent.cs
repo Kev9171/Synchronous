@@ -32,12 +32,12 @@ namespace KWY
         /// <summary>
         /// Send to 'ready signal' to the Server; content: [ready?: bool]
         /// </summary>
-        public void RaiseEventReady()
+        public void RaiseEventReady(bool isReady)
         {
             byte evCode = (byte)EvCode.LobbyReady;
             object[] content = new object[]
             {
-                true
+                isReady
             };
 
             RaiseEventOptions raiseEventOptions = new RaiseEventOptions
