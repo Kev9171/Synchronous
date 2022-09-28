@@ -95,11 +95,6 @@ namespace KWY
 
             if (UserId == (string)data[0] && (bool)data[1])
             {
-<<<<<<< Updated upstream
-                // 임시로 ready 완료되면 버튼 blue로 변경
-                //ReadyBtn.GetComponent<Image>().color = Color.gray;
-                readyTxt.text = "준비 완료";
-=======
                 // ready 상태 최신화에 대한 ok 사인을 받았으면
                 if ((bool)data[1])
                 {
@@ -124,7 +119,6 @@ namespace KWY
                 {
                     // error
                 }
->>>>>>> Stashed changes
             }
 
             // check 'start game?' through data[2]

@@ -144,21 +144,7 @@ namespace KWY
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Right);
 
-<<<<<<< Updated upstream
-                    if(((SkillBase)SelAction).areaAttack)
-                    {
-                        Vector3Int v = new Vector3Int(clickX, clickY, 0);
-                        skillSpawner.Activate(map.CellToWorld(v));
-                        skillSpawner.Destroy(((SkillBase)SelAction).triggerTime);   // triggerTime만큼 스킬 지속후 삭제
-                    }
-                    else
-                    {
-                        ray.CurvedMultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, true, ((SkillBase)SelAction).directions.Count);
-                    }
-=======
                     SelChara.SelTilePos.Set(clickX, clickY, 0);
->>>>>>> Stashed changes
-
                     turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                     SetSelClear();
 

@@ -29,7 +29,7 @@ namespace KWY
 
         private bool nowMove = false;
 
-        private SkillSpawner skillSpawner;
+        private skillSpawner skillSpawner;
         [SerializeField] private RayTest ray;
         public Character(CharacterBase cb)
         {
@@ -195,24 +195,13 @@ namespace KWY
             Cb = _characterBase;
             Buffs = new List<Buff>();
 
-<<<<<<< Updated upstream
-            // for test
-            //Buffs.Add(new Buff(BuffManager.GetData(BID.Burn), 2));
-=======
             map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
-            hlMap = GameObject.Find("HighlightTilemap").GetComponent<Tilemap>();
-            TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
-
-            TilePos = map.WorldToCell(transform.position);
-            //map.GetTile<CustomTile>(map.WorldToCell(transform.position)).updateCharNum(1, gameObject);
-            //map.GetTile<CustomTile>(map.WorldToCell(transform.position)).getTilePos();
 
             Hp = Cb.hp; 
             Mp = 0;
             BreakDown = false;
 
             Debug.Log(this+"'s pos = "+map.WorldToCell(transform.position));
->>>>>>> Stashed changes
         }
 
         void Update()
