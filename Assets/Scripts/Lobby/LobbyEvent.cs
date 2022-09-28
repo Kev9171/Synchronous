@@ -13,10 +13,8 @@ namespace KWY
     public class LobbyEvent : MonoBehaviourPun
     {
         #region Private Serializable Fields
-        [Tooltip("The button to send ready to start the game to server")]
-        [SerializeField] private Button ReadyBtn;
-
-        [SerializeField] private Text readyTxt;
+        [SerializeField]
+        GameLobby gameLobby;
 
         #endregion
 
