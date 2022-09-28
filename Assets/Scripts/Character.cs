@@ -18,6 +18,7 @@ namespace KWY
         public float Mp { get; private set; }
         public bool BreakDown { get; private set; }
         public Vector3Int TempTilePos { get; private set; }
+        public Vector3Int SelTilePos { get; private set; }
 
         public Vector3 worldPos { get; private set; }
 
@@ -32,6 +33,8 @@ namespace KWY
 
         private bool nowMove = false;
 
+        private SkillSpawner skillSpawner;
+        [SerializeField] private RayTest ray;
         public Character(CharacterBase cb)
         {
             Cb = cb;
@@ -282,6 +285,18 @@ namespace KWY
         public void SpellSkill(SID sid, SkillDicection direction)
         {
             nowMove = false;
+            SkillBase SelSkill = SkillManager.GetData(sid);
+            if (SelSkill.areaAttack)
+            {
+                skillSpawner = SelSkill.area;
+                Vector3Int v = new Vector3Int(SelTilePos.x, SelTilePos.y, 0);
+                skillSpawner.Activate(map.CellToWorld(v));
+                skillSpawner.Destroy(SkillManager.GetData(sid).triggerTime);   // triggerTime만큼 스킬 지속후 삭제
+            }
+            else
+            {
+                ray.CurvedMultipleRay(map.CellToWorld(TempTilePos), SelSkill, SelSkill.directions, true, SelSkill.directions.Count);
+            }
             Debug.LogFormat("{0} / {1} spells {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, sid);
         }
 
@@ -301,6 +316,10 @@ namespace KWY
             TilePos = map.WorldToCell(transform.position);
             //map.GetTile<CustomTile>(map.WorldToCell(transform.position)).updateCharNum(1, gameObject);
             //map.GetTile<CustomTile>(map.WorldToCell(transform.position)).getTilePos();
+
+            Hp = Cb.hp;
+            Mp = 0;
+            BreakDown = false;
 
             Debug.Log(this+"'s pos = "+map.WorldToCell(transform.position));
         }

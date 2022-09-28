@@ -126,8 +126,11 @@ namespace KWY
             for (int i = 0; i < hits.Length; i++)
             {
                 RaycastHit2D hit = hits[i];
-                hit.transform.GetComponent<SpriteRenderer>().color = Color.red;
-                Debug.Log(hit.transform.name);
+                //hit.transform.GetComponent<SpriteRenderer>().color = Color.red;
+                if (sb.isDamage)
+                {
+                    hit.transform.GetComponent<Character>().DamageHP(sb.value);
+                }
             }
             lastPos = lastPos + dp * d;
         }
