@@ -7,45 +7,65 @@ using UnityEngine.Tilemaps;
 
 namespace KWY
 {
-    public class Character :MonoBehaviourPunCallbacks, IPunObservable 
+    public class Character : MonoBehaviourPunCallbacks, IPunObservable, ISubject
     {
         [SerializeField]
         CharacterBase _characterBase;
 
+        private List<IObserverCharacter<Character>> observers = new List<IObserverCharacter<Character>>();
+        private List<Buff> buffs = new List<Buff>();
+
+        public List<IObserverCharacter<Character>> Observers
+        {
+            get;
+            private set;
+        } = new List<IObserverCharacter<Character>>();
+
+        public List<Buff> Buffs
+        {
+            get;
+            private set;
+        } = new List<Buff>();
         public CharacterBase Cb { get; private set; }
-        public List<Buff> Buffs { get; private set; }
         public float Hp { get; private set; }
         public float Mp { get; private set; }
+        public float MaxHp { get; private set; }
+        public float MaxMp { get; private set; }
         public bool BreakDown { get; private set; }
+        public float Atk { get; private set; }
+        public float Def { get; private set; }
+
+
+
+
+
         public Vector3Int TempTilePos { get; private set; }
 
-        public static readonly float MaxMp = 10;
+        public Vector3 worldPos { get; private set; }
 
         [SerializeField] private float movementSpeed;
         private Vector2 destination;
+        public Vector3Int TilePos;
 
         private Tilemap map, hlMap;
-        private TilemapControl fTiles;
+        private TilemapControl TCtrl;
 
         private bool nowMove = false;
 
-        public Character(CharacterBase cb)
+        private void Init()
         {
-            Cb = cb;
-            Buffs = new List<Buff>();
-            Hp = cb.hp;
-            Mp = 0;
-            BreakDown = false;
-        }
+            Cb = _characterBase;
 
-        public Character(CharacterBase cb, Vector3Int pos)
-        {
-            Cb = cb;
-            Buffs = new List<Buff>();
-            Hp = cb.hp;
-            Mp = 0;
+            Hp = Cb.hp;
+            Mp = 0; // TODO
+
             BreakDown = false;
-            TempTilePos = pos;
+
+            MaxHp = Cb.hp;
+            MaxMp = 10;
+
+            Atk = Cb.atk;
+            Def = 1; // TODO
         }
 
         public void DamageHP(float damage)
@@ -63,6 +83,8 @@ namespace KWY
             {
                 Debug.LogFormat("{0} is damaged {1}; Now hp: {2}", Cb.name, damage, Hp);
             }
+
+            NotifyObservers();
         }
 
         public void AddMP(float amount)
@@ -105,7 +127,7 @@ namespace KWY
         public void ResetTempPos()
         {
             map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
-            TempTilePos = map.WorldToCell(transform.position);
+            TempTilePos = TilePos;
         }
 
         public override string ToString()
@@ -116,7 +138,14 @@ namespace KWY
                 t += b.ToString() + ", ";
             }
             t += "]";
-            return string.Format("CID: {0}, HP: {1}, MP: {2}, Down?: {3}, Buffs: {4}", Cb.cid, Hp, Mp, BreakDown, t);
+
+            string tt = "[";
+            foreach(IObserverCharacter<Character> o in observers)
+            {
+                tt += o.GetType().ToString();
+            }
+            tt += "]";
+            return string.Format("CID: {0}, HP: {1}, MP: {2}, Down?: {3}, Buffs: {4}, Observers: {5}", Cb.cid, Hp, Mp, BreakDown, t, tt);
         }
 
         #region IPunObservable implementation
@@ -146,28 +175,35 @@ namespace KWY
 
         #region Simulation Functions
 
-        public void MoveTo(Vector2Int dir)
+        [PunRPC]
+        public void MoveTo(int x, int y)
         {
-            map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
-            hlMap = GameObject.Find("HighlightTilemap").GetComponent<Tilemap>();
-            fTiles = GameObject.Find("SecondTiles").GetComponent<TilemapControl>();
+            Vector2Int dir = new Vector2Int(x, y);
 
             Vector2Int realDir = TransFromY(dir);
-            Vector3Int nowPos = map.WorldToCell(this.transform.position);
+            Vector3Int nowPos = TilePos;
             Vector3 des = map.CellToWorld(new Vector3Int(nowPos.x + realDir.x, nowPos.y + realDir.y, nowPos.z));
+            TilePos = map.WorldToCell(des);
+            des.y += 0.1f;
 
             if (map.HasTile(map.WorldToCell(des)))
             {
-                map.GetTile<CustomTile>(map.WorldToCell(des)).updateCharNum(1, gameObject);
-                map.GetTile<CustomTile>(nowPos).updateCharNum(-1, gameObject);
+                TCtrl.updateCharNum(map.WorldToCell(des), 1, gameObject);
+                TCtrl.updateCharNum(nowPos, -1, gameObject);
 
-                //List<GameObject> charsOnDes = map.GetTile<CustomTile>(map.WorldToCell(des)).getCharList();
-                //List<GameObject> charsOnCur = map.GetTile<CustomTile>(nowPos).getCharList();
+                int charsOnDes = TCtrl.getCharList(map.WorldToCell(des)).Count;
+                int charsOnCur = TCtrl.getCharList(nowPos).Count;
 
-                int charsOnDes = map.GetTile<CustomTile>(map.WorldToCell(des)).getCharCount();
-                int charsOnCur = map.GetTile<CustomTile>(nowPos).getCharCount();
-
+                worldPos = des;
                 destination = des;
+                //nowMove = true;
+                Debug.Log("nowpos = " + nowPos + ", despos = " + map.WorldToCell(des));
+                Debug.Log(gameObject.name + ": desNum->" + charsOnDes + ", curNum->" + charsOnCur);
+
+                if (map.CellToWorld(nowPos).x < des.x)
+                    gameObject.GetComponent<SpriteRenderer>().flipX = false;
+                else if(map.CellToWorld(nowPos).x > des.x)
+                    gameObject.GetComponent<SpriteRenderer>().flipX = true;
 
                 if (charsOnDes > 1)
                 {
@@ -177,23 +213,24 @@ namespace KWY
                     map.SetColor(map.WorldToCell(des), new Color(1, 1, 1, 0));
 
                     Sprite sprite = map.GetTile<CustomTile>(map.WorldToCell(des)).sprite;
-                    fTiles.activateTile(des, charsOnDes, sprite);
+                    TCtrl.activateAltTile(des, charsOnDes, sprite);
 
-                    List<GameObject> characters = map.GetTile<CustomTile>(map.WorldToCell(des)).getCharList();
+                    List<GameObject> characters = TCtrl.getCharList(map.WorldToCell(des));
 
                     int count = 0;
 
+                    //nowMove = true;
                     foreach (GameObject chara in characters)
                     {
-                        Vector3 charpos = chara.transform.position;
-                        Vector2 offset = (Vector2)fTiles.nList[charsOnDes - 1].coordList[count] - (Vector2)fTiles.nList[charsOnDes - 2].coordList[count];
-                        chara.GetComponent<Character>().destination += offset;
+                        //chara.GetComponent<Character>().worldPos = des;
+                        Vector2 offset = TCtrl.nList[charsOnDes - 1].coordList[count];
+                        chara.GetComponent<Character>().destination = (Vector2)chara.GetComponent<Character>().worldPos + offset;
                         chara.GetComponent<Character>().nowMove = true;
                         //chara.transform.position += new Vector3(-0.1f, 0.5f, 0);
-                        chara.GetComponent<BoxCollider2D>().offset -= offset;
+                        chara.GetComponent<BoxCollider2D>().offset = -offset;
 
-                        Debug.Log(chara.GetComponent<Character>().destination);
-                        Debug.Log((Vector2)fTiles.nList[charsOnDes - 1].coordList[count] + ", " + (Vector2)fTiles.nList[charsOnDes - 2].coordList[count]);
+                        //Debug.Log(chara.GetComponent<Character>().destination);
+                        //Debug.Log((Vector2)fTiles.nList[charsOnDes - 1].coordList[count] + ", " + (Vector2)fTiles.nList[charsOnDes - 2].coordList[count]);
 
                         count++;
                     }
@@ -201,27 +238,30 @@ namespace KWY
                 else
                 {
                     nowMove = true;
+                    gameObject.GetComponent<BoxCollider2D>().offset = Vector2.zero;
 
-                    Debug.Log(destination);
+                    Debug.Log("noone on tile");
                 }
 
                 if (charsOnCur > 1)
                 {
                     Sprite sprite = map.GetTile<CustomTile>(nowPos).sprite;
-                    fTiles.activateTile(map.CellToWorld(nowPos), charsOnCur, sprite);
+                    Vector3 vec = map.CellToWorld(nowPos);
+                    vec.y += 0.1f;
+                    TCtrl.activateAltTile(vec, charsOnCur, sprite);
 
-                    List<GameObject> characters = map.GetTile<CustomTile>(nowPos).getCharList();
+                    List<GameObject> characters = TCtrl.getCharList(nowPos);
 
                     int count = 0;
                     destination = des;
                     foreach (GameObject chara in characters)
                     {
                         Vector3 charpos = chara.transform.position;
-                        Vector2 offset = (Vector2)fTiles.nList[charsOnCur - 1].coordList[count] - (Vector2)fTiles.nList[charsOnDes].coordList[count];
-                        chara.GetComponent<Character>().destination += offset;
+                        Vector2 offset = TCtrl.nList[charsOnCur - 1].coordList[count];
+                        chara.GetComponent<Character>().destination = (Vector2)chara.GetComponent<Character>().worldPos + offset;
                         chara.GetComponent<Character>().nowMove = true;
                         //chara.transform.position += new Vector3(-0.1f, 0.5f, 0);
-                        chara.GetComponent<BoxCollider2D>().offset -= offset;
+                        chara.GetComponent<BoxCollider2D>().offset = -offset;
 
                         count++;
                     }
@@ -235,12 +275,13 @@ namespace KWY
                     map.SetTileFlags(nowPos, TileFlags.None);
                     map.SetColor(nowPos, new Color(1, 1, 1, 1));
 
-                    fTiles.deactivateTile(map.CellToWorld(nowPos));
+                    TCtrl.deactivateAltTile(map.CellToWorld(nowPos));
 
-                    List<GameObject> characters = map.GetTile<CustomTile>(nowPos).getCharList();
+                    List<GameObject> characters = TCtrl.getCharList(nowPos);
                     characters[0].GetComponent<Character>().destination = map.CellToWorld(nowPos);
                     characters[0].GetComponent<Character>().nowMove = true;
                     characters[0].GetComponent<BoxCollider2D>().offset = Vector2.zero;
+                    GetComponent<BoxCollider2D>().offset = Vector2.zero;
 
                 }
 
@@ -275,11 +316,21 @@ namespace KWY
         #region MonoBehaviour CallBacks
         private void Awake()
         {
-            Cb = _characterBase;
-            Buffs = new List<Buff>();
+            Init();
 
-            Debug.Log(this);
+            
+
+            map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
+            hlMap = GameObject.Find("HighlightTilemap").GetComponent<Tilemap>();
+            TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
+
+            TilePos = map.WorldToCell(transform.position);
+            //map.GetTile<CustomTile>(map.WorldToCell(transform.position)).updateCharNum(1, gameObject);
+            //map.GetTile<CustomTile>(map.WorldToCell(transform.position)).getTilePos();
+
+            //Debug.Log(this+"'s pos = "+map.WorldToCell(transform.position));
         }
+
 
         void Update()
         {
@@ -296,6 +347,46 @@ namespace KWY
         }
         #endregion
 
+        #region IObserver Methods
+
+        public void AddObserver(IObserverCharacter<Character> o)
+        {
+            if (observers.IndexOf(o) < 0)
+            {
+                observers.Add(o);
+            }
+            else
+            {
+                Debug.LogWarning($"The observer already exists in list: {o}");
+            }
+        }
+
+        public void RemoveObserver(IObserverCharacter<Character> o)
+        {
+            int idx = observers.IndexOf(o);
+            if (idx >= 0)
+            {
+                observers.RemoveAt(idx); // O(n)
+            }
+            else
+            {
+                Debug.LogError($"Can not remove the observer; It does not exist in list: {o}");
+            }
+        }
+
+        public void NotifyObservers()
+        {
+            foreach (IObserverCharacter<Character> o in observers)
+            {
+                o.OnNotify(this);
+            }
+        }
+
+        public void RemoveAllObservers()
+        {
+            observers.Clear();
+        }
+        #endregion
 
     }
 }

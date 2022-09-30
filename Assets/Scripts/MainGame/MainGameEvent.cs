@@ -19,7 +19,7 @@ namespace KWY
         [SerializeField] private Button readyBtn;
 
         [SerializeField]
-        private GameManager gameManager;
+        private TurnManager gameManager;
 
         #endregion
 
@@ -205,12 +205,12 @@ namespace KWY
                 if (PhotonNetwork.IsMasterClient)
                 {
                     Debug.Log("Received simul data!!!!");
-                    gameManager.SetState(1, (Dictionary<int, object[]>)data[3]); // Note: if data[2] is false, there is no data[3]
+                    gameManager.SetState(STATE.Simul, (Dictionary<int, object[]>)data[3]); // Note: if data[2] is false, there is no data[3]
                 }
                 else
                 {
                     Debug.Log("It is not matser client");
-                    gameManager.SetState(1);
+                    gameManager.SetState(STATE.Simul);
                 }
             }
         }
@@ -221,7 +221,7 @@ namespace KWY
         /// <param name="eventData">Received data from the server</param>
         private void OnEventSimulEnd(EventData eventData)
         {
-            gameManager.SetState(0);
+            gameManager.SetState(STATE.TurnReady);
         }
 
         /// <summary>

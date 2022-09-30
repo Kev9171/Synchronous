@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 namespace KWY
 {
@@ -53,9 +54,12 @@ namespace KWY
             playerSkillPanel.UpdateUI();
         }
 
-        public void StartSimulationState()
+        public void StartSimulationState(ActionData actionData)
         {
             simulCanvas.SetActive(true);
+
+            this.actionData = actionData;
+            StartSimulation();
         }
 
         public void StartSimulation(ActionData actionData)
@@ -82,6 +86,10 @@ namespace KWY
             foreach (int t in actionData.Data.Keys)
             {
                 maxTimeLine = (t > maxTimeLine) ? t : maxTimeLine;
+            }
+            foreach(Character ch in data.Characters)
+            {
+                ch.ResetTempPos();
             }
 
             StartCoroutine(StartAction(-1));
@@ -127,7 +135,8 @@ namespace KWY
 
         IEnumerator DoCharaMove(int cid, Vector2Int v)
         {
-            data.WholeCharacters[cid].MoveTo(v);
+            //data.WholeCharacters[cid].MoveTo(v);
+            data.WholeCharacters[cid].photonView.RPC("MoveTo", RpcTarget.All, v.x, v.y);
             showActions.ShowMoveLog(cid);
             yield return null;
         }
@@ -153,16 +162,8 @@ namespace KWY
 
         private void Awake()
         {
-            LogicData logicData = Resources.Load(
-                "MainGameLogicData", typeof(LogicData)) as LogicData;
 
-            if (logicData == null)
-            {
-                Debug.LogError("Can not find LogicData at 'Resources/MainGameLogicData");
-                return;
-            }
-
-            simulationIntervalSeconds = logicData.simulationIntervalSeconds;
+            simulationIntervalSeconds = LogicData.Instance.SimulationIntervalSeconds;
         }
 
         #endregion

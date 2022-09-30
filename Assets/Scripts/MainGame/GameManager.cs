@@ -1,23 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
 
 namespace KWY
 {
     public class GameManager : MonoBehaviour
     {
         [SerializeField]
-        private GameObject mainCamera;
+        CameraController cameraController;
 
         [SerializeField]
-        private MainGameData data;
+        MainGameData data;
 
         [SerializeField]
-        private MainGameEvent gameEvent;
-
-        [SerializeField]
-        private ShowNowAction showActions;
+        ShowNowAction showActions;
 
         [SerializeField]
         private PlayerMPPanel playerMpPanel;
@@ -31,111 +27,82 @@ namespace KWY
         [SerializeField]
         private Simulation simulation;
 
-        int time = 0;
-        int tMax;
         ActionData nowActionData;
-        STATE nowState = 0;
 
-        #region Public Methods
+        STATE nowState = STATE.StandBy;
 
-        /// <summary>
-        /// 플레이어 MP 값 변경이 이 함수를 통해서 가능 (UI 업데이트 포함하는 함수)
-        /// </summary>
-        /// <param name="value">변경할 값(+, -)</param>
-        public void UpdatePlayerMP(int value)
+        public void SetState(STATE state, params object[] data)
         {
-            data.UpdatePlayerMP(value);
-
-            // update UI
-            playerMpPanel.UpdateUI();
-
-            if (nowState == STATE.Simul)
+            switch (state)
             {
-                playerSkillPanel.UpdateUI();
-            }
-        }
-
-        public void SetState(int state, params object[] data)
-        {
-            switch(state)
-            {
-                case 0: // turn ready
-                    TurnReadyState();
+                case STATE.TurnReady: // turn ready
                     nowState = STATE.TurnReady;
+                    TurnReadyState();
                     break;
-                case 1: // start simul
+                case STATE.Simul: // start simul
                     nowState = STATE.Simul;
-                    if (PhotonNetwork.IsMasterClient)
-                    {
-                        SimulationState();
-                        simulation.StartSimulation(new ActionData((Dictionary<int, object[]>)data[0]));
-                    } 
-                    else
-                        SimulationState();
+                    SimulationState(
+                        new ActionData((Dictionary<int, object[]>)data[0])
+                        );
                     break;
-                case 2: // game over
+                case STATE.GameOver: // game over
                     nowState = STATE.GameOver;
+                    GameOverState();
                     break;
             }
         }
-
-        #endregion
-
-        #region Private Methods
 
         private void TurnReadyState()
         {
+            // end simulation state
             simulation.EndSimulationState();
-
-            // 카메라 이동
-            mainCamera.GetComponent<CameraController>().SetCameraTurnReady();
-
-            // mp 추가
-            // player
-            if (data.turnNum == 1)
-            {
-                UpdatePlayerMP((Resources.Load("MainGameLogicData", typeof(LogicData)) as LogicData).playerInitialMp);
-            }
-            else
-            {
-                UpdatePlayerMP((Resources.Load("MainGameLogicData", typeof(LogicData)) as LogicData).playerMPIncrement);
-            }
-
-            // 순서 확인 필요
-            turnReady.ResetUI();
-            turnReady.UpdateUI();
-            turnReady.StartTurnReadyState();
-        }
-
-        /// <summary>
-        /// Set mode from TurnReady to Simul
-        /// </summary>
-        private void SimulationState()
-        {
-            turnReady.EndTurnReadyState();
 
             data.turnNum++;
 
-            mainCamera.GetComponent<CameraController>().SetCameraSimul();
+            // move camera
+            cameraController.SetCameraTurnReady();
 
-            simulation.UpdateUI();
-            simulation.StartSimulationState();
+            // start turn ready state
+            turnReady.StartTurnReadyState();
         }
 
-        #endregion
+        private void SimulationState(ActionData actionData)
+        {
+            // end turnready state
+            turnReady.EndTurnReadyState();
 
-        #region MonoBehaviour CallBacks
+            // move camera
+            cameraController.SetCameraSimul();
 
-        private void Start()
+            // start simulation state
+            simulation.StartSimulationState(actionData);
+        }
+
+        private void GameOverState()
+        {
+
+        }
+
+        // Start is called before the first frame update
+        void Start()
         {
             data.LoadData();
 
             turnReady.Init();
             simulation.Init();
 
-            SetState(0);
+
+
+
+            // must be called at end of Start func.
+            SetState(STATE.TurnReady);
         }
 
-        #endregion
+        // Update is called once per frame
+        void Update()
+        {
+
+        }
     }
+
 }

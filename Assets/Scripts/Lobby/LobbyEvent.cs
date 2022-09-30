@@ -94,7 +94,6 @@ namespace KWY
                 // ready 상태 최신화에 대한 ok 사인을 받았으면
                 if ((bool)data[1])
                 {
-                    
                     gameLobby.SetReadyStatus((bool)data[2]);
                 }
                 else

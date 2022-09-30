@@ -39,5 +39,10 @@ MonoBehaviour:
   - {x: -1, y: -1}
   sid: 4
   casters: 03000000
-  skillExplanation: '!'
+  skillExplanation: Knight Special!
   skillExImg: {fileID: 21300000, guid: 6baebaaa74a5b92469b0df54ffb02161, type: 3}
+  distance:
+  - 2
+  directions: 
+  areaAttack: 1
+  area: {fileID: 6941316062329348292, guid: 683939de26b66f745999e25866b13f7b, type: 3}

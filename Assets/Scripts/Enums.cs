@@ -77,4 +77,10 @@ namespace KWY
         WEB_REQUEST_ERROR = 103,
         CANNOT_FIND_FILE = 201,
     }
+
+    public enum Team : short
+    {
+        A = 0,
+        B = 1,
+    }
 }

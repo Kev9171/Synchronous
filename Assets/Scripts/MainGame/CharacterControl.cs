@@ -2,8 +2,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 
-using System.Collections.Generic;
-
 namespace KWY
 {
     public class CharacterControl : MonoBehaviour
@@ -15,14 +13,16 @@ namespace KWY
         Tilemap map;
 
         [SerializeField]
-        ManageShowingSkills showingSkillManager;
-
-        [SerializeField]
         MapHighLighter highLighter;
 
         [SerializeField]
         TurnReady turnReady;
 
+        [SerializeField]
+        RayTest ray;
+
+        [SerializeField]
+        CharacterUIHandler characterUIHandler;
 
         public Character SelChara { get; private set; }
         public ActionBase SelAction { get; private set; }
@@ -32,6 +32,8 @@ namespace KWY
         MouseInput mouseInput;
 
         private int SelOk = 0; // 음수: left, 양수: right -> |2| 가 되었을 때 액션 확정
+        private SkillSpawner skillSpawner;
+        private int tempClickX, tempClickY = -int.MaxValue;
         #endregion
 
         #region Public Methods
@@ -89,7 +91,6 @@ namespace KWY
 
         public void OnClickSkillDirection(InputAction.CallbackContext context)
         {
-
             if (SelAction == null || !(SelAction is SkillBase))
             {
                 mouseInput.Mouse.MouseClick.performed += OnClick;
@@ -104,51 +105,102 @@ namespace KWY
             Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
 
             // 클릭 된 좌표 맵 좌표로 변환
-            float clickX = map.WorldToCell(Camera.main.ScreenToWorldPoint(mousePosition)).x;
+            int clickX = map.WorldToCell(Camera.main.ScreenToWorldPoint(mousePosition)).x;
+            int clickY = map.WorldToCell(Camera.main.ScreenToWorldPoint(mousePosition)).y;
             float charaX = SelChara.TempTilePos.x;
-
+            skillSpawner = ((SkillBase)SelAction).area;
 
             // 클릭 된 좌표가 선택된 캐릭터의 오른쪽 있다면 왼쪽 하이라이트 및 방향 선택
             if (charaX < clickX)
             {
-                highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y%2==0 ? ((SkillBase)SelAction).areaEvenY : ((SkillBase)SelAction).areaOddY);
+                //highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? ((SkillBase)SelAction).areaEvenY : ((SkillBase)SelAction).areaOddY);
+                if (((SkillBase)SelAction).areaAttack)
+                {
+                    highLighter.HighlightMap(map.CellToWorld(new Vector3Int(clickX, clickY, 0)), ((SkillBase)SelAction));
+                }
+                else
+                {
+                    highLighter.HighlightMap(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), true);
+                }
+
+                if (tempClickX == clickX && tempClickY == clickY)
+                {
+                    // 같은 위치를 클릭했을 경우
+                    SelOk = 1;
+                }
+                else
+                {
+                    SelOk = 0;
+                }
 
                 if (SelOk > 0)
                 {
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Right);
 
+                    if (((SkillBase)SelAction).areaAttack)
+                    {
+                        Vector3Int v = new Vector3Int(clickX, clickY, 0);
+                        skillSpawner.Activate(map.CellToWorld(v));
+                        skillSpawner.Destroy(((SkillBase)SelAction).triggerTime);   // triggerTime만큼 스킬 지속후 삭제
+                    }
+                    else
+                    {
+                        ray.CurvedMultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, true, ((SkillBase)SelAction).directions.Count);
+                    }
+
                     turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                     SetSelClear();
 
                     mouseInput.Mouse.MouseClick.performed += OnClick;
                 }
-                else
-                {
-                    // 전에 다른 방향이었을 경우
-                    SelOk = 1;
-                }
             }
             else
             {
-                highLighter.HighlightMapXReverse(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? SelAction.areaEvenY : SelAction.areaOddY);
+                //highLighter.HighlightMapXReverse(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? SelAction.areaEvenY : SelAction.areaOddY);
+                if (((SkillBase)SelAction).areaAttack)
+                {
+                    highLighter.HighlightMap(map.CellToWorld(new Vector3Int(clickX, clickY, 0)), ((SkillBase)SelAction));
+                }
+                else
+                {
+                    highLighter.HighlightMap(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), false);
+                }
+
+                if (tempClickX == clickX && tempClickY == clickY)
+                {
+                    SelOk = -1;
+                }
+                else
+                {
+                    SelOk = 0;
+                }
 
                 if (SelOk < 0)
                 {
                     // 확정
                     data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Left);
 
+                    if (((SkillBase)SelAction).areaAttack)
+                    {
+                        Vector3Int v = new Vector3Int(clickX, clickY, 0);
+                        skillSpawner.Activate(map.CellToWorld(v));
+                        skillSpawner.Destroy(((SkillBase)SelAction).triggerTime);
+                    }
+                    else
+                    {
+                        ray.CurvedMultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, false, ((SkillBase)SelAction).directions.Count);
+                    }
+
                     turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                     SetSelClear();
 
                     mouseInput.Mouse.MouseClick.performed += OnClick;
                 }
-                else
-                {
-                    SelOk = -1;
-                }
             }
 
+            tempClickX = clickX;
+            tempClickY = clickY;
             // 일단 스킬로 인한 자신의 위치 변경 내용은 없음
         }
 
@@ -161,8 +213,14 @@ namespace KWY
         {
             SelAction = sb;
 
-            highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? sb.areaEvenY : sb.areaOddY);
-
+            if (((SkillBase)SelAction).areaAttack)
+            {
+                highLighter.HighlightMap(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction));
+            }
+            else
+            {
+                highLighter.HighlightMap(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), true);
+            }
         }
 
         public void StartControl()
@@ -179,7 +237,8 @@ namespace KWY
             mouseInput.Mouse.MouseClick.performed -= OnClick;
             mouseInput.Mouse.MouseClick.performed -= OnClickSkillDirection;
 
-            showingSkillManager.ShowSkillPanel(-1);
+            //showingSkillManager.ShowSkillPanel(-1);
+            characterUIHandler.HideAllSkillSelPanel();
 
             highLighter.ClearHighlight();
             HighlightCharacterClear();
@@ -189,27 +248,30 @@ namespace KWY
         {
             SelAction = MoveManager.MoveData;
 
-            //Matrix4x4 groundTile = Matrix4x4.TRS(new Vector3(0, 0f, 0), Quaternion.Euler(0f, 0f, 0f), Vector3.one);
-            //Matrix4x4 elevatedTile = Matrix4x4.TRS(new Vector3(0, 0.2f, 0), Quaternion.Euler(0f, 0f, 0f), Vector3.one/*scale 조정*/);
-            //if (map.GetTile<CustomTile>(SelChara.TempTilePos).getCharCount() < 2)
-            //{
-            //    map.SetTransformMatrix(SelChara.TempTilePos, elevatedTile);
-            //    highLighter.ChangeTileHeight(SelChara.TempTilePos, elevatedTile);
-            //}
-            //else
-            //map.SetTransformMatrix(SelChara.TempTilePos, groundTile);
-
-            /*TilemapControl fTiles = GameObject.Find("SecondTiles").GetComponent<TilemapControl>();
-
-            map.SetTileFlags(SelChara.TempTilePos, TileFlags.None);
-            map.SetColor(SelChara.TempTilePos, new Color(1, 1, 1, 0));
-
-            Sprite sprite = map.GetTile<CustomTile>(SelChara.TempTilePos).sprite;
-            fTiles.activateTile(map.CellToWorld(SelChara.TempTilePos), 2, sprite);*/
-
             highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? SelAction.areaEvenY : SelAction.areaOddY);
+        }
 
-            
+        public void SetSelChara(Character chara)
+        {
+            SelChara = chara;
+            SelAction = null;
+
+            /*showingSkillManager.ShowSkillPanel(data.GetCharacterNth(cid));
+            HighlightCharacter(cid);*/
+
+            // 스킬 선택 패널
+            characterUIHandler.ShowSkillSelPanel(SelChara);
+            HighlightCharacter(SelChara);
+
+
+            highLighter.ClearHighlight();
+
+            mouseInput.Mouse.MouseClick.performed += OnClick;
+            mouseInput.Mouse.MouseClick.performed -= OnClickSkillDirection;
+            mouseInput.Mouse.MouseClick.performed -= OnClickMoveDirection;
+
+            tempClickX = int.MaxValue;
+            tempClickY = int.MaxValue;
         }
 
         public void SetSelChara(CID cid)
@@ -227,7 +289,8 @@ namespace KWY
             SelAction = null;
 
             SelChara = c;
-            showingSkillManager.ShowSkillPanel(data.GetCharacterNth(cid));
+            //showingSkillManager.ShowSkillPanel(data.GetCharacterNth(cid));
+            characterUIHandler.ShowSkillSelPanel(SelChara);
             HighlightCharacter(cid);
             highLighter.ClearHighlight();
 
@@ -235,7 +298,8 @@ namespace KWY
             mouseInput.Mouse.MouseClick.performed -= OnClickSkillDirection;
             mouseInput.Mouse.MouseClick.performed -= OnClickMoveDirection;
 
-            Debug.Log("Character selected: " + cid);
+            tempClickX = int.MaxValue;
+            tempClickY = int.MaxValue;
         }
 
         public void HighlightCharacterClear()
@@ -243,6 +307,21 @@ namespace KWY
             foreach (CID c in data.CharacterObjects.Keys)
             {
                 data.CharacterObjects[c].transform.localScale = new Vector3(0.7f, 0.7f, 1);
+            }
+        }
+
+        public void HighlightCharacter(Character chara)
+        {
+            foreach (PlayableCharacter c in data.MyTeamCharacter)
+            {
+                if (c.Chara.Equals(chara))
+                {
+                    c.Chara.gameObject.transform.localScale = new Vector3(1, 1, 1);
+                }
+                else
+                {
+                    c.Chara.gameObject.transform.localScale = new Vector3(0.7f, 0.7f, 1);
+                }
             }
         }
 
@@ -258,9 +337,7 @@ namespace KWY
                 {
                     data.CharacterObjects[c].transform.localScale = new Vector3(0.7f, 0.7f, 1);
                 }
-                
             }
-            
         }
 
 
@@ -272,70 +349,12 @@ namespace KWY
 
             if (hit.collider != null)
             {
-                CID cid = hit.collider.gameObject.GetComponent<Character>().Cb.cid;
-                SetSelChara(cid);
+                //CID cid = hit.collider.gameObject.GetComponent<Character>();
+                //SetSelChara(cid);
+
+                Character c = hit.collider.gameObject.GetComponent<Character>();
+                SetSelChara(c);
             }
-        }
-
-        #endregion
-
-
-        #region Private Methods
-
-        void CharMoveSelect(InputAction.CallbackContext context)
-        {
-            /*Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
-            mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
-            Vector3Int gridPosition = map.WorldToCell(mousePosition);
-
-            CharacterActionData cad = data.GetActionData(SelChara.Cb.cid);
-
-            if (map.HasTile(gridPosition) && cad.Count < 3)
-            {
-                Vector2 deltaXY = ((Vector2Int)gridPosition) - SelChara.TempTilePos;
-                object[] arr = { "move", deltaXY.x, deltaXY.y };
-                
-                cad.AddAction(ActionType.Move, deltaXY.x, deltaXY.y);
-                // selChara.SetTilePos((Vector2Int)gridPosition); 필요?
-                Debug.Log("tile selected");
-            }
-            else if (!map.HasTile(gridPosition))
-                Debug.Log("no tile selected");
-            else
-            {
-                Debug.Log("더 이상 추가 불가");
-                foreach (KeyValuePair<int, object[]> item in cad.Actions)
-                {
-                    Debug.Log(item.Key + ", " + item.Value[0] + ", " + item.Value[1] + ", " + item.Value[2]);
-                }
-            }*/
-        }
-
-        void CharAttackSelect(InputAction.CallbackContext context)
-        {
-            /*Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
-            mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
-            Vector3Int gridPosition = map.WorldToCell(mousePosition);
-
-            CharacterActionData cad = data.GetActionData(SelChara.Cb.cid);
-
-            Vector2 deltaXY = ((Vector2Int)gridPosition) - SelChara.TempTilePos;
-            if (map.HasTile(gridPosition) && deltaXY.sqrMagnitude <= 2 && cad.Count < 3)
-            {
-                object[] arr = { "skill", deltaXY.x, deltaXY.y };
-                cad.AddAction(ActionType.Skill, SID.FireBall, SkillDicection.Left); // temp
-                Debug.Log("attack selected");
-            }
-            else if (deltaXY.sqrMagnitude > 2)
-                Debug.Log("outside the atk range");
-            else
-            {
-                Debug.Log("더 이상 추가 불가");
-                foreach (KeyValuePair<int, object[]> item in cad.Actions)
-                {
-                    Debug.Log(item.Key + ", " + item.Value[0] + ", " + item.Value[1] + ", " + item.Value[2]);
-                }
-            }*/
         }
 
         #endregion

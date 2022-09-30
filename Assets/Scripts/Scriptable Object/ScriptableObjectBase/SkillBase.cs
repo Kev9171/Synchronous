@@ -15,6 +15,8 @@ namespace KWY
         public Sprite skillExImg;
         public List<float> distance = new List<float>();
         public List<Direction> directions = new List<Direction>();
+        public bool areaAttack;
+        public SkillSpawner area;
 
         public override string ToString()
         {

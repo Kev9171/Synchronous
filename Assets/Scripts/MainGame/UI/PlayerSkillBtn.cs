@@ -40,7 +40,7 @@ namespace KWY
 
             if (data.PlayerMp >= psb.cost)
             {
-                GameManager gm = GameObject.Find("GameManager").GetComponent<GameManager>();
+                TurnManager gm = GameObject.Find("GameManager").GetComponent<TurnManager>();
                 gm.UpdatePlayerMP(-psb.cost);
 
                 Debug.Log("스킬 발동");
