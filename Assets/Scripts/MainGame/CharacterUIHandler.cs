@@ -15,8 +15,41 @@ namespace KWY
         [SerializeField]
         CharacterPanel characterPanel3;
 
+        [SerializeField]
+        SelSkillPanel selSkillPanel1;
+
+        [SerializeField]
+        SelSkillPanel selSkillPanel2;
+
+        [SerializeField]
+        SelSkillPanel selSkillPanel3;
+
+        [SerializeField]
+        MainGameData data;
+
         Dictionary<int, CharacterPanel> charaUIs = new Dictionary<int, CharacterPanel>();
         Dictionary<Character, CharacterPanel> charaPanels = new Dictionary<Character, CharacterPanel>();
+        Dictionary<int, SelSkillPanel> selSkillUIs = new Dictionary<int, SelSkillPanel>();
+
+        // 캐릭터 패널을 선택하여 캐릭터 선택 가능 여부
+        private bool charaPanelSelectable = false;
+
+        public bool CharaPanelSelectable
+        {
+            set
+            {
+                foreach (CharacterPanel cp in charaPanels.Values)
+                {
+                    cp.Selectable = value;
+                }
+                charaPanelSelectable = value;
+            }
+            get
+            {
+                return charaPanelSelectable;
+            }
+        }
+
 
         /// <summary>
         /// 자신의 캐릭터에 대해서 가져오고 UI를 맞는 캐릭터와 연결 should be called once
@@ -26,24 +59,54 @@ namespace KWY
         {
             if (charaList.Count != 3)
             {
-                Debug.LogError("INVALID LIST COUNT at charaList");
+                Debug.LogError($"INVALID LIST COUNT at charaList : {charaList.Count}");
                 return;
             }
 
-            Character c1 = charaList[0].Chara.GetComponent<Character>();
-            characterPanel1.SetData(c1.Cb, c1.Buffs);
+            Character c1 = charaList[0].CharaObject.GetComponent<Character>();
+            characterPanel1.SetData(c1, c1.Buffs);
+            selSkillPanel1.SetData(c1.name, c1.Cb.skills);
             charaUIs.Add(charaList[0].Id, characterPanel1);
+            selSkillUIs.Add(charaList[0].Id, selSkillPanel1);
             charaPanels.Add(c1, characterPanel1);
 
-            Character c2 = charaList[1].Chara.GetComponent<Character>();
-            characterPanel2.SetData(c2.Cb, c2.Buffs);
+            Character c2 = charaList[1].CharaObject.GetComponent<Character>();
+            characterPanel2.SetData(c2, c2.Buffs);
+            selSkillPanel2.SetData(c2.name, c2.Cb.skills);
             charaUIs.Add(charaList[1].Id, characterPanel2);
+            selSkillUIs.Add(charaList[1].Id, selSkillPanel2);
             charaPanels.Add(c2, characterPanel2);
 
-            Character c3 = charaList[2].Chara.GetComponent<Character>();
-            characterPanel3.SetData(c3.Cb, c3.Buffs);
+            Character c3 = charaList[2].CharaObject.GetComponent<Character>();
+            characterPanel3.SetData(c3, c3.Buffs);
+            selSkillPanel3.SetData(c3.name, c3.Cb.skills);
             charaUIs.Add(charaList[2].Id, characterPanel3);
+            selSkillUIs.Add(charaList[2].Id, selSkillPanel3);
             charaPanels.Add(c3, characterPanel3);
+
+
+        }
+
+        public void ShowSkillSelPanel(int id)
+        {
+            HideAllSkillSelPanel();
+
+            if (selSkillUIs.ContainsKey(id))
+            {
+                selSkillUIs[id].gameObject.SetActive(true);
+            }
+        }
+
+        public void ShowSkillSelPanel(Character chara)
+        {
+            ShowSkillSelPanel(data.PlayableDict[chara].Id);
+            /*foreach(PlayableCharacter p in data.CharactersDict.Values)
+            {
+                if (chara.Equals(p.Chara))
+                {
+                    ShowSkillSelPanel(p.Id);
+                }
+            }*/
         }
 
         public void UpdateCharacterStatusUI(Character chara)
@@ -51,9 +114,17 @@ namespace KWY
             Debug.Log("UpdateCharacterStatusUI");
         }
 
-        public void UpdateCharacterActionIcon(int id)
+        public void UpdateCharacterActionIcon(Character chara)
         {
+            Debug.Log("UpdateCharacterAcionIcon");
+        }
 
+        public void HideAllSkillSelPanel()
+        {
+            foreach(SelSkillPanel s in selSkillUIs.Values)
+            {
+                s.gameObject.SetActive(false);
+            }
         }
     }
 }

@@ -11,11 +11,19 @@ namespace KWY
         private readonly GameObject _charaObject;
         private readonly Character _baseCharacter = null;
 
-        public GameObject Chara
+        public GameObject CharaObject
         {
             get
             {
                 return _charaObject;
+            }
+        }
+
+        public Character Chara
+        {
+            get
+            {
+                return _baseCharacter;
             }
         }
 

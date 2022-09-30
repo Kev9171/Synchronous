@@ -54,9 +54,12 @@ namespace KWY
             playerSkillPanel.UpdateUI();
         }
 
-        public void StartSimulationState()
+        public void StartSimulationState(ActionData actionData)
         {
             simulCanvas.SetActive(true);
+
+            this.actionData = actionData;
+            StartSimulation();
         }
 
         public void StartSimulation(ActionData actionData)

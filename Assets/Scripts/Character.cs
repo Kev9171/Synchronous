@@ -12,21 +12,36 @@ namespace KWY
         [SerializeField]
         CharacterBase _characterBase;
 
-        List<IObserverCharacter<Character>> observers = new List<IObserverCharacter<Character>>();
+        private List<IObserverCharacter<Character>> observers = new List<IObserverCharacter<Character>>();
+        private List<Buff> buffs = new List<Buff>();
 
+        public List<IObserverCharacter<Character>> Observers
+        {
+            get;
+            private set;
+        } = new List<IObserverCharacter<Character>>();
 
-        private List<Buff> _buffs = new List<Buff>();
-
+        public List<Buff> Buffs
+        {
+            get;
+            private set;
+        } = new List<Buff>();
         public CharacterBase Cb { get; private set; }
-        public List<Buff> Buffs { get { return _buffs; } }
         public float Hp { get; private set; }
         public float Mp { get; private set; }
+        public float MaxHp { get; private set; }
+        public float MaxMp { get; private set; }
         public bool BreakDown { get; private set; }
+        public float Atk { get; private set; }
+        public float Def { get; private set; }
+
+
+
+
+
         public Vector3Int TempTilePos { get; private set; }
 
         public Vector3 worldPos { get; private set; }
-
-        public static readonly float MaxMp = 10;
 
         [SerializeField] private float movementSpeed;
         private Vector2 destination;
@@ -37,24 +52,20 @@ namespace KWY
 
         private bool nowMove = false;
 
-        public Character(CharacterBase cb)
+        private void Init()
         {
-            Cb = cb;
-            //Buffs = new List<Buff>();
-            Hp = cb.hp;
-            Mp = 0;
-            BreakDown = false;
-        }
+            Cb = _characterBase;
 
-        public Character(CharacterBase cb, Vector3Int pos)
-        {
-            Cb = cb;
-            //Buffs = new List<Buff>();
-            Hp = cb.hp;
-            Mp = 0;
+            Hp = Cb.hp;
+            Mp = 0; // TODO
+
             BreakDown = false;
-            TempTilePos = pos;
-            Debug.Log("position: "+pos);
+
+            MaxHp = Cb.hp;
+            MaxMp = 10;
+
+            Atk = Cb.atk;
+            Def = 1; // TODO
         }
 
         public void DamageHP(float damage)
@@ -72,6 +83,8 @@ namespace KWY
             {
                 Debug.LogFormat("{0} is damaged {1}; Now hp: {2}", Cb.name, damage, Hp);
             }
+
+            NotifyObservers();
         }
 
         public void AddMP(float amount)
@@ -125,7 +138,14 @@ namespace KWY
                 t += b.ToString() + ", ";
             }
             t += "]";
-            return string.Format("CID: {0}, HP: {1}, MP: {2}, Down?: {3}, Buffs: {4}", Cb.cid, Hp, Mp, BreakDown, t);
+
+            string tt = "[";
+            foreach(IObserverCharacter<Character> o in observers)
+            {
+                tt += o.GetType().ToString();
+            }
+            tt += "]";
+            return string.Format("CID: {0}, HP: {1}, MP: {2}, Down?: {3}, Buffs: {4}, Observers: {5}", Cb.cid, Hp, Mp, BreakDown, t, tt);
         }
 
         #region IPunObservable implementation
@@ -296,8 +316,9 @@ namespace KWY
         #region MonoBehaviour CallBacks
         private void Awake()
         {
-            Cb = _characterBase;
-            _buffs = new List<Buff>();
+            Init();
+
+            
 
             map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
             hlMap = GameObject.Find("HighlightTilemap").GetComponent<Tilemap>();
@@ -309,6 +330,7 @@ namespace KWY
 
             //Debug.Log(this+"'s pos = "+map.WorldToCell(transform.position));
         }
+
 
         void Update()
         {

@@ -49,9 +49,10 @@ namespace KWY
 
         #region Private Fields
 
-        private CharacterBase cb;
         private List<GameObject> buffPanelLists = new List<GameObject>();
-        private bool selectable = true;
+        private Character chara;
+
+        public bool Selectable = false;
 
         [SerializeField]
         private Color breakDownColor = new Color(0.66f, 0, 0, 0.7f);
@@ -64,17 +65,17 @@ namespace KWY
         /// 처음 데이터를 넣는 함수; 한번만 호출 할 수 있도록
         /// </summary>
         /// <param name="cb">Chacter Base Data</param>
-        public void SetData(CharacterBase cb, List<Buff> buffList)
+        public void SetData(Character chararacter, List<Buff> buffList)
         {
-            nameLabel.text = cb.characterName;
+            chara = chararacter;
 
-            charaImg.sprite = cb.icon;
+            nameLabel.text = chara.Cb.characterName;
+
+            charaImg.sprite = chara.Cb.icon;
 
             LoadBuffs(buffList);
 
-            this.cb = cb;
-
-            UpdateHP(cb.hp);
+            UpdateHP(chara.Cb.hp);
             UpdateMP(0);
         }
 
@@ -83,7 +84,7 @@ namespace KWY
             Debug.Log(c);
             if (c.BreakDown)
             {
-                selectable = false;
+                //selectable = false;
                 charaImg.color = breakDownColor;
                 ClearBuffs();
             }
@@ -101,14 +102,14 @@ namespace KWY
 
         public void UpdateHP(float hp)
         {
-            hpLabel.text = hp.ToString() + "/" + cb.hp.ToString();
-            hpBar.value = hp / cb.hp;
+            hpLabel.text = hp.ToString() + "/" + chara.MaxHp.ToString();
+            hpBar.value = hp / chara.MaxHp;
         }
 
         public void UpdateMP(float mp)
         {
-            mpLabel.text = mp.ToString() + "/10";
-            mpBar.value = mp / 10;
+            mpLabel.text = mp.ToString() + "/" + chara.MaxMp.ToString();
+            mpBar.value = mp / chara.MaxMp;
         }
 
         public void AddBuff(BuffBase bb, int nTurn)
@@ -137,7 +138,7 @@ namespace KWY
         public void CharaInfoBtnOnClick()
         {
             GameObject canvas = GameObject.Find("UICanvas");
-            PanelBuilder.ShowCharacterInfoPanel(canvas.transform, cb);
+            PanelBuilder.ShowCharacterInfoPanel(canvas.transform, chara.Cb);
         }
 
         public void SetSelActionImg(int nth, Sprite icon)
@@ -161,14 +162,20 @@ namespace KWY
 
         public void OnClickShowSkillPanel()
         {
-            if (!selectable)
+            if (!Selectable)
+            {
+                Debug.Log("It is not selectable now");
+                return;
+            }
+
+            if (chara.BreakDown)
             {
                 Debug.Log("This character is break down. You can not choose");
                 return;
             }
 
             // 캐릭터 선택
-            charaControl.SetSelChara(cb.cid);
+            charaControl.SetSelChara(chara);
         }
 
         /// <summary>

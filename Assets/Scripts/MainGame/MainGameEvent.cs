@@ -19,7 +19,7 @@ namespace KWY
         [SerializeField] private Button readyBtn;
 
         [SerializeField]
-        private GameManager gameManager;
+        private TurnManager gameManager;
 
         #endregion
 

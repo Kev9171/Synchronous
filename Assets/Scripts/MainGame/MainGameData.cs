@@ -9,26 +9,15 @@ namespace KWY
 {
     public class MainGameData : MonoBehaviour
     {
-        [Tooltip("Player Name or Player NickName")]
-        private string playerName;
 
         public float TimeLimit { get; private set; }
-
-        [Tooltip("0: left is my side; 1: right is my side")]
-        private bool mySide;
 
         // temp
         private string mapName; // 나중에 enum으로 바꿔서
 
+        public int turnNum = 0;
 
-        #region Mutable Variables
-
-        [Tooltip("진행 턴 수 = 진행중인 n 번째 턴(start: 1)")]
-        public int turnNum = 1;
-
-        [SerializeField]
         public int PlayerMp { get; internal set; } = 0;
-
 
         [Tooltip("Pre-set Possible-to-use Playerskills")]
         [SerializeField]
@@ -46,11 +35,10 @@ namespace KWY
 
         // 필드에 있는 캐릭터 정보를 가지고 있는 Dictionary
         private Dictionary<int, PlayableCharacter> _charactersDict = new Dictionary<int, PlayableCharacter>();
+        private Dictionary<Character, PlayableCharacter> _playableDict = new Dictionary<Character, PlayableCharacter>();
         private List<PlayableCharacter> _charasTeamA = new List<PlayableCharacter>();
         private List<PlayableCharacter> _charasTeamB = new List<PlayableCharacter>();
 
-
-        #endregion
 
         #region Public Fields
 
@@ -61,8 +49,23 @@ namespace KWY
         public List<PSID> PlayerSkillList { get { return _playerSkillList; } }
 
         public Dictionary<int, PlayableCharacter> CharactersDict { get { return _charactersDict; } }
+        public Dictionary<Character, PlayableCharacter> PlayableDict { get { return _playableDict; } }
         public List<PlayableCharacter> CharasTeamA { get { return _charasTeamA; } }
         public List<PlayableCharacter> CharasTeamB { get { return _charasTeamB; } }
+        public List<PlayableCharacter> MyTeamCharacter
+        {
+            get
+            {
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    return _charasTeamA;
+                }
+                else
+                {
+                    return _charasTeamB;
+                }
+            }
+        }
 
 
         #endregion
@@ -88,6 +91,18 @@ namespace KWY
             foreach(Character c in Characters)
             {
                 if (c.Cb.cid == cid)
+                {
+                    return c;
+                }
+            }
+            return null;
+        }
+
+        public PlayableCharacter GetPlayableCharacter(Character chara)
+        {
+            foreach(PlayableCharacter c in MyTeamCharacter)
+            {
+                if (c.Chara.Cb.cid.Equals(chara.Cb.cid))
                 {
                     return c;
                 }
@@ -124,8 +139,6 @@ namespace KWY
 
             this.TimeLimit = LogicData.Instance.TimeLimit;
             this.PlayerMp = LogicData.Instance.PlayerInitialMp;
-
-            turnNum = 1;
 
             //_characters.Add(TestCharacter()); // test 
 
@@ -245,6 +258,7 @@ namespace KWY
                 int id = IdHandler.GetNewId();
                 PlayableCharacter pc = new PlayableCharacter(chara, id, d.team);
                 _charactersDict.Add(id, pc);
+                _playableDict.Add(chara.GetComponent<Character>(), pc);
 
                 // 팀에 맞게 리스트에 추가
                 if (d.team == Team.A)
@@ -257,11 +271,22 @@ namespace KWY
                 }
             }
 
+            // add observer
+            foreach (PlayableCharacter p in _charactersDict.Values)
+            {
+                p.Chara.AddObserver(new CharacterObserver());
+            }
+
             // 확인용 코드
             foreach (PlayableCharacter c in _charactersDict.Values)
             {
                 Debug.Log(c);
             }
+
+            /*foreach (PlayableCharacter c in _playableDict.Values)
+            {
+                Debug.Log(c.Chara.GetHashCode());
+            }*/
         }
 
         #endregion
@@ -283,15 +308,6 @@ namespace KWY
 
         private void Start()
         {
-            LoadData();
-
-            if (PhotonNetwork.IsMasterClient)
-            {
-                GameObject.Find("CharacterUIHandler").GetComponent<CharacterUIHandler>().InitData(_charasTeamA);
-            }
-            else {
-                GameObject.Find("CharacterUIHandler").GetComponent<CharacterUIHandler>().InitData(_charasTeamB);
-            }
         }
         #endregion
     }
