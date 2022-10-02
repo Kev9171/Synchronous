@@ -32,25 +32,11 @@ namespace KWY
         [SerializeField]
         CharacterUIHandler characterUIHandler;
 
-        //[SerializeField]
-        //private ManageShowingSkills selCharaPanelManager;
-
-        [SerializeField]
-        private SelSkillPanel[] selSkillPanels = new SelSkillPanel[3];
-
-        //[SerializeField]
-        //private CharacterPanel[] characterPanels = new CharacterPanel[3];
-
-        [SerializeField]
-        private PlayerMPPanel playerMpPanel;
-
         [SerializeField]
         private MainGameEvent gameEvent;
 
         [SerializeField]
         private CharacterControl characterControl;
-
-        //private Dictionary<CID, CharacterPanel> charaPanels = new Dictionary<CID, CharacterPanel>();
 
         private float time;
         private float timeLimit;
@@ -78,6 +64,9 @@ namespace KWY
             {
                 c.Chara.GetComponent<Collider2D>().enabled = true;
             }
+
+            // readybtn에 onclick 추가
+            readyBtn.onClick.AddListener(OnClickTurnReady);
         }
 
         public void StartTurnReadyState()
@@ -89,43 +78,31 @@ namespace KWY
             characterUIHandler.CharaPanelSelectable = true;
             characterControl.StartControl();
 
+            // 확대된 캐릭터 원래 크기로 초기화 및 임시 좌표 초기화
+            foreach (PlayableCharacter c in data.MyTeamCharacter)
+            {
+                c.Chara.ResetTempPos();
+                c.CharaObject.transform.localScale = new Vector3(0.7f, 0.7f, 1);
+            }
+
+            // 버튼 기능 초기화
+            readyBtn.GetComponent<TurnReadyBtn>().ResetReady();
+
+            // 플레이어 mp 추가
+            data.MyPlayer.AddMp(LogicData.Instance.PlayerMPIncrement);
+
+            // 캐릭터 mp 추가
+            foreach(PlayableCharacter pc in data.MyTeamCharacter)
+            {
+                pc.Chara.AddMP(LogicData.Instance.CharacterMpIncrement);
+            }
+
             // show UI
             TurnReadyUI.SetActive(true);            
 
             // start timer
             StartTimer();
         }
-
-        public void UpdateUI()
-        {
-            // 각 캐릭터 정보에 따라 캐릭터 정보 표시 UI 업데이트
-            int idx = 0;
-            /*foreach (Character c in data.Characters)
-            {
-                characterPanels[idx++].UpdateUI(c);
-            }*/
-
-            // Update Mp Panel
-            playerMpPanel.UpdateUI();
-        }
-
-        public void ResetUI()
-        {
-            // 스킬 선택 UI 초기화
-            characterUIHandler.HideAllSkillSelPanel();
-
-            // TODO 
-            // 확대된 캐릭터 원래 크기로 초기화 및 임시 좌표 초기화
-
-            foreach(PlayableCharacter c in data.MyTeamCharacter)
-            {
-                c.Chara.ResetTempPos();
-                c.CharaObject.transform.localScale = new Vector3(0.7f, 0.7f, 1);
-            }
-
-            readyBtn.GetComponent<TurnReadyBtn>().ResetReady();
-        }
-
 
         public void EndTurnReadyState()
         {
@@ -134,7 +111,6 @@ namespace KWY
 
             // 타이머 리셋
             ResetTimer();
-
 
             // 캐릭터 선택 못하도록
             characterUIHandler.CharaPanelSelectable = false;
@@ -152,7 +128,6 @@ namespace KWY
 
             // 캐릭터 패널 숨기기
             characterUIHandler.HideAllSkillSelPanel();
-
 
             FillRandomMoveAtEmpty();
 

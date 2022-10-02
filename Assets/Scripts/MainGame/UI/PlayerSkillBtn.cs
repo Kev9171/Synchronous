@@ -36,12 +36,23 @@ namespace KWY
 
         public void OnClickUseSkill()
         {
-            MainGameData data = GameObject.Find("GameData").GetComponent<MainGameData>();
-
-            if (data.PlayerMp >= psb.cost)
+            GameObject o = GameObject.Find("MainGameData");
+            if (!o)
             {
-                TurnManager gm = GameObject.Find("GameManager").GetComponent<TurnManager>();
-                gm.UpdatePlayerMP(-psb.cost);
+                Debug.LogError($"Can not find gameobject: 'MainGameData'");
+                return;
+            }
+
+            MainGameData data = o.GetComponent<MainGameData>();
+            if (!data)
+            {
+                Debug.LogError($"Can not find component: 'MainGameData' in gameobject named 'MainGameData'");
+                return;
+            }
+
+            if (data.MyPlayer.Mp >= psb.cost)
+            {
+                data.MyPlayer.SubMp(psb.cost);
 
                 Debug.Log("스킬 발동");
             }

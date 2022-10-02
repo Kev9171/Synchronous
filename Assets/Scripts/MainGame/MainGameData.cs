@@ -7,21 +7,42 @@ using Photon.Pun;
 
 namespace KWY
 {
-    public class MainGameData : MonoBehaviour
+    public class MainGameData : MonoBehaviour, ISubject
     {
+        public List<IObserver> Observers
+        {
+            get;
+            private set;
+        } = new List<IObserver>();
 
         public float TimeLimit { get; private set; }
 
         // temp
         private string mapName; // 나중에 enum으로 바꿔서
 
-        public int turnNum = 0;
+        private int turnNum = 0;
+
+        public int TurnNum
+        {
+            get
+            {
+                return turnNum;
+            }
+            set
+            {
+                turnNum = value;
+                NotifyObservers();
+            }
+        }
 
         public int PlayerMp { get; internal set; } = 0;
 
         [Tooltip("Pre-set Possible-to-use Playerskills")]
         [SerializeField]
         private List<PSID> _playerSkillList;
+
+        [SerializeField]
+        Player player;
 
         private Tilemap _tileMap;
 
@@ -35,7 +56,6 @@ namespace KWY
 
         // 필드에 있는 캐릭터 정보를 가지고 있는 Dictionary
         private Dictionary<int, PlayableCharacter> _charactersDict = new Dictionary<int, PlayableCharacter>();
-        private Dictionary<Character, PlayableCharacter> _playableDict = new Dictionary<Character, PlayableCharacter>();
         private List<PlayableCharacter> _charasTeamA = new List<PlayableCharacter>();
         private List<PlayableCharacter> _charasTeamB = new List<PlayableCharacter>();
 
@@ -49,7 +69,6 @@ namespace KWY
         public List<PSID> PlayerSkillList { get { return _playerSkillList; } }
 
         public Dictionary<int, PlayableCharacter> CharactersDict { get { return _charactersDict; } }
-        public Dictionary<Character, PlayableCharacter> PlayableDict { get { return _playableDict; } }
         public List<PlayableCharacter> CharasTeamA { get { return _charasTeamA; } }
         public List<PlayableCharacter> CharasTeamB { get { return _charasTeamB; } }
         public List<PlayableCharacter> MyTeamCharacter
@@ -67,24 +86,17 @@ namespace KWY
             }
         }
 
+        public Player MyPlayer
+        {
+            get
+            {
+                return player;
+            }
+        }
 
         #endregion
 
         #region Public Methods
-
-        public void UpdatePlayerMP(int value)
-        {
-            PlayerMp += value;
-
-            if (PlayerMp < 0)
-            {
-                PlayerMp = 0;
-            }
-            else if (PlayerMp > 10)
-            {
-                PlayerMp = 10;
-            }
-        }
 
         public Character GetCharacter(CID cid)
         {
@@ -108,19 +120,6 @@ namespace KWY
                 }
             }
             return null;
-        }
-
-        public int GetCharacterNth(CID cid)
-        {
-            for (int i=0; i<Characters.Count; i++)
-            {
-                if (Characters[i].Cb.cid == cid)
-                {
-                    return i;
-                }
-            }
-
-            return -1;
         }
 
         public CharacterActionData GetActionData(CID cid)
@@ -258,7 +257,7 @@ namespace KWY
                 int id = IdHandler.GetNewId();
                 PlayableCharacter pc = new PlayableCharacter(chara, id, d.team);
                 _charactersDict.Add(id, pc);
-                _playableDict.Add(chara.GetComponent<Character>(), pc);
+                chara.GetComponent<Character>().SetData(pc);
 
                 // 팀에 맞게 리스트에 추가
                 if (d.team == Team.A)
@@ -271,22 +270,39 @@ namespace KWY
                 }
             }
 
-            // add observer
-            foreach (PlayableCharacter p in _charactersDict.Values)
-            {
-                p.Chara.AddObserver(new CharacterObserver());
-            }
 
+            InitBaseObservers();
             // 확인용 코드
-            foreach (PlayableCharacter c in _charactersDict.Values)
+            /*foreach (PlayableCharacter c in _charactersDict.Values)
             {
                 Debug.Log(c);
-            }
+            }*/
 
             /*foreach (PlayableCharacter c in _playableDict.Values)
             {
                 Debug.Log(c.Chara.GetHashCode());
             }*/
+        }
+
+
+        /// <summary>
+        /// Must be called after LoadData()
+        /// </summary>
+        private void InitBaseObservers()
+        {
+            // add observer
+
+            // character
+            foreach (PlayableCharacter p in _charactersDict.Values)
+            {
+                p.Chara.AddObserver(new CharacterObserver());
+            }
+
+            // player
+            player.AddObserver(new PlayerObserver());
+
+            // main data
+            AddObserver(new GameProgressObserver());
         }
 
         #endregion
@@ -308,6 +324,48 @@ namespace KWY
 
         private void Start()
         {
+        }
+
+
+        #endregion
+
+        #region ISubject Methods
+        public void AddObserver(IObserver o)
+        {
+            if (Observers.IndexOf(o) < 0)
+            {
+                Observers.Add(o);
+            }
+            else
+            {
+                Debug.LogWarning($"The observer already exists in list: {o}");
+            }
+        }
+
+        public void RemoveObserver(IObserver o)
+        {
+            int idx = Observers.IndexOf(o);
+            if (idx >= 0)
+            {
+                Observers.RemoveAt(idx); // O(n)
+            }
+            else
+            {
+                Debug.LogError($"Can not remove the observer; It does not exist in list: {o}");
+            }
+        }
+
+        public void NotifyObservers()
+        {
+            foreach (IObserver o in Observers)
+            {
+                o.OnNotify();
+            }
+        }
+
+        public void RemoveAllObservers()
+        {
+            Observers.Clear();
         }
         #endregion
     }

@@ -64,21 +64,21 @@ namespace KWY
             }
 
             Character c1 = charaList[0].CharaObject.GetComponent<Character>();
-            characterPanel1.SetData(c1, c1.Buffs);
+            characterPanel1.Init(c1, c1.Buffs);
             selSkillPanel1.SetData(c1.name, c1.Cb.skills);
             charaUIs.Add(charaList[0].Id, characterPanel1);
             selSkillUIs.Add(charaList[0].Id, selSkillPanel1);
             charaPanels.Add(c1, characterPanel1);
 
             Character c2 = charaList[1].CharaObject.GetComponent<Character>();
-            characterPanel2.SetData(c2, c2.Buffs);
+            characterPanel2.Init(c2, c2.Buffs);
             selSkillPanel2.SetData(c2.name, c2.Cb.skills);
             charaUIs.Add(charaList[1].Id, characterPanel2);
             selSkillUIs.Add(charaList[1].Id, selSkillPanel2);
             charaPanels.Add(c2, characterPanel2);
 
             Character c3 = charaList[2].CharaObject.GetComponent<Character>();
-            characterPanel3.SetData(c3, c3.Buffs);
+            characterPanel3.Init(c3, c3.Buffs);
             selSkillPanel3.SetData(c3.name, c3.Cb.skills);
             charaUIs.Add(charaList[2].Id, characterPanel3);
             selSkillUIs.Add(charaList[2].Id, selSkillPanel3);
@@ -99,19 +99,20 @@ namespace KWY
 
         public void ShowSkillSelPanel(Character chara)
         {
-            ShowSkillSelPanel(data.PlayableDict[chara].Id);
-            /*foreach(PlayableCharacter p in data.CharactersDict.Values)
-            {
-                if (chara.Equals(p.Chara))
-                {
-                    ShowSkillSelPanel(p.Id);
-                }
-            }*/
+            ShowSkillSelPanel(chara.Pc.Id);
         }
 
         public void UpdateCharacterStatusUI(Character chara)
         {
             Debug.Log("UpdateCharacterStatusUI");
+            if (charaPanels.TryGetValue(chara, out _))
+            {
+                charaPanels[chara].UpdateUI(chara);
+            }
+            else
+            {
+                Debug.LogError($"Can not find character: {chara.Pc.Id}");
+            }
         }
 
         public void UpdateCharacterActionIcon(Character chara)

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace KWY
 {
-    class CharacterObserver : IObserverCharacter<Character>
+    class CharacterObserver : IObserver<Character>
     {
         CharacterUIHandler _characterUIHandler;
 
@@ -32,7 +32,7 @@ namespace KWY
 
         private void FindCharacterUIHandler()
         {
-            GameObject g = GameObject.Find("CharacterUIHandler");
+            GameObject g = GameObject.Find("UIHandler");
 
             if (!g)
             {

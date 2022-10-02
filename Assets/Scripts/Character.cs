@@ -7,19 +7,25 @@ using UnityEngine.Tilemaps;
 
 namespace KWY
 {
-    public class Character : MonoBehaviourPunCallbacks, IPunObservable, ISubject
+    public class Character : MonoBehaviourPunCallbacks, IPunObservable, ISubject<Character>
     {
         [SerializeField]
         CharacterBase _characterBase;
 
-        private List<IObserverCharacter<Character>> observers = new List<IObserverCharacter<Character>>();
+        private List<IObserver<Character>> observers = new List<IObserver<Character>>();
         private List<Buff> buffs = new List<Buff>();
 
-        public List<IObserverCharacter<Character>> Observers
+        public PlayableCharacter Pc
         {
             get;
             private set;
-        } = new List<IObserverCharacter<Character>>();
+        } = null;
+
+        public List<IObserver<Character>> Observers
+        {
+            get;
+            private set;
+        } = new List<IObserver<Character>>();
 
         public List<Buff> Buffs
         {
@@ -38,7 +44,6 @@ namespace KWY
 
 
 
-
         public Vector3Int TempTilePos { get; private set; }
 
         public Vector3 worldPos { get; private set; }
@@ -51,6 +56,11 @@ namespace KWY
         private TilemapControl TCtrl;
 
         private bool nowMove = false;
+
+        public void SetData(PlayableCharacter pc)
+        {
+            Pc = pc;
+        }
 
         private void Init()
         {
@@ -91,8 +101,11 @@ namespace KWY
         {
             Mp += amount;
             if (Mp > MaxMp) Mp = MaxMp;
+            else if (Mp < 0) Mp = 0;
 
             Debug.LogFormat("{0}'s mp is added {1}; Now mp: {2}", Cb.name, amount, Mp);
+
+            NotifyObservers();
         }
 
         public void AddBuff(BuffBase bb, int turn)
@@ -140,7 +153,7 @@ namespace KWY
             t += "]";
 
             string tt = "[";
-            foreach(IObserverCharacter<Character> o in observers)
+            foreach(IObserver<Character> o in observers)
             {
                 tt += o.GetType().ToString();
             }
@@ -349,7 +362,7 @@ namespace KWY
 
         #region IObserver Methods
 
-        public void AddObserver(IObserverCharacter<Character> o)
+        public void AddObserver(IObserver<Character> o)
         {
             if (observers.IndexOf(o) < 0)
             {
@@ -361,7 +374,7 @@ namespace KWY
             }
         }
 
-        public void RemoveObserver(IObserverCharacter<Character> o)
+        public void RemoveObserver(IObserver<Character> o)
         {
             int idx = observers.IndexOf(o);
             if (idx >= 0)
@@ -376,7 +389,7 @@ namespace KWY
 
         public void NotifyObservers()
         {
-            foreach (IObserverCharacter<Character> o in observers)
+            foreach (IObserver<Character> o in observers)
             {
                 o.OnNotify(this);
             }

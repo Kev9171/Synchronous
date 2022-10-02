@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace KWY
 {
@@ -13,10 +14,10 @@ namespace KWY
         MainGameData data;
 
         [SerializeField]
-        ShowNowAction showActions;
+        Player player;
 
         [SerializeField]
-        private PlayerMPPanel playerMpPanel;
+        ShowNowAction showActions;
 
         [SerializeField]
         private PlayerSkillPanel playerSkillPanel;
@@ -36,28 +37,27 @@ namespace KWY
             switch (state)
             {
                 case STATE.TurnReady: // turn ready
-                    nowState = STATE.TurnReady;
                     TurnReadyState();
                     break;
                 case STATE.Simul: // start simul
-                    nowState = STATE.Simul;
                     SimulationState(
                         new ActionData((Dictionary<int, object[]>)data[0])
                         );
                     break;
                 case STATE.GameOver: // game over
-                    nowState = STATE.GameOver;
-                    GameOverState();
+                    GameOverState((Team)data[0]);
                     break;
             }
         }
 
         private void TurnReadyState()
         {
+            nowState = STATE.TurnReady;
+
             // end simulation state
             simulation.EndSimulationState();
 
-            data.turnNum++;
+            data.TurnNum++;
 
             // move camera
             cameraController.SetCameraTurnReady();
@@ -68,6 +68,8 @@ namespace KWY
 
         private void SimulationState(ActionData actionData)
         {
+            nowState = STATE.Simul;
+
             // end turnready state
             turnReady.EndTurnReadyState();
 
@@ -78,9 +80,10 @@ namespace KWY
             simulation.StartSimulationState(actionData);
         }
 
-        private void GameOverState()
+        private void GameOverState(Team winTeam)
         {
-
+            nowState = STATE.GameOver;
+            // TODO
         }
 
         // Start is called before the first frame update
