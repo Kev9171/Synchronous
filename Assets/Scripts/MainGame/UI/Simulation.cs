@@ -7,13 +7,8 @@ namespace KWY
 {
     public class Simulation : MonoBehaviour
     {
-        #region Canvas Elements
-
         [SerializeField] GameObject simulCanvas;
 
-        #endregion
-
-        #region Private Fields
 
         [SerializeField]
         private PlayerSkillPanel playerSkillPanel;
@@ -26,8 +21,6 @@ namespace KWY
 
         [SerializeField]
         private MainGameEvent gameEvent;
-
-        #endregion
 
         #region Private Fields
         [Tooltip("Game data about player and characters")]
@@ -56,13 +49,14 @@ namespace KWY
 
         public void StartSimulationState(ActionData actionData)
         {
+            this.actionData = actionData;
+
             simulCanvas.SetActive(true);
 
-            this.actionData = actionData;
             StartSimulation();
         }
 
-        public void StartSimulation(ActionData actionData)
+        private void StartSimulation(ActionData actionData)
         {
             this.actionData = actionData;
 
@@ -162,7 +156,6 @@ namespace KWY
 
         private void Awake()
         {
-
             simulationIntervalSeconds = LogicData.Instance.SimulationIntervalSeconds;
         }
 

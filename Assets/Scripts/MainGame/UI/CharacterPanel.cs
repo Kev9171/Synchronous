@@ -65,7 +65,7 @@ namespace KWY
         /// 처음 데이터를 넣는 함수; 한번만 호출 할 수 있도록
         /// </summary>
         /// <param name="cb">Chacter Base Data</param>
-        public void SetData(Character chararacter, List<Buff> buffList)
+        public void Init(Character chararacter, List<Buff> buffList)
         {
             chara = chararacter;
 
@@ -81,10 +81,8 @@ namespace KWY
 
         public void UpdateUI(Character c)
         {
-            Debug.Log(c);
             if (c.BreakDown)
             {
-                //selectable = false;
                 charaImg.color = breakDownColor;
                 ClearBuffs();
             }
@@ -96,8 +94,6 @@ namespace KWY
 
                 LoadBuffs(c.Buffs);
             }
-
-            SetSelActionImg(-1, null);
         }
 
         public void UpdateHP(float hp)
@@ -185,6 +181,7 @@ namespace KWY
         /// <param name="buffInfoPanel">BuffInfoPanel</param>
         public void LoadInfoPanel(GameObject characterInfoPanel, GameObject buffInfoPanel)
         {
+            Debug.Log("LoadInfoPanel");
             //this.characterInfoPanel = characterInfoPanel;
             //this.buffInfoPanel = buffInfoPanel;
         }
