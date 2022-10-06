@@ -135,10 +135,12 @@ namespace KWY
             gameEvent.RaiseEventTurnReady(ActionData.CreateActionData(data.CharaActionData));
         }
 
-        public void ShowCharacterActionPanel(CID cid)
+        public void ShowCharacterActionPanel(int id)
         {
-            for (int i = 0; i < data.CharaActionData[cid].Count; i++)
+            for (int i = 0; i < data.CharaActionData[id].ActionCount; i++)
             {
+                // TODO
+
                 /*object[] t = (object[])data.CharaActionData[cid].Actions[i];
                 if (ActionType.Move == (ActionType)(t[0]))
                 {
@@ -158,12 +160,12 @@ namespace KWY
         private void FillRandomMoveAtEmpty()
         {
             // 3개의 액션이 모두 정해지지 않은 캐릭터만 이동으로 대체
-            foreach (CID cid in data.CharaActionData.Keys)
+            foreach (int id in data.CharaActionData.Keys)
             {
                 // 다 정해지지 않았을 경우 move로 추가
-                if (data.CharaActionData[cid].Count != 3)
+                if (data.CharaActionData[id].ActionCount != 3)
                 {
-                    data.CharaActionData[cid].ClearActions();
+                    data.CharaActionData[id].ClearActions();
                     for (int i = 0; i < 3; i++)
                     {
                         int dx = 0, dy = 0;
@@ -173,7 +175,7 @@ namespace KWY
                             dy = Random.Range(-1, 2);
                         }
 
-                        data.CharaActionData[cid].AddMoveAction(ActionType.Move, dx, dy, true);
+                        data.CharaActionData[id].AddMoveAction(ActionType.Move, dx, dy, true, 0, 0);
                     }
                 }
             }
@@ -201,11 +203,17 @@ namespace KWY
 
         private void TimeOut()
         {
+            /*data.MyTeamCharacter[0].Chara.DamageHP(50);
+            return;*/
+
+
             // 캐릭터 선택 못하게 + 스킬 선택 패널 안보이게
             characterUIHandler.CharaPanelSelectable = false;
 
             FillRandomMoveAtEmpty();
-            gameEvent.RaiseEventTurnReady(ActionData.CreateActionData(data.CharaActionData));
+            ActionData d = ActionData.CreateActionData(data.CharaActionData);
+            Debug.Log(d);
+            //gameEvent.RaiseEventTurnReady(d);
         }
 
         IEnumerator Timer()

@@ -49,11 +49,13 @@ namespace KWY
         private List<Character> _characters = new List<Character>(); // 게임 진행 중 캐릭터 정보를 가지고 있는 리스트
         private Dictionary<CID, GameObject> _charaObjects = new Dictionary<CID, GameObject>();
 
-        private Dictionary<CID, CharacterActionData> _charaActionData = new Dictionary<CID, CharacterActionData>();
+        
 
         private Dictionary<int, Character> _wholeCharacters = new Dictionary<int, Character>();
 
 
+
+        private Dictionary<int, CharacterActionData> _charaActionData = new Dictionary<int, CharacterActionData>();
         // 필드에 있는 캐릭터 정보를 가지고 있는 Dictionary
         private Dictionary<int, PlayableCharacter> _charactersDict = new Dictionary<int, PlayableCharacter>();
         private List<PlayableCharacter> _charasTeamA = new List<PlayableCharacter>();
@@ -64,10 +66,12 @@ namespace KWY
 
         public List<Character> Characters { get { return _characters; } }
         public Dictionary<CID, GameObject> CharacterObjects { get { return _charaObjects; } }
-        public Dictionary<CID, CharacterActionData> CharaActionData { get { return _charaActionData; } }
+        
         public Dictionary<int, Character> WholeCharacters { get { return _wholeCharacters; } }
         public List<PSID> PlayerSkillList { get { return _playerSkillList; } }
 
+
+        public Dictionary<int, CharacterActionData> CharaActionData { get { return _charaActionData; } }
         public Dictionary<int, PlayableCharacter> CharactersDict { get { return _charactersDict; } }
         public List<PlayableCharacter> CharasTeamA { get { return _charasTeamA; } }
         public List<PlayableCharacter> CharasTeamB { get { return _charasTeamB; } }
@@ -122,14 +126,14 @@ namespace KWY
             return null;
         }
 
-        public CharacterActionData GetActionData(CID cid)
+        public CharacterActionData GetActionData(int id)
         {
-            if (_charaActionData.TryGetValue(cid, out var value))
+            if (_charaActionData.TryGetValue(id, out var value))
             {
                 return value;
             }
 
-            Debug.Log("There is no data: " + cid);
+            Debug.Log("There is no data: " + id);
             return null;
         }
 
@@ -268,6 +272,8 @@ namespace KWY
                 {
                     _charasTeamB.Add(pc);
                 }
+
+                _charaActionData.Add(id, new CharacterActionData());
             }
 
 

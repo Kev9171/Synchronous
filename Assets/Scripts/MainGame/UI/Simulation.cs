@@ -107,7 +107,8 @@ namespace KWY
 
         private void DoAction(int time)
         {
-            if (actionData.Data.TryGetValue(time, out var value))
+            return;
+            /*if (actionData.Data.TryGetValue(time, out var value))
             {
                 foreach (object[] d in value)
                 {
@@ -124,7 +125,7 @@ namespace KWY
                         StartCoroutine(DoCharaSkill(cid, (SID)d[2], (SkillDicection)d[3]));
                     }
                 }
-            }
+            }*/
         }
 
         IEnumerator DoCharaMove(int cid, Vector2Int v)

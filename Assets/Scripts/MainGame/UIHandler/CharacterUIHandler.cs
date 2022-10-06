@@ -28,6 +28,7 @@ namespace KWY
         MainGameData data;
 
         Dictionary<int, CharacterPanel> charaUIs = new Dictionary<int, CharacterPanel>();
+
         Dictionary<Character, CharacterPanel> charaPanels = new Dictionary<Character, CharacterPanel>();
         Dictionary<int, SelSkillPanel> selSkillUIs = new Dictionary<int, SelSkillPanel>();
 
@@ -127,5 +128,7 @@ namespace KWY
                 s.gameObject.SetActive(false);
             }
         }
+
+        
     }
 }
