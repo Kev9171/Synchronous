@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace KWY
 {
@@ -98,8 +99,11 @@ namespace KWY
 
         public void UpdateHP(float hp)
         {
-            hpLabel.text = hp.ToString() + "/" + chara.MaxHp.ToString();
-            hpBar.value = hp / chara.MaxHp;
+            float now = chara.Hp;
+            float v = hpBar.value * chara.MaxHp;
+            StartCoroutine(IEUpdateHp(now - v));
+            //hpLabel.text = hp.ToString() + "/" + chara.MaxHp.ToString();
+            //hpBar.value = hp / chara.MaxHp;
         }
 
         public void UpdateMP(float mp)
@@ -211,6 +215,25 @@ namespace KWY
             }
         }
 
-        #endregion        
+        #endregion
+
+        #region IEnumerator
+
+        IEnumerator IEUpdateHp(float dv)
+        {
+            // 10 tick (2000ms동안 업데이트)
+
+            // tick 당 업데이트할 값
+            float v = (dv / chara.MaxHp) / 10f;
+            for (float ft = 1f; ft >= 0; ft -= 0.1f)
+            {
+                hpBar.value += v;
+                hpLabel.text = Mathf.Floor(hpBar.value * chara.MaxHp).ToString();
+                yield return new WaitForSeconds(0.1f);
+            }
+            
+        }
+
+        #endregion
     }
 }

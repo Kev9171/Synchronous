@@ -76,12 +76,12 @@ namespace KWY
 
             if (map.HasTile(clickV) && (SelChara.TempTilePos.y % 2 == 0 ? SelAction.areaEvenY : SelAction.areaOddY).Contains(deltaXY))
             {
-                data.CharaActionData[SelChara.Cb.cid].AddMoveAction(ActionType.Move, (int)deltaXY.x, (int)deltaXY.y, SelChara.TempTilePos.y%2!=0);
+                data.CharaActionData[SelChara.Pc.Id].AddMoveAction(ActionType.Move, (int)deltaXY.x, (int)deltaXY.y, SelChara.TempTilePos.y%2!=0);
 
                 // 이동 넣었을 경우 하이라이트를 위한 임시 좌표 변경
                 SelChara.SetTilePos(clickV);
 
-                turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
+                turnReady.ShowCharacterActionPanel(SelChara.Pc.Id);
                 SetSelClear();
 
                 mouseInput.Mouse.MouseClick.performed += OnClick;
@@ -136,7 +136,7 @@ namespace KWY
                 if (SelOk > 0)
                 {
                     // 확정
-                    data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Right);
+                    data.CharaActionData[SelChara.Pc.Id].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Right);
 
                     if (((SkillBase)SelAction).areaAttack)
                     {
@@ -149,7 +149,7 @@ namespace KWY
                         ray.CurvedMultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, true, ((SkillBase)SelAction).directions.Count);
                     }
 
-                    turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
+                    turnReady.ShowCharacterActionPanel(SelChara.Pc.Id);
                     SetSelClear();
 
                     mouseInput.Mouse.MouseClick.performed += OnClick;
@@ -179,7 +179,7 @@ namespace KWY
                 if (SelOk < 0)
                 {
                     // 확정
-                    data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Left);
+                    data.CharaActionData[SelChara.Pc.Id].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Left);
 
                     if (((SkillBase)SelAction).areaAttack)
                     {
@@ -192,7 +192,7 @@ namespace KWY
                         ray.CurvedMultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, false, ((SkillBase)SelAction).directions.Count);
                     }
 
-                    turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
+                    turnReady.ShowCharacterActionPanel(SelChara.Pc.Id);
                     SetSelClear();
 
                     mouseInput.Mouse.MouseClick.performed += OnClick;
