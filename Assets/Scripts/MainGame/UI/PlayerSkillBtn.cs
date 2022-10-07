@@ -75,10 +75,10 @@ namespace KWY
         {
             map = GameObject.Find("Tilemap").GetComponent<Tilemap>();
             chCtrl = GameObject.Find("CharacterControl").GetComponent<CharacterControl>();
-            mouseInput.Mouse.MouseClick.performed += chCtrl.OnClick;
+            //mouseInput.Mouse.MouseClick.performed += chCtrl.OnClick;
 
-            if (chCtrl.SelChara == null) return;
-
+            if (SelChara == null) return;
+            Debug.Log("clicked "+SelChara);
             Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
 
             // 바로 WorldToCell 함수에 집어넣지 말것! (???)
@@ -92,10 +92,17 @@ namespace KWY
 
             if (map.HasTile(clickV))
             {
-                SelChara.TilePos = clickV;
-                Vector3 newPos = map.CellToWorld(clickV);
-                newPos.y += 0.1f;
-                SelChara.transform.position = newPos;
+                MainGameData data = GameObject.Find("GameData").GetComponent<MainGameData>();
+                TilemapControl TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
+                Simulation sim = GameObject.Find("UICanvas").GetComponent<Simulation>();
+                if(clickV.y%2 != SelChara.TilePos.y % 2)
+                {
+                    sim.ChangeAction((int)SelChara.Cb.cid, clickV.y%2, MoveManager.MoveData);
+                }
+                SelChara.Teleport(clickV);
+
+                
+
                 mouseInput.Mouse.MouseClick.performed -= Skill1;
             }
         }
@@ -114,6 +121,8 @@ namespace KWY
                 mouseInput.Mouse.MouseClick.performed -= OnClick;
                 mouseInput.Mouse.MouseClick.performed += Skill1;
             }
+            else
+                Debug.Log("no char");
         }
 
 

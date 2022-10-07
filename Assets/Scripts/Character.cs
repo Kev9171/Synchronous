@@ -282,6 +282,107 @@ namespace KWY
             }
         }
 
+        [PunRPC]
+        public void Teleport(Vector3Int vec)
+        {
+            if (map.HasTile(vec))
+            {
+                Vector3Int nowPos = TilePos;
+                TilePos = vec;
+                Vector3 newPos = map.CellToWorld(vec);
+                newPos.y += 0.1f;
+                transform.position = newPos;
+
+                TCtrl.updateCharNum(vec, 1, gameObject);
+                TCtrl.updateCharNum(nowPos, -1, gameObject);
+
+                int charsOnDes = TCtrl.getCharList(vec).Count;
+                int charsOnCur = TCtrl.getCharList(nowPos).Count;
+
+                worldPos = newPos;
+
+
+
+                //if (map.CellToWorld(nowPos).x < des.x)
+                //    gameObject.GetComponent<SpriteRenderer>().flipX = false;
+                //else if (map.CellToWorld(nowPos).x > des.x)
+                //    gameObject.GetComponent<SpriteRenderer>().flipX = true;
+
+                if (charsOnDes > 1)
+                {
+                    map.SetTileFlags(vec, TileFlags.None);
+                    map.SetColor(vec, new Color(1, 1, 1, 0));
+
+                    Sprite sprite = map.GetTile<CustomTile>(vec).sprite;
+                    TCtrl.activateAltTile(worldPos, charsOnDes, sprite);
+
+                    List<GameObject> characters = TCtrl.getCharList(vec);
+
+                    int count = 0;
+
+                    foreach (GameObject chara in characters)
+                    {
+                        Vector2 offset = TCtrl.nList[charsOnDes - 1].coordList[count];
+                        chara.GetComponent<Character>().destination = (Vector2)chara.GetComponent<Character>().worldPos + offset;
+                        chara.GetComponent<Character>().nowMove = true;
+                        //chara.GetComponent<BoxCollider2D>().offset = -offset;
+                        count++;
+                    }
+                }
+                else
+                {
+                    //nowMove = true;
+                    gameObject.GetComponent<BoxCollider2D>().offset = Vector2.zero;
+
+                    Debug.Log("noone on tile");
+                }
+
+                if (charsOnCur > 1)
+                {
+                    Sprite sprite = map.GetTile<CustomTile>(nowPos).sprite;
+                    Vector3 v = map.CellToWorld(nowPos);
+                    v.y += 0.1f;
+                    TCtrl.activateAltTile(vec, charsOnCur, sprite);
+
+                    List<GameObject> characters = TCtrl.getCharList(nowPos);
+
+                    int count = 0;
+                    //destination = worldPos;
+                    foreach (GameObject chara in characters)
+                    {
+                        Vector3 charpos = chara.transform.position;
+                        Vector2 offset = TCtrl.nList[charsOnCur - 1].coordList[count];
+                        chara.GetComponent<Character>().destination = (Vector2)chara.GetComponent<Character>().worldPos + offset;
+                        chara.GetComponent<Character>().nowMove = true;
+                        //chara.GetComponent<BoxCollider2D>().offset = -offset;
+
+                        count++;
+                    }
+                }
+
+                else if (charsOnCur == 1)
+                {
+                    map.SetTileFlags(nowPos, TileFlags.None);
+                    map.SetColor(nowPos, new Color(1, 1, 1, 1));
+
+                    TCtrl.deactivateAltTile(map.CellToWorld(nowPos));
+
+                    List<GameObject> characters = TCtrl.getCharList(nowPos);
+                    characters[0].GetComponent<Character>().destination = map.CellToWorld(nowPos);
+                    characters[0].GetComponent<Character>().nowMove = true;
+                    characters[0].GetComponent<BoxCollider2D>().offset = Vector2.zero;
+                    GetComponent<BoxCollider2D>().offset = Vector2.zero;
+
+                }
+
+                Debug.LogFormat("{0} / {1} teleported to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, vec);
+            }
+            else
+            {
+                Debug.LogFormat("{0} / {1} can not go to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, vec);
+            }
+        }
+
         public void SpellSkill(SID sid, SkillDicection direction)
         {
             nowMove = false;
