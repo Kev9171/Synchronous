@@ -13,20 +13,19 @@ namespace KWY
     {
         [SerializeField] Tilemap map;
         [SerializeField] GameObject ClientCharacters, MasterClientCharacters;
-        [SerializeField] private List<GameObject> deployableList = new List<GameObject>(); // 배치 가능한 캐릭터 정보 저장
+        [SerializeField] private List<GameObject> deployableList = new List<GameObject>(); // Storing deployable character information
 
-        private int deployCounter; // 배치 가능 캐릭터 수(3)
-        public GameObject[] charArray = new GameObject[10]; // 배치하는 캐릭터 최초 저장
-        public List<Vector3Int> deployPositionList = new List<Vector3Int>(); // 배치 가능한 타일맵 좌표 저장
-
-        private List<Character> pCharacters = new List<Character>(); // 게임 진행 중 캐릭터 정보를 가지고 있는 리스트
+        private List<GameObject> unDeployableList = new List<GameObject>(); // List to temporarily save deployabled characters
+        private GameObject[] charArray = new GameObject[10]; // Initial storage of instantiated characters
+        private List<Vector3Int> deployPositionList = new List<Vector3Int>(); // Initial storage of deployable tiles
+        private int deployCounter; // Deployable character number
+        private List<Character> pCharacters = new List<Character>(); // A list with character information during the game
         private Dictionary<CID, GameObject> pCharacterObjects = new Dictionary<CID, GameObject>();
-        private Dictionary<CID, Vector3Int> deployRPC = new Dictionary<CID, Vector3Int>();
+        private Dictionary<CID, Vector3Int> deployDontDestroy = new Dictionary<CID, Vector3Int>();
 
         #region Private Fields
 
         MouseInput mouseInput;
-        //private int SelOk = 0; // 음수: left, 양수: right -> |2| 가 되었을 때 액션 확정
 
         #endregion
 
@@ -39,39 +38,45 @@ namespace KWY
 
         public void SetSelClear()
         {
-            //SelChara = null;
-            //SelAction = null;
-            //SelOk = 0;
-
             mouseInput.Mouse.MouseClick.performed -= OnClick;
-            //mouseInput.Mouse.MouseClick.performed -= OnClickSkillDirection;
-
-            //showingSkillManager.ShowSkillPanel(-1);
-
             //highLighter.ClearHighlight();
             HighlightCharacterClear();
         }
 
         public void SetSelChara(CID cid)
         {
-            //SelChara = null;
             Character c = GetCertainCharacter(cid);
-
             if (c == null)
             {
                 Debug.LogErrorFormat("Can not select - cid: {0}", cid);
                 return;
             }
-
-            //SelAction = null;
-            //SelChara = c;
             HighlightCharacter(cid);
             //highLighter.ClearHighlight();
-
             mouseInput.Mouse.MouseClick.performed += OnClick;
-            Debug.Log("Character selected: " + cid);
-            //CID cd = (CID)1;
-            //Debug.Log((CID)"Flappy");
+            foreach (GameObject g in unDeployableList)
+            {
+                if (g.name == cid.ToString())
+                {
+                    deployableList.Add(g);
+                    unDeployableList.Remove(g);
+                    break; // InvalidOperationException: Collection was modified; enumeration operation may not execute.
+                }
+            }
+            Destroy(GameObject.Find(cid.ToString() + "(Clone)")); // Destroy clicked gameObject
+            Debug.Log("Character destroyed: " + cid);
+            deployPositionList.Add(deployDontDestroy[cid]); // Recover deployable tile
+            deployDontDestroy.Remove(cid);
+            foreach (Character ch in pCharacters)
+            {
+                if (ch.Cb.cid == cid)
+                {
+                    pCharacters.Remove(ch);
+                    break;
+                }
+            }
+            // GameObject gameObject = undeployList.Find(x => x.name.Equals(cid));
+            deployCounter++;
         }
 
         public void HighlightCharacterClear()
@@ -89,16 +94,12 @@ namespace KWY
                 if (c == cid)
                 {
                     pCharacterObjects[c].transform.localScale = new Vector3(1, 1, 1);
-                    //Destroy(pCharacterObjects[c]);
-                    
                 }
                 else
                 {
                     pCharacterObjects[c].transform.localScale = new Vector3(0.7f, 0.7f, 1);
                 }
-
             }
-
         }
 
         public Character GetCertainCharacter(CID cid)
@@ -111,11 +112,6 @@ namespace KWY
                 }
             }
             return null;
-        }
-
-        public void UndeployCharacter(CID cid)
-        {
-
         }
 
         public void GetDeployPosition()
@@ -145,14 +141,14 @@ namespace KWY
             Ray ray = Camera.main.ScreenPointToRay(mousePosition);
             RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
 
-            // 캐릭터 클릭 시
+            // When clicking on a character
             if (hit.collider != null)
             {
                 CID cid = hit.collider.gameObject.GetComponent<Character>().Cb.cid;
                 SetSelChara(cid);
             }
 
-            // 맵 클릭 시
+            // When clicking on the map
             if (hit.collider == null) // Instantiate하면 Box Collider 2D 옵션이 꺼져 있음
             {
                 mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
@@ -169,15 +165,17 @@ namespace KWY
                         {
                             int prefabEnum = (int)Enum.Parse(typeof(CID), PickManager.Instance.ClickedBtn.CharacterPrefab.name); // enum을 charArray의 index로 이용하기 위함
                             charArray[prefabEnum] = Instantiate(PickManager.Instance.ClickedBtn.CharacterPrefab, mousePosition, Quaternion.identity);
-                            pCharacters.Add(charArray[deployCounter].GetComponent<Character>());
+                            pCharacters.Add(charArray[prefabEnum].GetComponent<Character>());
                             //pCharacterObjects.Add(pCharacters[deployCounter].Cb.cid, charArray[deployCounter]);
+
+                            unDeployableList.Add(PickManager.Instance.ClickedBtn.CharacterPrefab);
                             deployableList.Remove(PickManager.Instance.ClickedBtn.CharacterPrefab);
                             deployPositionList.Remove(clickV);
+                            deployDontDestroy.Add(charArray[prefabEnum].GetComponent<Character>().Cb.cid, clickV);
 
                             charArray[prefabEnum].transform.parent = MasterClientCharacters.transform;
                             charArray[prefabEnum].GetComponent<BoxCollider2D>().enabled = true;
                             PickManager.Instance.PickClear();
-                            //deployRPC.Add(pCharacters[deployCounter].Cb.cid, clickV); // CID와 위치 정보 저장
                             deployCounter--;
                         }
                     }
@@ -189,14 +187,16 @@ namespace KWY
                             charArray[prefabEnum] = Instantiate(PickManager.Instance.ClickedBtn.CharacterPrefab, mousePosition, Quaternion.identity);
                             pCharacters.Add(charArray[prefabEnum].GetComponent<Character>());
                             //pCharacterObjects.Add(pCharacters[deployCounter].Cb.cid, firstDeployed[deployCounter]);
-                            deployableList.Remove(PickManager.Instance.ClickedBtn.CharacterPrefab); // 배치 가능한 캐릭터 list에서 제거
-                            deployPositionList.Remove(clickV); // 배치 가능한 위치 list에서 제거
+
+                            unDeployableList.Add(PickManager.Instance.ClickedBtn.CharacterPrefab);
+                            deployableList.Remove(PickManager.Instance.ClickedBtn.CharacterPrefab); // Remove from list of deployable characters
+                            deployPositionList.Remove(clickV); // Remove from list of available locations
+                            deployDontDestroy.Add(charArray[prefabEnum].GetComponent<Character>().Cb.cid, clickV);
 
                             charArray[prefabEnum].transform.parent = ClientCharacters.transform;
                             charArray[prefabEnum].GetComponent<SpriteRenderer>().flipX = true;
                             charArray[prefabEnum].GetComponent<BoxCollider2D>().enabled = true;
-                            PickManager.Instance.PickClear(); // 버튼 Prefab 해제
-                            //deployRPC.Add(pCharacters[deployCounter].Cb.cid, clickV); // CID와 위치 정보 저장
+                            PickManager.Instance.PickClear(); // Disable button prefab
                             deployCounter--;
                         }
                     }
@@ -223,7 +223,8 @@ namespace KWY
                 charArray[prefabEnum].transform.parent = ClientCharacters.transform;
                 charArray[prefabEnum].GetComponent<SpriteRenderer>().flipX = true;
                 charArray[prefabEnum].GetComponent<BoxCollider2D>().enabled = true;
-                //deployRPC.Add(pCharacters[deployCounter].Cb.cid, Vector3Int.FloorToInt(posAdaptation)); // CID와 위치 정보 저장
+                deployDontDestroy.Add(charArray[prefabEnum].GetComponent<Character>().Cb.cid, Vector3Int.FloorToInt(posAdaptation));
+                // deployDontDestroy.Add(pCharacters[deployCounter].Cb.cid, Vector3Int.FloorToInt(posAdaptation)); // CID와 위치 정보 저장
             }
         }
 
