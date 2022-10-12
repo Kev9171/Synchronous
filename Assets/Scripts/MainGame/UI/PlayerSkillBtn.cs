@@ -1,6 +1,8 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Tilemaps;
+using UnityEngine.InputSystem;
 
 namespace KWY
 {
@@ -15,6 +17,11 @@ namespace KWY
 
         PlayerSkillBase psb;
 
+        Character SelChara;
+        Tilemap map;
+        MouseInput mouseInput;
+        CharacterControl chCtrl;
+
         [Tooltip("Info 띄우는데 필요한 최소 클릭 시간; move 일 경우 없음")]
         public float minClickTime = 1;
 
@@ -25,6 +32,18 @@ namespace KWY
         private bool isClick;
 
         #endregion
+        private void Awake()
+        {
+            mouseInput = new MouseInput();
+        }
+        private void OnEnable()
+        {
+            mouseInput.Enable();
+        }
+        private void OnDisable()
+        {
+            mouseInput.Disable();
+        }
 
         public void SetData(PlayerSkillBase psb)
         {
@@ -40,6 +59,7 @@ namespace KWY
 
             if (data.PlayerMp >= psb.cost)
             {
+                mouseInput.Mouse.MouseClick.performed += OnClick;
                 GameManager gm = GameObject.Find("GameManager").GetComponent<GameManager>();
                 gm.UpdatePlayerMP(-psb.cost);
 
@@ -50,6 +70,52 @@ namespace KWY
                 Debug.Log("마나 부족");
             }
         }
+
+        public void Skill1(InputAction.CallbackContext context)
+        {
+            map = GameObject.Find("Tilemap").GetComponent<Tilemap>();
+            chCtrl = GameObject.Find("CharacterControl").GetComponent<CharacterControl>();
+            mouseInput.Mouse.MouseClick.performed += chCtrl.OnClick;
+
+            if (chCtrl.SelChara == null) return;
+
+            Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
+
+            // 바로 WorldToCell 함수에 집어넣지 말것! (???)
+            mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
+
+            // 사용 x
+            // Vector3Int clickV = map.WorldToCell(mouseInput.Mouse.MouseClick.performed += OnClickMoveDirection;);
+
+            // 클릭 된 좌표 맵 좌표로 변환
+            Vector3Int clickV = map.WorldToCell(mousePosition);
+
+            if (map.HasTile(clickV))
+            {
+                SelChara.TilePos = clickV;
+                Vector3 newPos = map.CellToWorld(clickV);
+                newPos.y += 0.1f;
+                SelChara.transform.position = newPos;
+                mouseInput.Mouse.MouseClick.performed -= Skill1;
+            }
+        }
+
+        public void OnClick(InputAction.CallbackContext context)
+        {
+            Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
+            Ray ray = Camera.main.ScreenPointToRay(mousePosition);
+            RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
+
+            if (hit.collider != null)
+            {
+                //CID cid = hit.collider.gameObject.GetComponent<Character>().Cb.cid;
+                //chCtrl.SetSelChara(cid);
+                SelChara = hit.collider.gameObject.GetComponent<Character>();
+                mouseInput.Mouse.MouseClick.performed -= OnClick;
+                mouseInput.Mouse.MouseClick.performed += Skill1;
+            }
+        }
+
 
         public void ButtonUp()
         {

@@ -130,6 +130,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 141463992}
     m_Modifications:
+    - target: {fileID: 256772674252538239, guid: 2460382867b38be4199fa99d54ae47e4, type: 3}
+      propertyPath: ray
+      value: 
+      objectReference: {fileID: 1695663021}
     - target: {fileID: 1445382690674112773, guid: 2460382867b38be4199fa99d54ae47e4, type: 3}
       propertyPath: m_Name
       value: Flappy
@@ -836,6 +840,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1692066141}
     m_Modifications:
+    - target: {fileID: 7138371582899994663, guid: 5415c2857bf979c4da96dd0893ed8283, type: 3}
+      propertyPath: ray
+      value: 
+      objectReference: {fileID: 1695663021}
     - target: {fileID: 8399122764979910724, guid: 5415c2857bf979c4da96dd0893ed8283, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -1212,6 +1220,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1692066141}
     m_Modifications:
+    - target: {fileID: 256772674252538239, guid: 2460382867b38be4199fa99d54ae47e4, type: 3}
+      propertyPath: ray
+      value: 
+      objectReference: {fileID: 1695663021}
     - target: {fileID: 1445382690674112773, guid: 2460382867b38be4199fa99d54ae47e4, type: 3}
       propertyPath: m_Name
       value: Flappy
@@ -1273,6 +1285,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 141463992}
     m_Modifications:
+    - target: {fileID: 429383500999419485, guid: 321733babb0a6974f87b9f2df13e5837, type: 3}
+      propertyPath: ray
+      value: 
+      objectReference: {fileID: 1695663021}
     - target: {fileID: 1326943966758870565, guid: 321733babb0a6974f87b9f2df13e5837, type: 3}
       propertyPath: sceneViewId
       value: 5
@@ -4011,6 +4027,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 141463992}
     m_Modifications:
+    - target: {fileID: 7138371582899994663, guid: 5415c2857bf979c4da96dd0893ed8283, type: 3}
+      propertyPath: ray
+      value: 
+      objectReference: {fileID: 1695663021}
     - target: {fileID: 8399122764979910723, guid: 5415c2857bf979c4da96dd0893ed8283, type: 3}
       propertyPath: m_FlipX
       value: 1
@@ -6360,6 +6380,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1692066141}
     m_Modifications:
+    - target: {fileID: 429383500999419485, guid: 321733babb0a6974f87b9f2df13e5837, type: 3}
+      propertyPath: ray
+      value: 
+      objectReference: {fileID: 1695663021}
     - target: {fileID: 1326943966758870565, guid: 321733babb0a6974f87b9f2df13e5837, type: 3}
       propertyPath: sceneViewId
       value: 2

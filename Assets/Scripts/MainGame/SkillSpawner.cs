@@ -23,7 +23,7 @@ public class SkillSpawner : MonoBehaviour
     {
         if (collision.gameObject.tag == "Enemy")
         {
-            collision.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+            collision.gameObject.GetComponent<Character>().DamageHP(5);
         }
     }
 }

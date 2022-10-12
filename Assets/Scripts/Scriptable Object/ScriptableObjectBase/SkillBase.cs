@@ -17,6 +17,8 @@ namespace KWY
         public List<Direction> directions = new List<Direction>();
         public bool areaAttack;
         public SkillSpawner area;
+        public bool isDamage;
+        public int value; // 데미지 또는 버프의 수치
 
         public override string ToString()
         {
