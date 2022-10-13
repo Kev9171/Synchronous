@@ -25,10 +25,14 @@ namespace KWY
         [SerializeField]
         Slider hpBar;
         [SerializeField]
+        TMP_Text hpMaxLabel;
+        [SerializeField]
         TMP_Text hpLabel;
 
         [SerializeField]
         Slider mpBar;
+        [SerializeField]
+        TMP_Text mpMaxLabel;
         [SerializeField]
         TMP_Text mpLabel;
 
@@ -66,7 +70,7 @@ namespace KWY
         /// 처음 데이터를 넣는 함수; 한번만 호출 할 수 있도록
         /// </summary>
         /// <param name="cb">Chacter Base Data</param>
-        public void Init(Character chararacter, List<Buff> buffList)
+        public void Init(Character chararacter)
         {
             chara = chararacter;
 
@@ -74,10 +78,14 @@ namespace KWY
 
             charaImg.sprite = chara.Cb.icon;
 
-            LoadBuffs(buffList);
+            LoadBuffs();
 
-            UpdateHP(chara.Cb.hp);
-            UpdateMP(0);
+            // set initial hp and mp
+            hpMaxLabel.text = chara.MaxHp.ToString();
+            mpMaxLabel.text = chara.MaxMp.ToString();
+
+            hpLabel.text = chara.Hp.ToString();
+            mpLabel.text = chara.Mp.ToString();
         }
 
         public void UpdateUI(Character c)
@@ -92,8 +100,6 @@ namespace KWY
             {
                 UpdateHP(c.Hp);
                 UpdateMP(c.Mp);
-
-                LoadBuffs(c.Buffs);
             }
         }
 
@@ -102,34 +108,18 @@ namespace KWY
             float now = chara.Hp;
             float v = hpBar.value * chara.MaxHp;
             StartCoroutine(IEUpdateHp(now - v));
-            //hpLabel.text = hp.ToString() + "/" + chara.MaxHp.ToString();
-            //hpBar.value = hp / chara.MaxHp;
         }
 
         public void UpdateMP(float mp)
         {
-            mpLabel.text = mp.ToString() + "/" + chara.MaxMp.ToString();
-            mpBar.value = mp / chara.MaxMp;
+            float now = chara.Mp;
+            float v = mpBar.value * chara.MaxMp;
+            StartCoroutine(IEUpdateMp(now - v));
         }
 
-        public void AddBuff(BuffBase bb, int nTurn)
+        public void UpdateBuffs()
         {
-            GameObject bPanel = Instantiate(buffPanelPrefab, buffPanel.transform);
-            bPanel.GetComponent<BuffPanel>().SetData(bb, nTurn);
-            buffPanelLists.Add(bPanel);
-        }
-
-        public void ReduceTurn(int nTurn)
-        {
-            foreach(GameObject buff in buffPanelLists)
-            {
-                // test 필요 loop 중에 요소 삭제하고 있어서 어떻게 되는지 모름
-                if (!buff.GetComponent<BuffPanel>().ReduceBuffTurnText(nTurn))
-                {
-                    buffPanelLists.Remove(buff);
-                    Destroy(buff);
-                }
-            }
+            LoadBuffs();
         }
 
         /// <summary>
@@ -204,15 +194,21 @@ namespace KWY
             buffPanelLists.Clear();
         }
 
-        private void LoadBuffs(List<Buff> buffs)
+        private void LoadBuffs()
         {
             ClearBuffs();
 
-            foreach (Buff bf in buffs)
+            foreach (Buff bf in chara.Buffs)
             {
-                //ReduceTurn(10); // temp
                 AddBuff(bf.bb, bf.turn);
             }
+        }
+
+        private void AddBuff(BuffBase bb, int nTurn)
+        {
+            GameObject bPanel = Instantiate(buffPanelPrefab, buffPanel.transform);
+            bPanel.GetComponent<BuffPanel>().SetData(bb, nTurn);
+            buffPanelLists.Add(bPanel);
         }
 
         #endregion
@@ -221,6 +217,8 @@ namespace KWY
 
         IEnumerator IEUpdateHp(float dv)
         {
+            // TODO
+            // 보안 필요
             // 10 tick (2000ms동안 업데이트)
 
             // tick 당 업데이트할 값
@@ -231,7 +229,18 @@ namespace KWY
                 hpLabel.text = Mathf.Floor(hpBar.value * chara.MaxHp).ToString();
                 yield return new WaitForSeconds(0.1f);
             }
-            
+        }
+
+        IEnumerator IEUpdateMp(float dv)
+        {
+            // TODO
+            float v = (dv / chara.MaxMp) / 10f;
+            for (float ft = 1f; ft >= 0; ft -= 0.1f)
+            {
+                mpBar.value += v;
+                mpLabel.text = Mathf.Floor(mpBar.value * chara.MaxMp).ToString();
+                yield return new WaitForSeconds(0.1f);
+            }
         }
 
         #endregion

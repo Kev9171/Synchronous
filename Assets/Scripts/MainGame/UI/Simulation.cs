@@ -68,6 +68,43 @@ namespace KWY
             simulCanvas.SetActive(false);
         }
 
+        
+        private TICK_RESULT CheckGameEnd()
+        {
+            // 0: 拌加 柳青
+            // 1: 公铰何
+            // 2: MasterClient 铰
+            // 3: OtherClient 铰
+
+            bool a = true;
+            bool b = true;
+            
+            foreach(PlayableCharacter p in data.MyTeamCharacter)
+            {
+                if (!p.Chara.BreakDown)
+                {
+                    // not end
+                    a = false;
+                    break;
+                }
+            }
+
+            foreach(PlayableCharacter p in data.OtherTeamCharacter)
+            {
+                if (!p.Chara.BreakDown)
+                {
+                    // not end
+                    b = false;
+                    break;
+                }
+            }
+
+            if (a && b) return TICK_RESULT.DRAW;
+            else if (a && !b) return TICK_RESULT.CLIENT_WIN;
+            else if (!a && b) return TICK_RESULT.MASTER_WIN;
+            else return TICK_RESULT.KEEP_GOING;
+        }
+
         #endregion
 
         #region Simulation 
@@ -94,14 +131,22 @@ namespace KWY
             // need codes
             DoAction(time);
             yield return new WaitForSeconds(simulationIntervalSeconds);
-            // need codes
-            if (time <= maxTimeLine + timeAfterSimul)
+
+            TICK_RESULT result = CheckGameEnd();
+            if (result == TICK_RESULT.KEEP_GOING)
             {
-                StartCoroutine(StartAction(++time));
+                if (time <= maxTimeLine + timeAfterSimul)
+                {
+                    StartCoroutine(StartAction(++time));
+                }
+                else
+                {
+                    SimulationEnd();
+                }
             }
             else
             {
-                SimulationEnd();
+                gameEvent.RaiseEventGameEnd(result);
             }
         }
 

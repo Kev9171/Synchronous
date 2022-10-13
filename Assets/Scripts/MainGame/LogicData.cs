@@ -37,6 +37,9 @@ namespace KWY
         private float actionLogShowingTime;
         private float simulationIntervalSeconds;
 
+        private int characterScoreMultiplier;
+        private int playerSkillCountScoreMultiplier;
+
         private bool loaded = false;
         private bool loadFailed = false;
 
@@ -56,6 +59,8 @@ namespace KWY
         public float ActionLogShowingTime { get { if (!loaded) { LoadValues(); } return actionLogShowingTime; } }
         public float SimulationIntervalSeconds { get { if (!loaded) { LoadValues(); } return simulationIntervalSeconds; } }
 
+        public int CharacterScoreMultiplier { get { if (!loaded) { LoadValues(); } return characterScoreMultiplier; } }
+        public int PlayerSkillCountScoreMultiplier { get { if (!loaded) { LoadValues(); } return playerSkillCountScoreMultiplier; } }
         public void LoadValues()
         {
             if (loadFailed)
@@ -73,6 +78,8 @@ namespace KWY
                 timeLimit = data.timeLimit;
                 actionLogShowingTime = data.actionLogShowingTime;
                 simulationIntervalSeconds = data.simulationIntervalSeconds;
+                characterScoreMultiplier = data.characterScoreMultiplier;
+                playerSkillCountScoreMultiplier = data.playerSkillCountScoreMultiplier;
 
                 loaded = true;
             }

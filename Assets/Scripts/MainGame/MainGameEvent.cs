@@ -13,7 +13,6 @@ namespace KWY
 {
     public class MainGameEvent : MonoBehaviourPun
     {
-        #region Private Serializable Fields
 
         [Tooltip("The button to send ready to start simulation to server")]
         [SerializeField] private Button readyBtn;
@@ -21,19 +20,15 @@ namespace KWY
         [SerializeField]
         private GameManager gameManager;
 
-        #endregion
-
-        #region Private Fields
-
         [Tooltip("다음에 게임이 시작되면 로드될 scene")]
         readonly private string nextLevel = "";
 
         [Tooltip("Unique user id that the server determined")]
         private string UserId;
 
+        private GameObject UICanvas;
        
 
-        #endregion
 
         #region Public Methods
 
@@ -95,14 +90,20 @@ namespace KWY
         }
 
         /// <summary>
-        /// Send to 'Game ends' signal to the Server; It must be called ONLY Master Client; content: winnerId: string
+        /// Send to 'Game ends' signal to the Server; It must be called ONLY Master Client; content: winnerTeam: string
         /// </summary>
-        public void RaiseEventGameEnd()
+        public void RaiseEventGameEnd(TICK_RESULT result)
         {
             byte evCode = (byte)EvCode.GameEnd;
 
-            var content = UserId; // temp 이긴 유저의 id 값을 content로
-            // content에 이긴 유저의 id 값 넣기
+            var content = result switch
+            {
+                TICK_RESULT.KEEP_GOING => -1,
+                TICK_RESULT.DRAW => ((int)TICK_RESULT.DRAW),
+                TICK_RESULT.MASTER_WIN => ((int)TICK_RESULT.MASTER_WIN),
+                TICK_RESULT.CLIENT_WIN => ((int)TICK_RESULT.CLIENT_WIN),
+                _ => -1,
+            };
 
             RaiseEventOptions raiseEventOptions = new RaiseEventOptions
             {
@@ -225,7 +226,7 @@ namespace KWY
         }
 
         /// <summary>
-        /// Method when the server responses the signal, 'the game ended'; data: [winnerId: string]
+        /// Method when the server responses the signal, 'the game ended'; data: [TICK_RESULT: int]
         /// </summary>
         /// <param name="eventData">Received data from the server</param>
         private void OnEventGameEnd(EventData eventData)
@@ -238,22 +239,9 @@ namespace KWY
                 return;
             }
 
-            // 이겻을 경우
-            if ((string)data == this.UserId)
-            {
-                // null 값은 임시
-                GameObject canvas = GameObject.Find("UICanvas");
-                PanelBuilder.ShowWinPanel(canvas.transform, null);
-            }
-            // 졌을 경우
-            else
-            {
-                // null 값은 임시
-                GameObject canvas = GameObject.Find("UICanvas");
-                PanelBuilder.ShowLosePanel(canvas.transform, null);
-            }
+            TICK_RESULT result = (TICK_RESULT)data;
 
-            // 게임 종료 후 할 내용들 작성
+            gameManager.SetState(STATE.GameOver, result);
         }
 
         #endregion
@@ -271,6 +259,13 @@ namespace KWY
             catch (Exception e)
             {
                 Debug.LogError("Can not get UserId - Check the server connection");
+            }
+
+            UICanvas = GameObject.Find("UICanvas");
+
+            if (!UICanvas)
+            {
+                Debug.Log("Can not find gameobject named: UICanvas");
             }
         }
 

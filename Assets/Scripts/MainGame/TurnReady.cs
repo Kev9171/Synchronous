@@ -11,8 +11,6 @@ namespace KWY
 {
     public class TurnReady : MonoBehaviour
     {
-        #region Canvas Elements
-
         [SerializeField]
         private GameObject TurnReadyUI;
 
@@ -21,9 +19,6 @@ namespace KWY
 
         [SerializeField]
         private Button readyBtn;
-        #endregion
-
-        #region Private Fields
 
         [Tooltip("Game data about player and characters")]
         [SerializeField]
@@ -38,10 +33,12 @@ namespace KWY
         [SerializeField]
         private CharacterControl characterControl;
 
+        [SerializeField]
+        Transform UICanvasTransform;
+
         private float time;
         private float timeLimit;
 
-        #endregion
 
         #region Public Methods
 
@@ -203,8 +200,12 @@ namespace KWY
 
         private void TimeOut()
         {
-            /*data.MyTeamCharacter[0].Chara.DamageHP(50);
-            return;*/
+
+            data.MyTeamCharacter[0].Chara.DamageHP(50);
+            data.MyTeamCharacter[1].Chara.AddMP(-2);
+
+            PanelBuilder.ShowResultPanel(UICanvasTransform, WINLOSE.WIN, data.CreateResultData());
+            return;
 
 
             // 캐릭터 선택 못하게 + 스킬 선택 패널 안보이게

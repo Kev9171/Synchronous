@@ -13,7 +13,6 @@ namespace KWY
         CharacterBase _characterBase;
 
         private List<IObserver<Character>> observers = new List<IObserver<Character>>();
-        private List<Buff> buffs = new List<Buff>();
 
         public PlayableCharacter Pc
         {
@@ -111,6 +110,8 @@ namespace KWY
         public void AddBuff(BuffBase bb, int turn)
         {
             Buffs.Add(new Buff(bb, turn));
+
+            NotifyObservers();
         }
 
         public void ReduceBuffTurn(int turn)
@@ -124,12 +125,14 @@ namespace KWY
                     Debug.LogFormat("The buff {0} of {1} is removed", b.bb.name, Cb.name);
                 }
             }
+
+            NotifyObservers();
         }
 
         public void ClearBuff()
         {
             Buffs.Clear();
-            Debug.LogFormat("All buffs of {0} is removed", Cb.name);
+            NotifyObservers();
         }
 
         public void SetTilePos(Vector3Int pos)
@@ -338,10 +341,6 @@ namespace KWY
             TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
 
             TilePos = map.WorldToCell(transform.position);
-            //map.GetTile<CustomTile>(map.WorldToCell(transform.position)).updateCharNum(1, gameObject);
-            //map.GetTile<CustomTile>(map.WorldToCell(transform.position)).getTilePos();
-
-            //Debug.Log(this+"'s pos = "+map.WorldToCell(transform.position));
         }
 
 
