@@ -57,29 +57,16 @@ namespace KWY
         }
 
         // 아직 미완성 인자 확인 필요
-        public static void ShowWinPanel(Transform parent, Object o)
+        public static void ShowResultPanel(Transform parent, WINLOSE result, ResultData data)
         {
-            GameObject winPanel = GameObject.Instantiate(
+            GameObject resultPanel = GameObject.Instantiate(
                 Resources.Load(
-                    "Prefabs/UI/Game/WinPanel",
+                    "Prefabs/UI/Game/ResultPanel",
                     typeof(GameObject)
                     )) as GameObject;
 
-            winPanel.transform.SetParent(parent, false);
-            winPanel.GetComponent<WinPanel>().SetData(o);
-        }
-
-        // 아직 미완성 인자 확인 필요
-        public static void ShowLosePanel(Transform parent, Object o)
-        {
-            GameObject losePanel = GameObject.Instantiate(
-                Resources.Load(
-                    "Prefabs/UI/Game/LosePanel",
-                    typeof(GameObject)
-                    )) as GameObject;
-
-            losePanel.transform.SetParent(parent, false);
-            losePanel.GetComponent<LosePanel>().SetData(o);
+            resultPanel.transform.SetParent(parent, false);
+            resultPanel.GetComponent<ResultPanel>().SetData(result, data);
         }
     }
 }

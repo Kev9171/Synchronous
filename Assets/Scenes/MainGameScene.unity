@@ -525,13 +525,9 @@ MonoBehaviour:
   readyBtn: {fileID: 1710340621}
   data: {fileID: 1447055416}
   characterUIHandler: {fileID: 1414391423}
-  selSkillPanels:
-  - {fileID: 1457726781}
-  - {fileID: 1742473581}
-  - {fileID: 1784957913}
-  playerMpPanel: {fileID: 514760366}
   gameEvent: {fileID: 1896979066}
   characterControl: {fileID: 627332755}
+  UICanvasTransform: {fileID: 134885409}
 --- !u!114 &134885414
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5573,6 +5569,7 @@ MonoBehaviour:
   playerSkillPanel: {fileID: 1059560472}
   turnReady: {fileID: 134885413}
   simulation: {fileID: 134885414}
+  UICanvas: {fileID: 0}
 --- !u!1 &785816981
 GameObject:
   m_ObjectHideFlags: 0
@@ -7535,7 +7532,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60971c986c0de5e42a3aaffbaa59b081, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turnReady: {fileID: 0}
   ReadyText: {fileID: 1841856364}
 --- !u!1001 &1742473580
 PrefabInstance:

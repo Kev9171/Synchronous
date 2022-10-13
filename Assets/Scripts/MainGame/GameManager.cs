@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
 
 namespace KWY
 {
@@ -28,6 +29,9 @@ namespace KWY
         [SerializeField]
         private Simulation simulation;
 
+        [SerializeField]
+        Transform UICanvas;
+
         ActionData nowActionData;
 
         STATE nowState = STATE.StandBy;
@@ -45,7 +49,7 @@ namespace KWY
                         );
                     break;
                 case STATE.GameOver: // game over
-                    GameOverState((Team)data[0]);
+                    GameOverState((TICK_RESULT)data[0]);
                     break;
             }
         }
@@ -80,10 +84,26 @@ namespace KWY
             simulation.StartSimulationState(actionData);
         }
 
-        private void GameOverState(Team winTeam)
+        private void GameOverState(TICK_RESULT result)
         {
             nowState = STATE.GameOver;
             // TODO
+
+            // 마스터 클라이언트가 이겻을 경우
+            if (result == TICK_RESULT.MASTER_WIN)
+            {
+                PanelBuilder.ShowResultPanel(UICanvas, PhotonNetwork.IsMasterClient ? WINLOSE.WIN : WINLOSE.LOSE, data.CreateResultData());
+            }
+            // 마스터 클라이언트가 졌을 경우
+            else if (result == TICK_RESULT.CLIENT_WIN)
+            {
+                PanelBuilder.ShowResultPanel(UICanvas, PhotonNetwork.IsMasterClient ? WINLOSE.LOSE : WINLOSE.WIN, data.CreateResultData());
+            }
+            // 무승부
+            else if (result == TICK_RESULT.DRAW)
+            {
+                PanelBuilder.ShowResultPanel(UICanvas, WINLOSE.DRAW, data.CreateResultData());
+            }
         }
 
         // Start is called before the first frame update

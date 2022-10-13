@@ -15,5 +15,9 @@ namespace KWY
         public float actionLogShowingTime;
 
         public float simulationIntervalSeconds;
+
+
+        public int characterScoreMultiplier;
+        public int playerSkillCountScoreMultiplier;
     }
 }

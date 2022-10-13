@@ -21,6 +21,7 @@ namespace KWY
         private string mapName; // 나중에 enum으로 바꿔서
 
         private int turnNum = 0;
+        private int playerSkillCount = 0;
 
         public int TurnNum
         {
@@ -86,6 +87,21 @@ namespace KWY
                 else
                 {
                     return _charasTeamB;
+                }
+            }
+        }
+
+        public List<PlayableCharacter> OtherTeamCharacter
+        {
+            get
+            {
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    return _charasTeamB;
+                }
+                else
+                {
+                    return _charasTeamA;
                 }
             }
         }
@@ -313,6 +329,11 @@ namespace KWY
 
         #endregion
 
+        public ResultData CreateResultData()
+        {
+            return new ResultData(MyTeamCharacter, playerSkillCount);
+        }
+
         #region MonoBehaviour CallBacks
 
         private void Awake()
@@ -327,12 +348,6 @@ namespace KWY
                 Debug.LogError("Can not find object with tag: 'Map'");
             }
         }
-
-        private void Start()
-        {
-        }
-
-
         #endregion
 
         #region ISubject Methods
