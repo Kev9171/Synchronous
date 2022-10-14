@@ -1,4 +1,5 @@
 using Photon.Pun;
+using Photon.Realtime;
 using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
@@ -7,22 +8,47 @@ using UnityEngine.Tilemaps;
 
 namespace KWY
 {
-    public class Character :MonoBehaviourPunCallbacks, IPunObservable 
+    public class Character : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback, IPunObservable, ISubject<Character>
     {
         [SerializeField]
         CharacterBase _characterBase;
 
+        private List<IObserver<Character>> observers = new List<IObserver<Character>>();
+
+        public PlayableCharacter Pc
+        {
+            get;
+            private set;
+        } = null;
+
+        public List<IObserver<Character>> Observers
+        {
+            get;
+            private set;
+        } = new List<IObserver<Character>>();
+
+        public List<Buff> Buffs
+        {
+            get;
+            private set;
+        } = new List<Buff>();
         public CharacterBase Cb { get; private set; }
-        public List<Buff> Buffs { get; private set; }
         public float Hp { get; private set; }
         public float Mp { get; private set; }
+        public float MaxHp { get; private set; }
+        public float MaxMp { get; private set; }
         public bool BreakDown { get; private set; }
+        public float Atk { get; private set; }
+        public float Def { get; private set; }
+
+        private SkillSpawner skillSpawner;
+
+        private RayTest ray;
+
+
         public Vector3Int TempTilePos { get; private set; }
-        public Vector3Int SelTilePos { get; private set; }
 
         public Vector3 worldPos { get; private set; }
-
-        public static readonly float MaxMp = 10;
 
         [SerializeField] private float movementSpeed;
         private Vector2 destination;
@@ -33,26 +59,25 @@ namespace KWY
 
         private bool nowMove = false;
 
-        private SkillSpawner skillSpawner;
-        [SerializeField] private RayTest ray;
-        public Character(CharacterBase cb)
+        public void SetData(PlayableCharacter pc)
         {
-            Cb = cb;
-            Buffs = new List<Buff>();
-            Hp = cb.hp;
-            Mp = 0;
-            BreakDown = false;
+            Pc = pc;
         }
 
-        public Character(CharacterBase cb, Vector3Int pos)
+        private void Init()
         {
-            Cb = cb;
-            Buffs = new List<Buff>();
-            Hp = cb.hp;
-            Mp = 0;
+            Cb = _characterBase;
+
+            Hp = Cb.hp;
+            Mp = 0; // TODO
+
             BreakDown = false;
-            TempTilePos = pos;
-            Debug.Log("position: "+pos);
+
+            MaxHp = Cb.hp;
+            MaxMp = 10;
+
+            Atk = Cb.atk;
+            Def = 1; // TODO
         }
 
         public void DamageHP(float damage)
@@ -70,19 +95,26 @@ namespace KWY
             {
                 Debug.LogFormat("{0} is damaged {1}; Now hp: {2}", Cb.name, damage, Hp);
             }
+
+            NotifyObservers();
         }
 
         public void AddMP(float amount)
         {
             Mp += amount;
             if (Mp > MaxMp) Mp = MaxMp;
+            else if (Mp < 0) Mp = 0;
 
             Debug.LogFormat("{0}'s mp is added {1}; Now mp: {2}", Cb.name, amount, Mp);
+
+            NotifyObservers();
         }
 
         public void AddBuff(BuffBase bb, int turn)
         {
             Buffs.Add(new Buff(bb, turn));
+
+            NotifyObservers();
         }
 
         public void ReduceBuffTurn(int turn)
@@ -96,12 +128,14 @@ namespace KWY
                     Debug.LogFormat("The buff {0} of {1} is removed", b.bb.name, Cb.name);
                 }
             }
+
+            NotifyObservers();
         }
 
         public void ClearBuff()
         {
             Buffs.Clear();
-            Debug.LogFormat("All buffs of {0} is removed", Cb.name);
+            NotifyObservers();
         }
 
         public void SetTilePos(Vector3Int pos)
@@ -123,7 +157,14 @@ namespace KWY
                 t += b.ToString() + ", ";
             }
             t += "]";
-            return string.Format("CID: {0}, HP: {1}, MP: {2}, Down?: {3}, Buffs: {4}", Cb.cid, Hp, Mp, BreakDown, t);
+
+            string tt = "[";
+            foreach(IObserver<Character> o in observers)
+            {
+                tt += o.GetType().ToString();
+            }
+            tt += "]";
+            return string.Format("CID: {0}, HP: {1}, MP: {2}, Down?: {3}, Buffs: {4}, Observers: {5}", Cb.cid, Hp, Mp, BreakDown, t, tt);
         }
 
         #region IPunObservable implementation
@@ -386,6 +427,7 @@ namespace KWY
         public void SpellSkill(SID sid, SkillDicection direction, Vector2Int v)
         {
             nowMove = false;
+            nowMove = false;
             SkillBase SelSkill = SkillManager.GetData(sid);
             if (SelSkill.areaAttack)
             {
@@ -395,7 +437,7 @@ namespace KWY
             }
             else
             {
-                if(direction == SkillDicection.Right)
+                if (direction == SkillDicection.Right)
                 {
                     ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, true, SelSkill.directions.Count);
                 }
@@ -413,23 +455,34 @@ namespace KWY
         #region MonoBehaviour CallBacks
         private void Awake()
         {
-            Cb = _characterBase;
-            Buffs = new List<Buff>();
+            Init();
+
+            
 
             map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
             hlMap = GameObject.Find("HighlightTilemap").GetComponent<Tilemap>();
             TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
 
             TilePos = map.WorldToCell(transform.position);
-            //map.GetTile<CustomTile>(map.WorldToCell(transform.position)).updateCharNum(1, gameObject);
-            //map.GetTile<CustomTile>(map.WorldToCell(transform.position)).getTilePos();
-
-            Hp = Cb.hp;
-            Mp = 0;
-            BreakDown = false;
-
-            Debug.Log(this+"'s pos = "+map.WorldToCell(transform.position));
         }
+
+        private void Start()
+        {
+            GameObject o = GameObject.Find("RayTest");
+
+            if (!o)
+            {
+                Debug.LogError("Can not find GameObject named RayTest");
+            }
+
+            ray = o.GetComponent<RayTest>();
+
+            if (!ray)
+            {
+                Debug.LogError("Can not find component, RayTest at RayTest");
+            }
+        }
+
 
         void Update()
         {
@@ -444,8 +497,65 @@ namespace KWY
                 
             }
         }
+
         #endregion
 
+        #region IObserver Methods
 
+        public void AddObserver(IObserver<Character> o)
+        {
+            if (observers.IndexOf(o) < 0)
+            {
+                observers.Add(o);
+            }
+            else
+            {
+                Debug.LogWarning($"The observer already exists in list: {o}");
+            }
+        }
+
+        public void RemoveObserver(IObserver<Character> o)
+        {
+            int idx = observers.IndexOf(o);
+            if (idx >= 0)
+            {
+                observers.RemoveAt(idx); // O(n)
+            }
+            else
+            {
+                Debug.LogError($"Can not remove the observer; It does not exist in list: {o}");
+            }
+        }
+
+        public void NotifyObservers()
+        {
+            foreach (IObserver<Character> o in observers)
+            {
+                o.OnNotify(this);
+            }
+        }
+
+        public void RemoveAllObservers()
+        {
+            observers.Clear();
+        }
+        #endregion
+
+        public void OnPhotonInstantiate(PhotonMessageInfo info)
+        {
+            Debug.Log(info.photonView.GetInstanceID());
+            Debug.Log(info.photonView);
+
+            Debug.Log(PhotonNetwork.GetPhotonView(GetComponent<PhotonView>().ViewID).gameObject.GetComponent<Character>());
+
+            
+        }
+
+        [PunRPC]
+        public void TestRPC()
+        {
+            Debug.Log(Pc); // null
+            Debug.Log(this);
+        }
     }
 }

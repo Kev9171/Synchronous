@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace KWY
 {
-    [CreateAssetMenu(fileName = "MainGameLogicData", menuName = "MainGameLogicData")]
-    public class LogicData : ScriptableObject
+    [CreateAssetMenu(fileName = "OLogicData", menuName = "OLogicData")]
+    public class SLogicData : ScriptableObject
     {
         public int playerInitialMp;
         public int playerMPIncrement;
@@ -15,5 +15,9 @@ namespace KWY
         public float actionLogShowingTime;
 
         public float simulationIntervalSeconds;
+
+
+        public int characterScoreMultiplier;
+        public int playerSkillCountScoreMultiplier;
     }
 }

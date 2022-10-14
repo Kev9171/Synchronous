@@ -18,66 +18,78 @@ namespace KWY
         [SerializeField]
         private GameObject rightActionPiecePrefab;
 
+        [SerializeField]
+        MainGameData data;
 
 
-        public void ShowMoveLog(int charaCid)
+        /// <summary>
+        /// Called only by Master-Client
+        /// </summary>
+        /// <param name="id"></param>
+        public void ShowMoveLog(int id)
         {
-            PhotonView.Get(this).RPC("ShowMoveLogRPC", RpcTarget.Others, charaCid);
+            PhotonView.Get(this).RPC("ShowMoveLogRPC", RpcTarget.Others, id);
 
-            int t = charaCid;
-            if (charaCid > 100)
-            {
-                charaCid -= 100;
-            }
-
-            Sprite icon = CharaManager.GetData((CID)charaCid).icon;
+            Sprite icon = data.PCharacters[id].Chara.Cb.icon;
             string name = "Move";
-            StartCoroutine(ShowActionLog(icon, name, t < 100));
 
+            if (PhotonNetwork.IsMasterClient)
+            {
+                StartCoroutine(ShowActionLog(icon, name, data.IsMyCharacter[id]));
+            }
+            else
+            {
+                Debug.LogError("It can not be called on client");
+            }
         }
 
-        public void ShowSkillLog(int charaCid, SID sid)
+        public void ShowSkillLog(int id, SID sid)
         {
-            PhotonView.Get(this).RPC("ShowSkillLogRPC", RpcTarget.Others, charaCid, sid);
+            PhotonView.Get(this).RPC("ShowSkillLogRPC", RpcTarget.Others, id, sid);
 
-            int t = charaCid;
-            if (charaCid > 100)
-            {
-                charaCid -= 100;
-            }
-
-            Sprite icon = CharaManager.GetData((CID)charaCid).icon;
+            Sprite icon = data.PCharacters[id].Chara.Cb.icon;
             string name = SkillManager.GetData(sid).name;
-            StartCoroutine(ShowActionLog(icon, name, t < 100));
+
+            if (PhotonNetwork.IsMasterClient)
+            {
+                StartCoroutine(ShowActionLog(icon, name, data.IsMyCharacter[id]));
+            }
+            else
+            {
+                Debug.LogError("It can not be called on client");
+            }
         }
 
         [PunRPC]
-        public void ShowMoveLogRPC(int charaCid)
+        public void ShowMoveLogRPC(int id)
         {
-            int t = charaCid;
-            if (charaCid > 100)
-            {
-                charaCid -= 100;
-            }
-
-            Sprite icon = CharaManager.GetData((CID)charaCid).icon;
+            Sprite icon = data.PCharacters[id].Chara.Cb.icon;
             string name = "Move";
-            StartCoroutine(ShowActionLog(icon, name, t < 100));
 
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                StartCoroutine(ShowActionLog(icon, name, !data.IsMyCharacter[id]));
+            }
+            else
+            {
+                Debug.LogError("It can not be called on master-client");
+            }
         }
 
         [PunRPC]
-        public void ShowSkillLogRPC(int charaCid, SID sid)
+        public void ShowSkillLogRPC(int id, SID sid)
         {
-            int t = charaCid;
-            if (charaCid > 100)
-            {
-                charaCid -= 100;
-            }
-
-            Sprite icon = CharaManager.GetData((CID)charaCid).icon;
+            Sprite icon = data.PCharacters[id].Chara.Cb.icon;
             string name = SkillManager.GetData(sid).name;
-            StartCoroutine(ShowActionLog(icon, name, t < 100));
+
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                StartCoroutine(ShowActionLog(icon, name, !data.IsMyCharacter[id]));
+            }
+            else
+            {
+                Debug.LogError("It can not be called on master-client");
+            }
         }
 
         IEnumerator ShowActionLog(Sprite icon, string name, bool left)

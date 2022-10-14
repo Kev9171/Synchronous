@@ -155,7 +155,7 @@ namespace KWY
 
                     ch = getInitialChar(map.CellToWorld(position));
                     if (ch.Count > 0)
-                        Debug.Log("at position: " + position);
+                        //Debug.Log("at position: " + position);
                     Characters.Add(position, ch);
                     
                     //CustomTile tile = map.GetTile(position) as CustomTile;
@@ -187,12 +187,12 @@ namespace KWY
                     if (k.gameObject.tag == "Friendly" || k.gameObject.tag == "Enemy")
                     {
                         ch.Add(k.gameObject);
-                        Debug.Log(k.gameObject.name);
+                        //Debug.Log(k.gameObject.name);
                         count++;
                     }
                     //Debug.Log(k.gameObject.name);
                 }
-                Debug.Log("캐릭터 수: " + count);
+                //Debug.Log("캐릭터 수: " + count);
                 if (count > 0)
                 {
                     //Debug.Log(gameObject.name);

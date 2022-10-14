@@ -77,4 +77,24 @@ namespace KWY
         WEB_REQUEST_ERROR = 103,
         CANNOT_FIND_FILE = 201,
     }
+
+    public enum Team : short
+    {
+        A = 0,
+        B = 1,
+    }
+    public enum TICK_RESULT
+    {
+        KEEP_GOING = 0,
+        DRAW = 1,
+        MASTER_WIN = 2,
+        CLIENT_WIN = 3
+    };
+
+    public enum WINLOSE
+    {
+        WIN = 1,
+        LOSE = 2,
+        DRAW = 3
+    }
 }

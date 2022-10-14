@@ -133,7 +133,7 @@ namespace KWY
                 RaycastHit2D hit = hits[i];
                 hit.transform.GetComponent<SpriteRenderer>().color = Color.red;
 
-                if(hit.transform.gameObject.layer == 6)
+                if (hit.transform.gameObject.layer == 6)
                 {
                     if (sb.isDamage)
                     {
@@ -146,7 +146,7 @@ namespace KWY
                     List<GameObject> list = tilemapcontrol.getCharList(v);
                     for (int j = 0; j < list.Count; j++)
                     {
-                        if(list[j].transform.gameObject.layer == 6)
+                        if (list[j].transform.gameObject.layer == 6)
                         {
                             if (sb.isDamage)
                             {
