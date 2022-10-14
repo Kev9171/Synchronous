@@ -318,6 +318,19 @@ MonoBehaviour:
   - {fileID: 1445382690674112773, guid: 2460382867b38be4199fa99d54ae47e4, type: 3}
   - {fileID: 1326943966758870567, guid: 321733babb0a6974f87b9f2df13e5837, type: 3}
   - {fileID: 8399122764979910749, guid: 5415c2857bf979c4da96dd0893ed8283, type: 3}
+  unDeployableList: []
+  charArray:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  deployPositionList: []
 --- !u!1 &776724092
 GameObject:
   m_ObjectHideFlags: 0
