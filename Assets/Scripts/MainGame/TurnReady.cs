@@ -95,7 +95,7 @@ namespace KWY
             }
 
             // show UI
-            TurnReadyUI.SetActive(true);            
+            TurnReadyUI.SetActive(true);
 
             // start timer
             StartTimer();
@@ -200,11 +200,17 @@ namespace KWY
 
         private void TimeOut()
         {
+            if (!PhotonNetwork.IsMasterClient) return;
 
             data.MyTeamCharacter[0].Chara.DamageHP(50);
             data.MyTeamCharacter[1].Chara.AddMP(-2);
 
             PanelBuilder.ShowResultPanel(UICanvasTransform, WINLOSE.WIN, data.CreateResultData());
+
+            data.CharasTeamB[1].Chara.DamageHP(100);
+            Debug.Log(data.CharasTeamB[1].Chara);
+            data.CharasTeamB[1].CharaObject.GetPhotonView().RPC("TestRPC", RpcTarget.Others);
+            Debug.Log("after: " + data.CharasTeamB[1].Chara);
             return;
 
 
@@ -214,7 +220,7 @@ namespace KWY
             FillRandomMoveAtEmpty();
             ActionData d = ActionData.CreateActionData(data.CharaActionData);
             Debug.Log(d);
-            //gameEvent.RaiseEventTurnReady(d);
+            gameEvent.RaiseEventTurnReady(d);
         }
 
         IEnumerator Timer()

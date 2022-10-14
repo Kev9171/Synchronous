@@ -12,10 +12,10 @@ namespace KWY
 
         public int PlayerSkillCount { get; private set; }
 
-        public ResultData(List<PlayableCharacter> myTeamCharacters, int playerSkillCount)
+        public ResultData(List<PlayableCharacter> myTeamCharacters, Player player)
         {
             MyTeamCharacters = myTeamCharacters;
-            PlayerSkillCount = playerSkillCount;
+            PlayerSkillCount = player.SkillCount;
         }
 
         public void SetData(List<PlayableCharacter> myTeamCharacters, int playerSkillCount)
