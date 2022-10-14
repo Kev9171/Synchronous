@@ -10,8 +10,6 @@ using TMPro;
 using Photon.Pun;
 using Photon.Realtime;
 
-using PhotonPlayer = Photon.Realtime.Player;
-
 namespace KWY
 {
     public class GameLobby : MonoBehaviour
@@ -98,7 +96,7 @@ namespace KWY
         // 플레이어에 custom property로 icon 가져올 수 있도록? -> 로그인 서버에서 처리?
         // 일단 null 값
 
-        public void SetEnteredPlayer(PhotonPlayer player)
+        public void SetEnteredPlayer(Player player)
         {
             RightUserPanel.GetComponent<UserProfilePanel>().SetData(null, player.NickName);
             RightUserPanel.SetActive(true);
@@ -188,7 +186,7 @@ namespace KWY
             // join 한 경우 이미 들어와있는 플레이어 정보 로드
             if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
             {
-                foreach (PhotonPlayer p in PhotonNetwork.CurrentRoom.Players.Values)
+                foreach (Player p in PhotonNetwork.CurrentRoom.Players.Values)
                 {
                     if (p.UserId != PhotonNetwork.AuthValues.UserId)
                     {

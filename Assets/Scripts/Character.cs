@@ -12,41 +12,17 @@ namespace KWY
         [SerializeField]
         CharacterBase _characterBase;
 
-        private List<IObserver<Character>> observers = new List<IObserver<Character>>();
-
-        public PlayableCharacter Pc
-        {
-            get;
-            private set;
-        } = null;
-
-        public List<IObserver<Character>> Observers
-        {
-            get;
-            private set;
-        } = new List<IObserver<Character>>();
-
-        public List<Buff> Buffs
-        {
-            get;
-            private set;
-        } = new List<Buff>();
         public CharacterBase Cb { get; private set; }
+        public List<Buff> Buffs { get; private set; }
         public float Hp { get; private set; }
         public float Mp { get; private set; }
-        public float MaxHp { get; private set; }
-        public float MaxMp { get; private set; }
         public bool BreakDown { get; private set; }
-        public float Atk { get; private set; }
-        public float Def { get; private set; }
-
-
-
-
         public Vector3Int TempTilePos { get; private set; }
         public Vector3Int SelTilePos { get; private set; }
 
         public Vector3 worldPos { get; private set; }
+
+        public static readonly float MaxMp = 10;
 
         [SerializeField] private float movementSpeed;
         private Vector2 destination;
@@ -57,31 +33,26 @@ namespace KWY
 
         private bool nowMove = false;
 
-<<<<<<< HEAD
         private SkillSpawner skillSpawner;
         [SerializeField] private RayTest ray;
         public Character(CharacterBase cb)
-=======
-        public void SetData(PlayableCharacter pc)
->>>>>>> kwy
         {
-            Pc = pc;
+            Cb = cb;
+            Buffs = new List<Buff>();
+            Hp = cb.hp;
+            Mp = 0;
+            BreakDown = false;
         }
 
-        private void Init()
+        public Character(CharacterBase cb, Vector3Int pos)
         {
-            Cb = _characterBase;
-
-            Hp = Cb.hp;
-            Mp = 0; // TODO
-
+            Cb = cb;
+            Buffs = new List<Buff>();
+            Hp = cb.hp;
+            Mp = 0;
             BreakDown = false;
-
-            MaxHp = Cb.hp;
-            MaxMp = 10;
-
-            Atk = Cb.atk;
-            Def = 1; // TODO
+            TempTilePos = pos;
+            Debug.Log("position: "+pos);
         }
 
         public void DamageHP(float damage)
@@ -99,26 +70,19 @@ namespace KWY
             {
                 Debug.LogFormat("{0} is damaged {1}; Now hp: {2}", Cb.name, damage, Hp);
             }
-
-            NotifyObservers();
         }
 
         public void AddMP(float amount)
         {
             Mp += amount;
             if (Mp > MaxMp) Mp = MaxMp;
-            else if (Mp < 0) Mp = 0;
 
             Debug.LogFormat("{0}'s mp is added {1}; Now mp: {2}", Cb.name, amount, Mp);
-
-            NotifyObservers();
         }
 
         public void AddBuff(BuffBase bb, int turn)
         {
             Buffs.Add(new Buff(bb, turn));
-
-            NotifyObservers();
         }
 
         public void ReduceBuffTurn(int turn)
@@ -132,14 +96,12 @@ namespace KWY
                     Debug.LogFormat("The buff {0} of {1} is removed", b.bb.name, Cb.name);
                 }
             }
-
-            NotifyObservers();
         }
 
         public void ClearBuff()
         {
             Buffs.Clear();
-            NotifyObservers();
+            Debug.LogFormat("All buffs of {0} is removed", Cb.name);
         }
 
         public void SetTilePos(Vector3Int pos)
@@ -161,14 +123,7 @@ namespace KWY
                 t += b.ToString() + ", ";
             }
             t += "]";
-
-            string tt = "[";
-            foreach(IObserver<Character> o in observers)
-            {
-                tt += o.GetType().ToString();
-            }
-            tt += "]";
-            return string.Format("CID: {0}, HP: {1}, MP: {2}, Down?: {3}, Buffs: {4}, Observers: {5}", Cb.cid, Hp, Mp, BreakDown, t, tt);
+            return string.Format("CID: {0}, HP: {1}, MP: {2}, Down?: {3}, Buffs: {4}", Cb.cid, Hp, Mp, BreakDown, t);
         }
 
         #region IPunObservable implementation
@@ -351,9 +306,8 @@ namespace KWY
         #region MonoBehaviour CallBacks
         private void Awake()
         {
-            Init();
-
-            
+            Cb = _characterBase;
+            Buffs = new List<Buff>();
 
             map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
             //Debug.Log(map.name + " found.");
@@ -362,7 +316,6 @@ namespace KWY
             TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
 
             TilePos = map.WorldToCell(transform.position);
-<<<<<<< HEAD
             //map.GetTile<CustomTile>(map.WorldToCell(transform.position)).updateCharNum(1, gameObject);
             //map.GetTile<CustomTile>(map.WorldToCell(transform.position)).getTilePos();
 
@@ -371,10 +324,7 @@ namespace KWY
             BreakDown = false;
 
             Debug.Log(this+"'s pos = "+map.WorldToCell(transform.position));
-=======
->>>>>>> kwy
         }
-
 
         void Update()
         {
@@ -391,46 +341,6 @@ namespace KWY
         }
         #endregion
 
-        #region IObserver Methods
-
-        public void AddObserver(IObserver<Character> o)
-        {
-            if (observers.IndexOf(o) < 0)
-            {
-                observers.Add(o);
-            }
-            else
-            {
-                Debug.LogWarning($"The observer already exists in list: {o}");
-            }
-        }
-
-        public void RemoveObserver(IObserver<Character> o)
-        {
-            int idx = observers.IndexOf(o);
-            if (idx >= 0)
-            {
-                observers.RemoveAt(idx); // O(n)
-            }
-            else
-            {
-                Debug.LogError($"Can not remove the observer; It does not exist in list: {o}");
-            }
-        }
-
-        public void NotifyObservers()
-        {
-            foreach (IObserver<Character> o in observers)
-            {
-                o.OnNotify(this);
-            }
-        }
-
-        public void RemoveAllObservers()
-        {
-            observers.Clear();
-        }
-        #endregion
 
     }
 }

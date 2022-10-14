@@ -11,6 +11,8 @@ namespace KWY
 {
     public class TurnReady : MonoBehaviour
     {
+        #region Canvas Elements
+
         [SerializeField]
         private GameObject TurnReadyUI;
 
@@ -19,13 +21,25 @@ namespace KWY
 
         [SerializeField]
         private Button readyBtn;
+        #endregion
+
+        #region Private Fields
 
         [Tooltip("Game data about player and characters")]
         [SerializeField]
         private MainGameData data;
 
         [SerializeField]
-        CharacterUIHandler characterUIHandler;
+        private ManageShowingSkills selCharaPanelManager;
+
+        [SerializeField]
+        private SelSkillPanel[] selSkillPanels = new SelSkillPanel[3];
+
+        [SerializeField]
+        private CharacterPanel[] characterPanels = new CharacterPanel[3];
+
+        [SerializeField]
+        private PlayerMPPanel playerMpPanel;
 
         [SerializeField]
         private MainGameEvent gameEvent;
@@ -33,69 +47,79 @@ namespace KWY
         [SerializeField]
         private CharacterControl characterControl;
 
-        [SerializeField]
-        Transform UICanvasTransform;
+        private Dictionary<CID, CharacterPanel> charaPanels = new Dictionary<CID, CharacterPanel>();
 
         private float time;
         private float timeLimit;
 
+        #endregion
 
         #region Public Methods
 
         public void Init()
         {
-            timeLimit = LogicData.Instance.TimeLimit;
+            timeLimit = (Resources.Load("MainGameLogicData", typeof(LogicData)) as LogicData).timeLimit;
+            ResetUI();
 
-            // 자신의 캐릭터 스킬 선택 패널에 배치
-            if (PhotonNetwork.IsMasterClient)
+            int idx = 0;
+            foreach (Character c in data.Characters)
             {
-                characterUIHandler.InitData(data.CharasTeamA);
-            }
-            else
-            {
-                characterUIHandler.InitData(data.CharasTeamB);
+                selSkillPanels[idx++].SetData(c.Cb.name, CharaManager.GetData(c.Cb.cid).skills);
             }
 
-            // 자신의 캐릭터를 직접 클릭하여 선택 가능하도록 collider 추가
-            foreach (PlayableCharacter c in data.MyTeamCharacter)
+            idx = 0;
+            foreach (Character c in data.Characters)
             {
-                c.Chara.GetComponent<Collider2D>().enabled = true;
+                characterPanels[idx].SetData(c.Cb, c.Buffs);
+                charaPanels.Add(c.Cb.cid, characterPanels[idx]);
+                idx++;
             }
 
-            // readybtn에 onclick 추가
-            readyBtn.onClick.AddListener(OnClickTurnReady);
+            data.Characters[0].GetComponent<Collider2D>().enabled = true;
+            data.Characters[1].GetComponent<Collider2D>().enabled = true;
+            data.Characters[2].GetComponent<Collider2D>().enabled = true;
+        }
+
+        public void UpdateUI()
+        {
+            // 각 캐릭터 정보에 따라 캐릭터 정보 표시 UI 업데이트
+            int idx = 0;
+            foreach (Character c in data.Characters)
+            {
+                characterPanels[idx++].UpdateUI(c);
+            }
+
+            // Update Mp Panel
+            playerMpPanel.UpdateUI();
+        }
+
+        public void ResetUI()
+        {
+            // 스킬 선택 UI 초기화
+            selCharaPanelManager.ShowSkillPanel(-1);
+
+            // 확대된 캐릭터 원래 크기로 초기화
+            foreach (CID c in data.CharacterObjects.Keys)
+            {
+                data.CharacterObjects[c].transform.localScale = new Vector3(0.7f, 0.7f, 1);
+            }
+
+            // 하이라이트를 위한 임시 좌표 초기화
+            data.Characters[0].ResetTempPos();
+            data.Characters[1].ResetTempPos();
+            data.Characters[2].ResetTempPos();
+
+            readyBtn.GetComponent<TurnReadyBtn>().ResetReady();
         }
 
         public void StartTurnReadyState()
         {
-            // 스킬 선택 패널 전부 초기화
-            characterUIHandler.HideAllSkillSelPanel();
+            // show UI
+            TurnReadyUI.SetActive(true);
 
             // 캐릭터 선택 가능하도록
-            characterUIHandler.CharaPanelSelectable = true;
+            selCharaPanelManager.SetSeletable(true);
             characterControl.StartControl();
-
-            // 확대된 캐릭터 원래 크기로 초기화 및 임시 좌표 초기화
-            foreach (PlayableCharacter c in data.MyTeamCharacter)
-            {
-                c.Chara.ResetTempPos();
-                c.CharaObject.transform.localScale = new Vector3(0.7f, 0.7f, 1);
-            }
-
-            // 버튼 기능 초기화
-            readyBtn.GetComponent<TurnReadyBtn>().ResetReady();
-
-            // 플레이어 mp 추가
-            data.MyPlayer.AddMp(LogicData.Instance.PlayerMPIncrement);
-
-            // 캐릭터 mp 추가
-            foreach(PlayableCharacter pc in data.MyTeamCharacter)
-            {
-                pc.Chara.AddMP(LogicData.Instance.CharacterMpIncrement);
-            }
-
-            // show UI
-            TurnReadyUI.SetActive(true);            
 
             // start timer
             StartTimer();
@@ -103,16 +127,9 @@ namespace KWY
 
         public void EndTurnReadyState()
         {
-            // UI 숨기기
             TurnReadyUI.SetActive(false);
-
-            // 타이머 리셋
             ResetTimer();
-
-            // 캐릭터 선택 못하도록
-            characterUIHandler.CharaPanelSelectable = false;
-
-            // 선택된 캐릭터 빼기
+            selCharaPanelManager.SetSeletable(false);
             characterControl.SetSelClear();
         }
 
@@ -120,25 +137,23 @@ namespace KWY
         {
             StopTimer();
 
-            // 캐릭터 선택 막고
-            characterUIHandler.CharaPanelSelectable = false;
-
-            // 캐릭터 패널 숨기기
-            characterUIHandler.HideAllSkillSelPanel();
+            // 캐릭터 선택 못하게 + 스킬 선택 패널 안보이게
+            selCharaPanelManager.SetSeletable(false);
 
             FillRandomMoveAtEmpty();
-
-            // event 전송
             gameEvent.RaiseEventTurnReady(ActionData.CreateActionData(data.CharaActionData));
+
+            // for test
+            // 테스트로 masterclient 가 승리가 되도록
+            /*if (PhotonNetwork.IsMasterClient)
+                gameEvent.RaiseEventGameEnd();*/
         }
 
-        public void ShowCharacterActionPanel(int id)
+        public void ShowCharacterActionPanel(CID cid)
         {
-            for (int i = 0; i < data.CharaActionData[id].ActionCount; i++)
+            for (int i = 0; i < data.CharaActionData[cid].Count; i++)
             {
-                // TODO
-
-                /*object[] t = (object[])data.CharaActionData[cid].Actions[i];
+                object[] t = (object[])data.CharaActionData[cid].Actions[i];
                 if (ActionType.Move == (ActionType)(t[0]))
                 {
                     charaPanels[cid].SetSelActionImg(i, MoveManager.MoveData.icon);
@@ -146,7 +161,7 @@ namespace KWY
                 else
                 {
                     charaPanels[cid].SetSelActionImg(i, SkillManager.GetData((SID)(t[1])).icon);
-                }*/
+                }
             }
         }
 
@@ -157,12 +172,12 @@ namespace KWY
         private void FillRandomMoveAtEmpty()
         {
             // 3개의 액션이 모두 정해지지 않은 캐릭터만 이동으로 대체
-            foreach (int id in data.CharaActionData.Keys)
+            foreach (CID cid in data.CharaActionData.Keys)
             {
                 // 다 정해지지 않았을 경우 move로 추가
-                if (data.CharaActionData[id].ActionCount != 3)
+                if (data.CharaActionData[cid].Count != 3)
                 {
-                    data.CharaActionData[id].ClearActions();
+                    data.CharaActionData[cid].ClearActions();
                     for (int i = 0; i < 3; i++)
                     {
                         int dx = 0, dy = 0;
@@ -172,7 +187,7 @@ namespace KWY
                             dy = Random.Range(-1, 2);
                         }
 
-                        data.CharaActionData[id].AddMoveAction(ActionType.Move, dx, dy, true, 0, 0);
+                        data.CharaActionData[cid].AddMoveAction(ActionType.Move, dx, dy, true);
                     }
                 }
             }
@@ -200,21 +215,11 @@ namespace KWY
 
         private void TimeOut()
         {
-
-            data.MyTeamCharacter[0].Chara.DamageHP(50);
-            data.MyTeamCharacter[1].Chara.AddMP(-2);
-
-            PanelBuilder.ShowResultPanel(UICanvasTransform, WINLOSE.WIN, data.CreateResultData());
-            return;
-
-
             // 캐릭터 선택 못하게 + 스킬 선택 패널 안보이게
-            characterUIHandler.CharaPanelSelectable = false;
+            selCharaPanelManager.SetSeletable(false);
 
             FillRandomMoveAtEmpty();
-            ActionData d = ActionData.CreateActionData(data.CharaActionData);
-            Debug.Log(d);
-            //gameEvent.RaiseEventTurnReady(d);
+            gameEvent.RaiseEventTurnReady(ActionData.CreateActionData(data.CharaActionData));
         }
 
         IEnumerator Timer()
@@ -243,6 +248,11 @@ namespace KWY
         #region MonoBehaviour CallBacks
         private void Awake()
         {
+            if (data == null)
+            {
+                Debug.LogError("Can not find MainGameData in this object");
+                return;
+            }
         }
         #endregion
     }

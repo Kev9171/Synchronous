@@ -9,8 +9,6 @@ namespace KWY
     {
         Dictionary<int, object[]> _data;
 
-        //Dictionary<int, object[]> _data;
-
         public Dictionary<int, object[]> Data { get { return _data; } }
 
         public ActionData()
@@ -24,40 +22,65 @@ namespace KWY
             _data = data;
         }
 
-        public static ActionData CreateActionData(Dictionary<int, CharacterActionData> data)
+        public static ActionData CreateActionData(Dictionary<CID, CharacterActionData> data)
         {
             ActionData ad = new ActionData();
-            
 
-            foreach(int id in data.Keys)
+            foreach(CID c in data.Keys)
             {
-                int idx = 0;
-                object[] value = new object[data[id].ActionCount];
                 int time = 0;
-                foreach (object[] action in data[id].Actions)
+                int cid = (PhotonNetwork.IsMasterClient) ? (int)c : (int)c + 100;
+                foreach (object[] action in data[c].Actions)
                 {
-                    
-
                     ActionType type = (ActionType)action[0];
                     object[] timeData;
 
                     // time 구하기
                     if (type == ActionType.Skill)
                     {
+                        
                         time += SkillManager.GetData((SID)action[1]).triggerTime;
 
-                        // 이제 길이는 6으로 고정
-                        timeData = new object[] { time, type, (SID)action[1], (SkillDicection)action[2], action[3], action[4] };
+                        if (action.Length >= 4)
+                        {
+                            timeData = new object[] { cid, type, (SID)action[1], (SkillDicection)action[2], action[3]};
+                        }
+                        else
+                        {
+                            timeData = new object[] { cid, type, (SID)action[1], (SkillDicection)action[2] };
+                        }
                     }
                     // move.triggerTime = 0
                     else
                     {
-                        timeData = new object[] { time, type, (int)action[1], (int)action[2], action[3], action[4] };
+                        if (action.Length >= 4)
+                        {
+                            timeData = new object[] { cid, type, (int)action[1], (int)action[2], action[3] };
+                        }
+                        else
+                        {
+                            timeData = new object[] { cid, type, (int)action[1], (int)action[2] };
+                        }
                     }
 
-                    value[idx++] = timeData;
+                    // 이미 해당 time에 데이터가 있을 경우 기존 데이터에 하나 추가
+                    if (ad.Data.ContainsKey(time))
+                    {
+                        object[] tData = new object[ad.Data[time].Length+1];
+                        int idx = 0;
+                        foreach(object[] t in ad.Data[time])
+                        {
+                            tData[idx++] = t;
+                        }
+                        tData[idx] = timeData;
 
-                    // time shift
+                        ad.Data[time] = tData;
+                    }
+                    else
+                    {
+                        ad.Data.Add(time, new object[] { timeData });
+                    }
+
                     if (type == ActionType.Skill)
                     {
                         time += SkillManager.GetData((SID)action[1]).castingTime;
@@ -67,8 +90,6 @@ namespace KWY
                         time += 2; // Move 경우
                     }
                 }
-
-                ad.Data.Add(id, value);
             }
 
             return ad;
@@ -78,22 +99,13 @@ namespace KWY
         {
             string t = "[";
 
-            foreach(int id in _data.Keys)
+            foreach(int ti in _data.Keys)
             {
-                t += $"id: {id} [";
-                foreach(object[] o in _data[id])
+                t += string.Format("t: {0}", ti);
+                foreach(object[] d in _data[ti])
                 {
-                    if ((ActionType)(o[1]) == ActionType.Move)
-                    {
-                        t += $"time: {(int)o[0]}, type: MOVE, dx: {o[2]}, dy: {o[3]}, ex0: {o[4]}, ex1: {o[5]} / ";
-                    }
-                    else
-                    {
-                        t += $"time: {(int)o[0]}, type: SKILL, sid: {o[2]}, skill dir: {o[3]}, s_x: {o[4]}, s_y: {o[5]} / ";
-                    }
-
+                    t += string.Format("<{0}, {1}, {2}, {3}> / ", (int) d[0], (ActionType) d[1], d[2], d[3]);
                 }
-                t += "]";
             }
             t += "]";
 

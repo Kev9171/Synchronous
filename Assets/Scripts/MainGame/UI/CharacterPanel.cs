@@ -2,7 +2,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using System.Collections;
 
 namespace KWY
 {
@@ -25,14 +24,10 @@ namespace KWY
         [SerializeField]
         Slider hpBar;
         [SerializeField]
-        TMP_Text hpMaxLabel;
-        [SerializeField]
         TMP_Text hpLabel;
 
         [SerializeField]
         Slider mpBar;
-        [SerializeField]
-        TMP_Text mpMaxLabel;
         [SerializeField]
         TMP_Text mpLabel;
 
@@ -54,10 +49,9 @@ namespace KWY
 
         #region Private Fields
 
+        private CharacterBase cb;
         private List<GameObject> buffPanelLists = new List<GameObject>();
-        private Character chara;
-
-        public bool Selectable = false;
+        private bool selectable = true;
 
         [SerializeField]
         private Color breakDownColor = new Color(0.66f, 0, 0, 0.7f);
@@ -70,28 +64,26 @@ namespace KWY
         /// 처음 데이터를 넣는 함수; 한번만 호출 할 수 있도록
         /// </summary>
         /// <param name="cb">Chacter Base Data</param>
-        public void Init(Character chararacter)
+        public void SetData(CharacterBase cb, List<Buff> buffList)
         {
-            chara = chararacter;
+            nameLabel.text = cb.characterName;
 
-            nameLabel.text = chara.Cb.characterName;
+            charaImg.sprite = cb.icon;
 
-            charaImg.sprite = chara.Cb.icon;
+            LoadBuffs(buffList);
 
-            LoadBuffs();
+            this.cb = cb;
 
-            // set initial hp and mp
-            hpMaxLabel.text = chara.MaxHp.ToString();
-            mpMaxLabel.text = chara.MaxMp.ToString();
-
-            hpLabel.text = chara.Hp.ToString();
-            mpLabel.text = chara.Mp.ToString();
+            UpdateHP(cb.hp);
+            UpdateMP(0);
         }
 
         public void UpdateUI(Character c)
         {
+            Debug.Log(c);
             if (c.BreakDown)
             {
+                selectable = false;
                 charaImg.color = breakDownColor;
                 ClearBuffs();
             }
@@ -100,26 +92,43 @@ namespace KWY
             {
                 UpdateHP(c.Hp);
                 UpdateMP(c.Mp);
+
+                LoadBuffs(c.Buffs);
             }
+
+            SetSelActionImg(-1, null);
         }
 
         public void UpdateHP(float hp)
         {
-            float now = chara.Hp;
-            float v = hpBar.value * chara.MaxHp;
-            StartCoroutine(IEUpdateHp(now - v));
+            hpLabel.text = hp.ToString() + "/" + cb.hp.ToString();
+            hpBar.value = hp / cb.hp;
         }
 
         public void UpdateMP(float mp)
         {
-            float now = chara.Mp;
-            float v = mpBar.value * chara.MaxMp;
-            StartCoroutine(IEUpdateMp(now - v));
+            mpLabel.text = mp.ToString() + "/10";
+            mpBar.value = mp / 10;
         }
 
-        public void UpdateBuffs()
+        public void AddBuff(BuffBase bb, int nTurn)
         {
-            LoadBuffs();
+            GameObject bPanel = Instantiate(buffPanelPrefab, buffPanel.transform);
+            bPanel.GetComponent<BuffPanel>().SetData(bb, nTurn);
+            buffPanelLists.Add(bPanel);
+        }
+
+        public void ReduceTurn(int nTurn)
+        {
+            foreach(GameObject buff in buffPanelLists)
+            {
+                // test 필요 loop 중에 요소 삭제하고 있어서 어떻게 되는지 모름
+                if (!buff.GetComponent<BuffPanel>().ReduceBuffTurnText(nTurn))
+                {
+                    buffPanelLists.Remove(buff);
+                    Destroy(buff);
+                }
+            }
         }
 
         /// <summary>
@@ -128,7 +137,7 @@ namespace KWY
         public void CharaInfoBtnOnClick()
         {
             GameObject canvas = GameObject.Find("UICanvas");
-            PanelBuilder.ShowCharacterInfoPanel(canvas.transform, chara.Cb);
+            PanelBuilder.ShowCharacterInfoPanel(canvas.transform, cb);
         }
 
         public void SetSelActionImg(int nth, Sprite icon)
@@ -152,20 +161,14 @@ namespace KWY
 
         public void OnClickShowSkillPanel()
         {
-            if (!Selectable)
-            {
-                Debug.Log("It is not selectable now");
-                return;
-            }
-
-            if (chara.BreakDown)
+            if (!selectable)
             {
                 Debug.Log("This character is break down. You can not choose");
                 return;
             }
 
             // 캐릭터 선택
-            charaControl.SetSelChara(chara);
+            charaControl.SetSelChara(cb.cid);
         }
 
         /// <summary>
@@ -175,7 +178,6 @@ namespace KWY
         /// <param name="buffInfoPanel">BuffInfoPanel</param>
         public void LoadInfoPanel(GameObject characterInfoPanel, GameObject buffInfoPanel)
         {
-            Debug.Log("LoadInfoPanel");
             //this.characterInfoPanel = characterInfoPanel;
             //this.buffInfoPanel = buffInfoPanel;
         }
@@ -194,55 +196,17 @@ namespace KWY
             buffPanelLists.Clear();
         }
 
-        private void LoadBuffs()
+        private void LoadBuffs(List<Buff> buffs)
         {
             ClearBuffs();
 
-            foreach (Buff bf in chara.Buffs)
+            foreach (Buff bf in buffs)
             {
+                //ReduceTurn(10); // temp
                 AddBuff(bf.bb, bf.turn);
             }
         }
 
-        private void AddBuff(BuffBase bb, int nTurn)
-        {
-            GameObject bPanel = Instantiate(buffPanelPrefab, buffPanel.transform);
-            bPanel.GetComponent<BuffPanel>().SetData(bb, nTurn);
-            buffPanelLists.Add(bPanel);
-        }
-
-        #endregion
-
-        #region IEnumerator
-
-        IEnumerator IEUpdateHp(float dv)
-        {
-            // TODO
-            // 보안 필요
-            // 10 tick (2000ms동안 업데이트)
-
-            // tick 당 업데이트할 값
-            float v = (dv / chara.MaxHp) / 10f;
-            for (float ft = 1f; ft >= 0; ft -= 0.1f)
-            {
-                hpBar.value += v;
-                hpLabel.text = Mathf.Floor(hpBar.value * chara.MaxHp).ToString();
-                yield return new WaitForSeconds(0.1f);
-            }
-        }
-
-        IEnumerator IEUpdateMp(float dv)
-        {
-            // TODO
-            float v = (dv / chara.MaxMp) / 10f;
-            for (float ft = 1f; ft >= 0; ft -= 0.1f)
-            {
-                mpBar.value += v;
-                mpLabel.text = Mathf.Floor(mpBar.value * chara.MaxMp).ToString();
-                yield return new WaitForSeconds(0.1f);
-            }
-        }
-
-        #endregion
+        #endregion        
     }
 }

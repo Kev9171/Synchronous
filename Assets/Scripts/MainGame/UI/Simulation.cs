@@ -7,8 +7,13 @@ namespace KWY
 {
     public class Simulation : MonoBehaviour
     {
+        #region Canvas Elements
+
         [SerializeField] GameObject simulCanvas;
 
+        #endregion
+
+        #region Private Fields
 
         [SerializeField]
         private PlayerSkillPanel playerSkillPanel;
@@ -21,6 +26,8 @@ namespace KWY
 
         [SerializeField]
         private MainGameEvent gameEvent;
+
+        #endregion
 
         #region Private Fields
         [Tooltip("Game data about player and characters")]
@@ -47,16 +54,12 @@ namespace KWY
             playerSkillPanel.UpdateUI();
         }
 
-        public void StartSimulationState(ActionData actionData)
+        public void StartSimulationState()
         {
-            this.actionData = actionData;
-
             simulCanvas.SetActive(true);
-
-            StartSimulation();
         }
 
-        private void StartSimulation(ActionData actionData)
+        public void StartSimulation(ActionData actionData)
         {
             this.actionData = actionData;
 
@@ -66,43 +69,6 @@ namespace KWY
         public void EndSimulationState()
         {
             simulCanvas.SetActive(false);
-        }
-
-        
-        private TICK_RESULT CheckGameEnd()
-        {
-            // 0: 拌加 柳青
-            // 1: 公铰何
-            // 2: MasterClient 铰
-            // 3: OtherClient 铰
-
-            bool a = true;
-            bool b = true;
-            
-            foreach(PlayableCharacter p in data.MyTeamCharacter)
-            {
-                if (!p.Chara.BreakDown)
-                {
-                    // not end
-                    a = false;
-                    break;
-                }
-            }
-
-            foreach(PlayableCharacter p in data.OtherTeamCharacter)
-            {
-                if (!p.Chara.BreakDown)
-                {
-                    // not end
-                    b = false;
-                    break;
-                }
-            }
-
-            if (a && b) return TICK_RESULT.DRAW;
-            else if (a && !b) return TICK_RESULT.CLIENT_WIN;
-            else if (!a && b) return TICK_RESULT.MASTER_WIN;
-            else return TICK_RESULT.KEEP_GOING;
         }
 
         #endregion
@@ -131,29 +97,20 @@ namespace KWY
             // need codes
             DoAction(time);
             yield return new WaitForSeconds(simulationIntervalSeconds);
-
-            TICK_RESULT result = CheckGameEnd();
-            if (result == TICK_RESULT.KEEP_GOING)
+            // need codes
+            if (time <= maxTimeLine + timeAfterSimul)
             {
-                if (time <= maxTimeLine + timeAfterSimul)
-                {
-                    StartCoroutine(StartAction(++time));
-                }
-                else
-                {
-                    SimulationEnd();
-                }
+                StartCoroutine(StartAction(++time));
             }
             else
             {
-                gameEvent.RaiseEventGameEnd(result);
+                SimulationEnd();
             }
         }
 
         private void DoAction(int time)
         {
-            return;
-            /*if (actionData.Data.TryGetValue(time, out var value))
+            if (actionData.Data.TryGetValue(time, out var value))
             {
                 foreach (object[] d in value)
                 {
@@ -170,7 +127,7 @@ namespace KWY
                         StartCoroutine(DoCharaSkill(cid, (SID)d[2], (SkillDicection)d[3]));
                     }
                 }
-            }*/
+            }
         }
 
         IEnumerator DoCharaMove(int cid, Vector2Int v)
@@ -202,7 +159,16 @@ namespace KWY
 
         private void Awake()
         {
-            simulationIntervalSeconds = LogicData.Instance.SimulationIntervalSeconds;
+            LogicData logicData = Resources.Load(
+                "MainGameLogicData", typeof(LogicData)) as LogicData;
+
+            if (logicData == null)
+            {
+                Debug.LogError("Can not find LogicData at 'Resources/MainGameLogicData");
+                return;
+            }
+
+            simulationIntervalSeconds = logicData.simulationIntervalSeconds;
         }
 
         #endregion
