@@ -95,9 +95,9 @@ namespace KWY
                 MainGameData data = GameObject.Find("GameData").GetComponent<MainGameData>();
                 TilemapControl TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
                 Simulation sim = GameObject.Find("UICanvas").GetComponent<Simulation>();
-                if(clickV.y%2 != SelChara.TilePos.y % 2)
+                if (clickV.y % 2 != SelChara.TempTilePos.y % 2)
                 {
-                    sim.ChangeAction((int)SelChara.Cb.cid, clickV.y%2, MoveManager.MoveData);
+                    sim.ChangeAction((int)SelChara.Cb.cid, clickV.y % 2, MoveManager.MoveData);
                 }
                 SelChara.Teleport(clickV);
 
