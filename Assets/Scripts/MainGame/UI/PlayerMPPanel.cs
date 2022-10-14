@@ -19,16 +19,15 @@ namespace KWY
         public void SetData(Sprite sprite, int mp)
         {
             playerImg.sprite = sprite;
-            UpdateMP(mp);
+            UpdateMP(0, 10);
         }
 
-        public void UpdateUI()
+        public void UpdateUI(Player player)
         {
-            int mp = GameObject.Find("GameData").GetComponent<MainGameData>().PlayerMp;
-            UpdateMP(mp);
+            UpdateMP(player.Mp, player.MaxMp);
         }
 
-        private void UpdateMP(int mp)
+        private void UpdateMP(int mp, int maxMp)
         {
             mpLabel.text = mp.ToString();
             mpBar.value = mp / (float)10;
