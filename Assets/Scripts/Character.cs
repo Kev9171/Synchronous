@@ -383,20 +383,26 @@ namespace KWY
             }
         }
 
-        public void SpellSkill(SID sid, SkillDicection direction)
+        public void SpellSkill(SID sid, SkillDicection direction, Vector2Int v)
         {
             nowMove = false;
             SkillBase SelSkill = SkillManager.GetData(sid);
             if (SelSkill.areaAttack)
             {
                 skillSpawner = SelSkill.area;
-                Vector3Int v = new Vector3Int(SelTilePos.x, SelTilePos.y, 0);
-                skillSpawner.Activate(map.CellToWorld(v));
+                skillSpawner.Activate(v);
                 skillSpawner.Destroy(SkillManager.GetData(sid).triggerTime);   // triggerTime만큼 스킬 지속후 삭제
             }
             else
             {
-                ray.CurvedMultipleRay(map.CellToWorld(TempTilePos), SelSkill, SelSkill.directions, true, SelSkill.directions.Count);
+                if(direction == SkillDicection.Right)
+                {
+                    ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, true, SelSkill.directions.Count);
+                }
+                else
+                {
+                    ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, false, SelSkill.directions.Count);
+                }
             }
             Debug.LogFormat("{0} / {1} spells {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, sid);
         }

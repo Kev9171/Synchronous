@@ -9,7 +9,7 @@ namespace KWY
     {
         Dictionary<int, object[]> _data;
 
-        public Dictionary<int, object[]> Data { get { return _data; } set { _data = value; } }
+        public Dictionary<int, object[]> Data { get { return _data; } }
 
         public ActionData()
         {
@@ -26,7 +26,7 @@ namespace KWY
         {
             ActionData ad = new ActionData();
 
-            foreach(CID c in data.Keys)
+            foreach (CID c in data.Keys)
             {
                 int time = 0;
                 int cid = (PhotonNetwork.IsMasterClient) ? (int)c : (int)c + 100;
@@ -38,16 +38,16 @@ namespace KWY
                     // time 구하기
                     if (type == ActionType.Skill)
                     {
-                        
+
                         time += SkillManager.GetData((SID)action[1]).triggerTime;
 
                         if (action.Length >= 4)
                         {
-                            timeData = new object[] { time, type, (SID)action[1], (SkillDicection)action[2], action[3]};
+                            timeData = new object[] { cid, type, (SID)action[1], (SkillDicection)action[2], action[3] };
                         }
                         else
                         {
-                            timeData = new object[] { time, type, (SID)action[1], (SkillDicection)action[2] };
+                            timeData = new object[] { cid, type, (SID)action[1], (SkillDicection)action[2] };
                         }
                     }
                     // move.triggerTime = 0
@@ -55,32 +55,31 @@ namespace KWY
                     {
                         if (action.Length >= 4)
                         {
-                            timeData = new object[] { time, type, (int)action[1], (int)action[2], action[3] };
+                            timeData = new object[] { cid, type, (int)action[1], (int)action[2], action[3] };
                         }
                         else
                         {
-                            timeData = new object[] { time, type, (int)action[1], (int)action[2] };
+                            timeData = new object[] { cid, type, (int)action[1], (int)action[2] };
                         }
                     }
 
-                    //이미 해당 time에 데이터가 있을 경우 기존 데이터에 하나 추가
-                    if (ad.Data.ContainsKey(cid))
+                    // 이미 해당 time에 데이터가 있을 경우 기존 데이터에 하나 추가
+                    if (ad.Data.ContainsKey(time))
                     {
-                        object[] tData = new object[ad.Data[cid].Length + 1];
+                        object[] tData = new object[ad.Data[time].Length + 1];
                         int idx = 0;
-                        foreach (object[] t in ad.Data[cid])
+                        foreach (object[] t in ad.Data[time])
                         {
                             tData[idx++] = t;
                         }
                         tData[idx] = timeData;
 
-                        ad.Data[cid] = tData;
+                        ad.Data[time] = tData;
                     }
                     else
                     {
-                        ad.Data.Add(cid, new object[] { timeData });
+                        ad.Data.Add(time, new object[] { timeData });
                     }
-                    //ad.Data.Add((CID)cid, new object[] { timeData });
 
                     if (type == ActionType.Skill)
                     {
@@ -100,12 +99,12 @@ namespace KWY
         {
             string t = "[";
 
-            foreach(int ti in _data.Keys)
+            foreach (int ti in _data.Keys)
             {
                 t += string.Format("t: {0}", ti);
-                foreach(object[] d in _data[ti])
+                foreach (object[] d in _data[ti])
                 {
-                    t += string.Format("<{0}, {1}, {2}, {3}> / ", d[0], (ActionType) d[1], d[2], d[3]);
+                    t += string.Format("<{0}, {1}, {2}, {3}> / ", (int)d[0], (ActionType)d[1], d[2], d[3]);
                 }
             }
             t += "]";

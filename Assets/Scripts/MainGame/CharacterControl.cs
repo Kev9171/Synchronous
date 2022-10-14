@@ -136,8 +136,8 @@ namespace KWY
                 if (SelOk > 0)
                 {
                     // 확정
-                    data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Right);
-                    
+                    data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Right, clickX, clickY);
+
                     SelChara.SelTilePos.Set(clickX, clickY, 0);
                     turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                     SetSelClear();
@@ -169,7 +169,7 @@ namespace KWY
                 if (SelOk < 0)
                 {
                     // 확정
-                    data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Left);
+                    data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Left, clickX, clickY);
 
                     SelChara.SelTilePos.Set(clickX, clickY, 0);
                     turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
