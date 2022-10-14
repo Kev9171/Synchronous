@@ -105,7 +105,6 @@ namespace KWY
 
         public void UpdateCharacterStatusUI(Character chara)
         {
-            Debug.Log("UpdateCharacterStatusUI");
             if (charaPanels.TryGetValue(chara, out _))
             {
                 charaPanels[chara].UpdateUI(chara);

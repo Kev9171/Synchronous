@@ -29,7 +29,9 @@ namespace KWY
 
         private ActionData actionData = null;
         private int maxTimeLine;
+        private int finActions;
         private float simulationIntervalSeconds;
+
         [Tooltip("이 값은 시뮬레이션 종료 후 다음 진행까지 얼마나 대기 하고 있을 것인가에 대한 int 값으로 logic data에서 지정하고 있는 interval 단위")]
         [SerializeField]
         private int timeAfterSimul = 3;
@@ -40,11 +42,6 @@ namespace KWY
         public void Init()
         {
             playerSkillPanel.SetData(data.PlayerSkillList);
-        }
-
-        public void UpdateUI()
-        {
-            playerSkillPanel.UpdateUI();
         }
 
         public void StartSimulationState(ActionData actionData)
@@ -118,15 +115,16 @@ namespace KWY
             {
                 maxTimeLine = (t > maxTimeLine) ? t : maxTimeLine;
             }
-            foreach(Character ch in data.Characters)
+            foreach(PlayableCharacter p in data.PCharacters.Values)
             {
-                ch.ResetTempPos();
+                p.Chara.ResetTempPos();
             }
 
-            StartCoroutine(StartAction(-1));
+            //StartCoroutine(StartAction(-1));
+            StartAction();
         }
 
-        IEnumerator StartAction(int time)
+        /*IEnumerator StartAction(int time)
         {
             // need codes
             DoAction(time);
@@ -148,12 +146,36 @@ namespace KWY
             {
                 gameEvent.RaiseEventGameEnd(result);
             }
+        }*/
+
+        void StartAction()
+        {
+            Task[] task = new Task[data.PCharacters.Count];
+            int i = 0;
+            foreach (int id in data.PCharacters.Keys)
+            {
+                Debug.Log("action start");
+                task[i] = new Task(DoAction(id));
+                task[i++].Finished += delegate (bool t) {
+                    if (!t) Notify();
+                };
+            }
         }
 
-        private void DoAction(int time)
+        void Notify()
+        {
+            finActions++;
+            if (finActions == data.PCharacters.Count)
+            {
+                finActions = 0;
+                SimulationEnd();
+            }
+        }
+
+        /*private void DoAction(int time)
         {
             return;
-            /*if (actionData.Data.TryGetValue(time, out var value))
+            *//*if (actionData.Data.TryGetValue(time, out var value))
             {
                 foreach (object[] d in value)
                 {
@@ -170,22 +192,111 @@ namespace KWY
                         StartCoroutine(DoCharaSkill(cid, (SID)d[2], (SkillDicection)d[3]));
                     }
                 }
-            }*/
+            }*//*
+        }*/
+
+        IEnumerator DoAction(int id)
+        {
+            if (actionData.Data.TryGetValue(id, out var value))
+            {
+                foreach (object[] d in value)
+                {
+                    int time = (int)d[0];
+
+                    ActionType type = (ActionType)d[1];
+                    yield return new WaitForSeconds(simulationIntervalSeconds);
+                    if (type == ActionType.Move)
+                    {
+                        StartCoroutine(DoCharaMove(id, new Vector2Int((int)d[2], (int)d[3])));
+                        yield return new WaitForSeconds(simulationIntervalSeconds);
+                    }
+                    else if (type == ActionType.Skill)
+                    {
+                        yield return new WaitForSeconds(SkillManager.GetData((SID)d[2]).triggerTime);
+                        StartCoroutine(DoCharaSkill(id, (SID)d[2], (SkillDicection)d[3], new Vector2Int((int)d[2], (int)d[3])));
+                        yield return new WaitForSeconds(SkillManager.GetData((SID)d[2]).castingTime);
+                    }
+                }
+            }
         }
 
-        IEnumerator DoCharaMove(int cid, Vector2Int v)
+        IEnumerator DoCharaMove(int id, Vector2Int v)
         {
-            //data.WholeCharacters[cid].MoveTo(v);
-            data.WholeCharacters[cid].photonView.RPC("MoveTo", RpcTarget.All, v.x, v.y);
-            showActions.ShowMoveLog(cid);
+            data.PCharacters[id].CharaObject.GetComponent<PhotonView>().RPC("MoveTo", RpcTarget.All, v.x, v.y);
+            showActions.ShowMoveLog(id);
             yield return null;
         }
 
-        IEnumerator DoCharaSkill(int cid, SID sid, SkillDicection dir)
+        IEnumerator DoCharaSkill(int cid, SID sid, SkillDicection dir, Vector2Int v)
         {
-            data.WholeCharacters[cid].SpellSkill(sid, dir);
+            data.PCharacters[cid].Chara.SpellSkill(sid, dir, v);
             showActions.ShowSkillLog(cid, sid);
             yield return null;
+        }
+
+        public void ChangeAction(int id, int y, ActionBase action)
+        {
+            if (actionData.Data.TryGetValue(id, out var value))
+            {
+                //foreach (object[] d in value)
+                //{
+                //    int time = (int)d[0];
+
+                //    ActionType t = (ActionType)d[1];
+
+                //    if (t == ActionType.Move)
+                //    {
+                //        Vector2Int vec = new Vector2Int((int)d[2], (int)d[3]);
+                //        List<Vector2Int> des = y % 2 == 0 ? action.areaEvenY : action.areaOddY;
+                //        List<Vector2Int> cur = y % 2 != 0 ? action.areaEvenY : action.areaOddY;
+                //        int idx = cur.IndexOf(vec);
+
+                //    }
+                //}
+                for (int i = 0; i < value.Length; i++)
+                {
+                    object[] d = (object[])value[i];
+                    if ((ActionType)d[1] == ActionType.Move)
+                    {
+                        Vector2Int vec = new Vector2Int((int)d[2], (int)d[3]);
+                        List<Vector2Int> v = y != 0 ? action.areaEvenY : action.areaOddY;
+                        //List<Vector2Int> cur = y % 2 != 0 ? action.areaEvenY : action.areaOddY;
+                        int idx = v.IndexOf(vec);
+                        Vector2Int newVec = v[5 - idx] * (-1);
+                        Debug.Log("vec = " + vec + ", newvec = " + newVec + "index = " + idx);
+                        Debug.Log("ActionType = " + d[1] + ", vec = " + d[2] + ", " + d[3]);
+                        d[2] = newVec.x;
+                        d[3] = newVec.y;
+                        value[i] = d;
+                    }
+                }
+                actionData.Data[id] = value;
+            }
+            else
+                Debug.Log("no char matching cid");
+            /*if (actionData.Data.TryGetValue(id, out var value))
+            {
+
+
+                foreach (object[] d in value)
+                {
+                    int time = (int)d[0];
+
+                    ActionType t = (ActionType)d[1];
+
+                    if (t == ActionType.Move)
+                    {
+                        Vector2Int vec = new Vector2Int((int)d[2], (int)d[3]);
+                        List<Vector2Int> des = y % 2 == 0 ? action.areaEvenY : action.areaOddY;
+                        List<Vector2Int> cur = y % 2 != 0 ? action.areaEvenY : action.areaOddY;
+                        int idx = cur.IndexOf(vec);
+                    }
+                }
+                for (int i = 0; i < value.Length; i++)
+                {
+                    Debug.Log(value[0] + ", " + value[1] + ", " + value[2] + ", " + value[3]);
+                }
+            }*/
         }
 
         /// <summary>

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Tilemaps;
+using UnityEngine.InputSystem;
 
 namespace KWY
 {
@@ -27,6 +29,22 @@ namespace KWY
 
         public readonly int MaxMp = 10;
 
+        public int SkillCount
+        {
+            get;
+            private set;
+        }
+
+        [SerializeField]
+        Tilemap map;
+        [SerializeField]
+        CharacterControl chCtrl;
+        [SerializeField]
+        MouseInput mouseInput;
+        [SerializeField]
+        Simulation simulation;
+
+
         public void InitData(Image icon, int initialMp)
         {
             Mp = initialMp;
@@ -45,6 +63,35 @@ namespace KWY
             Mp -= value;
 
             NotifyObservers();
+        }
+
+        public bool Skill1(Character selChara)
+        {
+            Debug.Log("Skill1");
+
+            if (selChara == null) return false;
+            Debug.Log("clicked " + selChara);
+
+            Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
+
+            mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
+
+            Vector3Int clickV = map.WorldToCell(mousePosition);
+
+            if (map.HasTile(clickV))
+            {
+                if (clickV.y % 2 != selChara.TempTilePos.y % 2)
+                {
+                    simulation.ChangeAction(selChara.Pc.Id, clickV.y % 2, MoveManager.MoveData);
+                }
+                selChara.Teleport(clickV);
+
+
+                SkillCount++;
+                return true;
+            }
+
+            return false;
         }
 
         #region ISubject Methods

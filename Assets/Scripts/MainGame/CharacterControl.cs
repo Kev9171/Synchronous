@@ -136,7 +136,7 @@ namespace KWY
                 if (SelOk > 0)
                 {
                     // 확정
-                    data.CharaActionData[SelChara.Pc.Id].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Right);
+                    data.CharaActionData[SelChara.Pc.Id].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Right, clickX, clickY);
 
                     if (((SkillBase)SelAction).areaAttack)
                     {
@@ -179,7 +179,7 @@ namespace KWY
                 if (SelOk < 0)
                 {
                     // 확정
-                    data.CharaActionData[SelChara.Pc.Id].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Left);
+                    data.CharaActionData[SelChara.Pc.Id].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Left, clickX, clickY);
 
                     if (((SkillBase)SelAction).areaAttack)
                     {
@@ -274,40 +274,17 @@ namespace KWY
             tempClickY = int.MaxValue;
         }
 
-        public void SetSelChara(CID cid)
-        {
-            SelChara = null;
-
-            Character c = data.GetCharacter(cid);
-
-            if (c == null)
-            {
-                Debug.LogErrorFormat("Can not select - cid: {0}", cid);
-                return;
-            }
-
-            SelAction = null;
-
-            SelChara = c;
-            //showingSkillManager.ShowSkillPanel(data.GetCharacterNth(cid));
-            characterUIHandler.ShowSkillSelPanel(SelChara);
-            HighlightCharacter(cid);
-            highLighter.ClearHighlight();
-
-            mouseInput.Mouse.MouseClick.performed += OnClick;
-            mouseInput.Mouse.MouseClick.performed -= OnClickSkillDirection;
-            mouseInput.Mouse.MouseClick.performed -= OnClickMoveDirection;
-
-            tempClickX = int.MaxValue;
-            tempClickY = int.MaxValue;
-        }
-
         public void HighlightCharacterClear()
         {
-            foreach (CID c in data.CharacterObjects.Keys)
+            foreach(PlayableCharacter p in data.PCharacters.Values)
+            {
+                p.CharaObject.transform.localScale = new Vector3(0.7f, 0.7f, 1);
+            }
+
+            /*foreach (CID c in data.CharacterObjects.Keys)
             {
                 data.CharacterObjects[c].transform.localScale = new Vector3(0.7f, 0.7f, 1);
-            }
+            }*/
         }
 
         public void HighlightCharacter(Character chara)
@@ -324,22 +301,6 @@ namespace KWY
                 }
             }
         }
-
-        public void HighlightCharacter(CID cid)
-        {
-            foreach(CID c in data.CharacterObjects.Keys)
-            {
-                if (c == cid)
-                {
-                    data.CharacterObjects[c].transform.localScale = new Vector3(1, 1, 1);
-                }
-                else
-                {
-                    data.CharacterObjects[c].transform.localScale = new Vector3(0.7f, 0.7f, 1);
-                }
-            }
-        }
-
 
         public void OnClick(InputAction.CallbackContext context)
         {

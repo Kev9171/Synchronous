@@ -11,7 +11,7 @@ namespace KWY
 
         //Dictionary<int, object[]> _data;
 
-        public Dictionary<int, object[]> Data { get { return _data; } }
+        public Dictionary<int, object[]> Data { get { return _data; } set { _data = value; } }
 
         public ActionData()
         {
@@ -36,8 +36,6 @@ namespace KWY
                 int time = 0;
                 foreach (object[] action in data[id].Actions)
                 {
-                    
-
                     ActionType type = (ActionType)action[0];
                     object[] timeData;
 
