@@ -51,10 +51,11 @@ namespace KWY
 
     public enum STATE : int
     {
-        StandBy = 0,
-        TurnReady = 1,
-        Simul = 2,
-        GameOver = 3
+        IDLE = 0,
+        StandBy = 1,
+        TurnReady = 2,
+        Simul = 3,
+        GameOver = 4
     }
 
     // À°°¢Çü ¹æÇâ

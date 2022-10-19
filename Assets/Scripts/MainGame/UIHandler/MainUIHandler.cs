@@ -16,7 +16,6 @@ namespace KWY
 
         public void Init()
         {
-
         }
 
         public void UpdateTurnText()

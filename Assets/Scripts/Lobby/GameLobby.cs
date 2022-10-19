@@ -145,6 +145,12 @@ namespace KWY
 
         public void OnReadyBtnClicked()
         {
+            // 상대 플레이어 입장 안했을 경우 레디 x
+            if (PhotonNetwork.CurrentRoom.PlayerCount != 2)
+            {
+                return;
+            }
+
             lobbyEvent.RaiseEventReady(true);
         }
 
