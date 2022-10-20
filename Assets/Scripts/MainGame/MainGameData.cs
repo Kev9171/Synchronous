@@ -1,3 +1,5 @@
+#define TEST
+
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -10,6 +12,10 @@ namespace KWY
 {
     public class MainGameData : MonoBehaviour, ISubject
     {
+        public static MainGameData Instance;
+
+        private PhotonView photonView;
+
         public List<IObserver> Observers
         {
             get;
@@ -227,6 +233,11 @@ namespace KWY
 
         private void InitCharacters()
         {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                return;
+            }
+
             List<CharaData> tList = new List<CharaData>
             {
                 new CharaData(CID.Flappy, -3, 0, Team.A),
@@ -286,12 +297,7 @@ namespace KWY
                     _charasTeamB.Add(pc);
                 }
 
-                if (PhotonNetwork.IsMasterClient && d.team == Team.A)
-                {
-                    _charaActionData.Add(id, new CharacterActionData());
-                    _isMyCharacter.Add(id, true);
-                }
-                else if (!PhotonNetwork.IsMasterClient && d.team == Team.B)
+                if (d.team == Team.A)
                 {
                     _charaActionData.Add(id, new CharacterActionData());
                     _isMyCharacter.Add(id, true);
@@ -301,27 +307,94 @@ namespace KWY
                     _isMyCharacter.Add(id, false);
                 }
 
+                photonView.RPC(
+                    "InitCharacterRPC", RpcTarget.Others,
+                    chara.GetPhotonView().ViewID, id, ((int)d.team));
             }
 
-
             InitBaseObservers();
+        }
+
+
+        [PunRPC]
+        private void OnGameReadyRPC()
+        {
+            Debug.Log("OnGameReadyRPC");
+            GameManager.Instance.SetState(STATE.StandBy);
         }
 
         // serialize custom type으로 바꿔야 할듯...
 
         [PunRPC]
-        private void InitCharactersRPC(int id1, int id2, int id3, int v1, int v2, int v3) 
+        private void InitCharacterRPC(int viewId, int id, int team) 
         {
-            List<int> ids = new List<int>() { id1, id2, id3 };
-            List<int> vIds = new List<int>() { v1, v2, v3 };
-
-            for (int i= 0; i < ids.Count; i++)
+            if (PhotonNetwork.IsMasterClient)
             {
-                GameObject c1 = PhotonNetwork.GetPhotonView(vIds[0]).gameObject;
+                return;
+            }
 
-                PlayableCharacter pc = new PlayableCharacter(c1, ids[0], Team.B);
+            Team _team = (Team)team;
 
+            // get object by photonViewId
+            PhotonView _photonView = PhotonNetwork.GetPhotonView(viewId);
+            if (!_photonView)
+            {
+                Debug.Log($"Can not find PhotonView id: {id}");
+                return;
+            }
 
+            GameObject chara = _photonView.gameObject;
+            if (!chara)
+            {
+                Debug.Log($"Can not find gameobject on photonView id: {id}");
+                return;
+            }
+
+            PlayableCharacter pc = new PlayableCharacter(chara, id, _team);
+
+            _pCharacters.Add(id, pc);
+            chara.GetComponent<Character>().SetData(pc);
+
+            // Master Client
+            if (_team == Team.A)
+            {
+                _charasTeamA.Add(pc);
+                _isMyCharacter.Add(id, false);
+            }
+            // other client
+            else
+            {
+                _charasTeamB.Add(pc);
+
+                _charaActionData.Add(id, new CharacterActionData());
+                _isMyCharacter.Add(id, true);
+            }
+
+            // for test
+#if TEST
+            if (_pCharacters.Count == 6)
+            {
+                Debug.Log("_pCharacters:");
+                foreach (PlayableCharacter p in _pCharacters.Values)
+                {
+                    Debug.Log(p);
+                }
+            }
+
+            if (_charasTeamB.Count == 3)
+            {
+                Debug.Log("_myTeamCharacter(B):");
+                foreach (PlayableCharacter p in _charasTeamB)
+                {
+                    Debug.Log(p);
+                }
+            }
+#endif
+
+            if (_pCharacters.Count == 6)
+            {
+                InitBaseObservers();
+                photonView.RPC("OnGameReadyRPC", RpcTarget.All);
             }
         }
 
@@ -352,7 +425,8 @@ namespace KWY
             // add observer
 
             // character
-            foreach (PlayableCharacter p in _pCharacters.Values)
+            // 일단 자신의 캐릭터만
+            foreach (PlayableCharacter p in MyTeamCharacter)
             {
                 p.Chara.AddObserver(new CharacterObserver());
             }
@@ -363,9 +437,9 @@ namespace KWY
             // main data
             AddObserver(new GameProgressObserver());
         }
-
         #endregion
 
+        
         public ResultData CreateResultData()
         {
             return new ResultData(MyTeamCharacter, MyPlayer);
@@ -375,6 +449,15 @@ namespace KWY
 
         private void Awake()
         {
+            Instance = this;
+
+            photonView = PhotonView.Get(this);
+            if (!photonView)
+            {
+                Debug.LogError("Can not find photonview on this object (MainGameData)");
+                return;
+            }
+
             GameObject t = GameObject.FindGameObjectWithTag("Map");
             if (t)
             {
@@ -386,6 +469,8 @@ namespace KWY
             }
         }
         #endregion
+
+        
 
         #region ISubject Methods
         public void AddObserver(IObserver o)

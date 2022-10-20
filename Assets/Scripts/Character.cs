@@ -82,18 +82,17 @@ namespace KWY
 
         public void DamageHP(float damage)
         {
-            Hp -= damage;
-            if (Hp < 0) Hp = 0;
-
-            if (Hp == 0)
+            if (Hp - damage > 0)
             {
+                Hp -= damage;
+                Debug.LogFormat("{0} is damaged {1}; Now hp: {2}", Cb.name, damage, Hp);
+            }
+            else if (Hp - damage < 0)
+            {
+                Hp = 0;
                 BreakDown = true;
                 ClearBuff();
                 Debug.LogFormat("{0} is damaged {1}; Now hp: {2}; BREAK DOWN!", Cb.name, damage, Hp);
-            }
-            else
-            {
-                Debug.LogFormat("{0} is damaged {1}; Now hp: {2}", Cb.name, damage, Hp);
             }
 
             NotifyObservers();
@@ -101,11 +100,40 @@ namespace KWY
 
         public void AddMP(float amount)
         {
-            Mp += amount;
-            if (Mp > MaxMp) Mp = MaxMp;
-            else if (Mp < 0) Mp = 0;
+            if (Mp + amount > MaxMp)
+            {
+                Mp = MaxMp;
+            }
+            else if (Mp + amount < 0)
+            {
+                Mp = 0;
+            }
+            else
+            {
+                Mp += amount;
+            }
 
-            Debug.LogFormat("{0}'s mp is added {1}; Now mp: {2}", Cb.name, amount, Mp);
+            Debug.LogFormat($"[id={Pc.Id}]{Cb.name}'s mp is added {amount}; Now mp: {Mp}");
+
+            NotifyObservers();
+        }
+
+        public void AddHp(float amount)
+        {
+            if (Hp + amount > MaxMp)
+            {
+                Hp = MaxHp;
+            }
+            else if (Hp - amount < 0)
+            {
+                Hp = 0;
+            }
+            else
+            {
+                Hp += amount;
+            }
+
+            Debug.LogFormat("{0}'s hp is added {1}; Now hp: {2}", Cb.name, amount, Hp);
 
             NotifyObservers();
         }
@@ -498,6 +526,8 @@ namespace KWY
             }
         }
 
+
+
         #endregion
 
         #region IObserver Methods
@@ -543,12 +573,8 @@ namespace KWY
 
         public void OnPhotonInstantiate(PhotonMessageInfo info)
         {
-            Debug.Log(info.photonView.GetInstanceID());
-            Debug.Log(info.photonView);
-
             Debug.Log(PhotonNetwork.GetPhotonView(GetComponent<PhotonView>().ViewID).gameObject.GetComponent<Character>());
 
-            
         }
 
         [PunRPC]

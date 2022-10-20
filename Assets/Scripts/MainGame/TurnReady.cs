@@ -1,5 +1,6 @@
+#define TEST
+
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 using TMPro;
@@ -85,14 +86,20 @@ namespace KWY
             // 버튼 기능 초기화
             readyBtn.GetComponent<TurnReadyBtn>().ResetReady();
 
-            // 플레이어 mp 추가
+            if (PhotonNetwork.IsMasterClient)
+            {
+                DataController.Instance.AddPlayerMp(LogicData.Instance.PlayerMPIncrement);
+                DataController.Instance.AddAllCharactersMp(LogicData.Instance.CharacterMpIncrement);
+            }
+
+            /*// 플레이어 mp 추가
             data.MyPlayer.AddMp(LogicData.Instance.PlayerMPIncrement);
 
             // 캐릭터 mp 추가
             foreach(PlayableCharacter pc in data.MyTeamCharacter)
             {
                 pc.Chara.AddMP(LogicData.Instance.CharacterMpIncrement);
-            }
+            }*/
 
             // show UI
             TurnReadyUI.SetActive(true);
@@ -200,26 +207,23 @@ namespace KWY
 
         private void TimeOut()
         {
-            if (!PhotonNetwork.IsMasterClient) return;
-
-            data.MyTeamCharacter[0].Chara.DamageHP(50);
-            data.MyTeamCharacter[1].Chara.AddMP(-2);
-
-            PanelBuilder.ShowResultPanel(UICanvasTransform, WINLOSE.WIN, data.CreateResultData());
-
-            data.CharasTeamB[1].Chara.DamageHP(100);
-            Debug.Log(data.CharasTeamB[1].Chara);
-            data.CharasTeamB[1].CharaObject.GetPhotonView().RPC("TestRPC", RpcTarget.Others);
-            Debug.Log("after: " + data.CharasTeamB[1].Chara);
-            return;
+            //PanelBuilder.ShowResultPanel(UICanvasTransform, WINLOSE.WIN, data.CreateResultData());
 
 
             // 캐릭터 선택 못하게 + 스킬 선택 패널 안보이게
             characterUIHandler.CharaPanelSelectable = false;
 
             FillRandomMoveAtEmpty();
+
             ActionData d = ActionData.CreateActionData(data.CharaActionData);
             Debug.Log(d);
+
+#if TEST
+            if (!PhotonNetwork.IsMasterClient) return;
+            DataController.Instance.ModifyCharacterHp(2, -50);
+            DataController.Instance.ModifyCharacterHp(5, -50);
+            return;
+#endif
             gameEvent.RaiseEventTurnReady(d);
         }
 

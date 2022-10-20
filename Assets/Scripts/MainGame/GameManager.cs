@@ -1,8 +1,11 @@
+#define TEST
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
+
 
 namespace KWY
 {
@@ -21,7 +24,7 @@ namespace KWY
         ShowNowAction showActions;
 
         [SerializeField]
-        private PlayerSkillPanel playerSkillPanel;
+        GameObject loadingScreen;
 
         [SerializeField]
         private TurnReady turnReady;
@@ -32,14 +35,28 @@ namespace KWY
         [SerializeField]
         Transform UICanvas;
 
-        ActionData nowActionData;
+        STATE nowState = STATE.IDLE;
 
-        STATE nowState = STATE.StandBy;
+        public static GameManager Instance;
+        public TurnReady TurnReady
+        {
+            get { return turnReady; }
+        }
+        public Simulation Simulation
+        {
+            get { return simulation; }
+        }
 
         public void SetState(STATE state, params object[] data)
         {
+#if TEST
+            Debug.Log($"SetState: {state}");
+#endif
             switch (state)
             {
+                case STATE.StandBy: // 게임 시작 준비 완료
+                    TurnStandBy();
+                    break;
                 case STATE.TurnReady: // turn ready
                     TurnReadyState();
                     break;
@@ -52,6 +69,16 @@ namespace KWY
                     GameOverState((TICK_RESULT)data[0]);
                     break;
             }
+        }
+
+        private void TurnStandBy()
+        {
+            // UI 관련 데이터 연결
+            turnReady.Init();
+            simulation.Init();
+
+            SetState(STATE.TurnReady);
+            loadingScreen.SetActive(false);
         }
 
         private void TurnReadyState()
@@ -109,16 +136,11 @@ namespace KWY
         // Start is called before the first frame update
         void Start()
         {
+            Instance = this;
+            loadingScreen.SetActive(true);
+
             data.LoadData();
 
-            turnReady.Init();
-            simulation.Init();
-
-
-
-
-            // must be called at end of Start func.
-            SetState(STATE.TurnReady);
         }
 
         // Update is called once per frame
