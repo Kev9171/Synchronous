@@ -6,6 +6,8 @@ using System.Collections.Concurrent;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+using DebugUtil;
+
 namespace KWY
 {
     public class Character : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback, IPunObservable, ISubject<Character>
@@ -13,7 +15,7 @@ namespace KWY
         [SerializeField]
         CharacterBase _characterBase;
 
-        private List<IObserver<Character>> observers = new List<IObserver<Character>>();
+        private readonly List<IObserver<Character>> observers = new List<IObserver<Character>>();
 
         public PlayableCharacter Pc
         {
@@ -485,7 +487,6 @@ namespace KWY
         {
             Init();
 
-            
 
             map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
             hlMap = GameObject.Find("HighlightTilemap").GetComponent<Tilemap>();

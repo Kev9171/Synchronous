@@ -110,9 +110,28 @@ namespace KWY
             }
         }
 
-        public void UpdateCharacterActionIcon(Character chara)
+        public void UpdateCharacterActionIcon(int id)
         {
             Debug.Log("UpdateCharacterAcionIcon");
+
+            CharacterActionData data = MainGameData.Instance.GetActionData(id);
+
+            charaUIs[id].ResetSelActionImg();
+
+            for (int i=0; i<data.ActionCount; i++)
+            {
+                object[] o = (object[])data.Actions[i];
+                ActionType type = (ActionType)o[0];
+
+                if (type == ActionType.Move)
+                {
+                    charaUIs[id].SetSelActionImg(i, MoveManager.MoveData.icon);
+                }
+                else if (type == ActionType.Skill)
+                {
+                    charaUIs[id].SetSelActionImg(i, SkillManager.SkillData[(SID)o[1]].icon);
+                }
+            }
         }
 
         public void HideAllSkillSelPanel()

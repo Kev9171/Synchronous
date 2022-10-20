@@ -3,7 +3,12 @@ using UnityEngine;
 
 namespace KWY
 {
-    public class GameProgressObserver : IObserver
+    public enum EGameProgress
+    {
+        TURN_NUM = 0
+    }
+
+    public class GameProgressObserver : IObserver<EGameProgress>
     {
         MainUIHandler _mainUiHandler;
 
@@ -19,12 +24,12 @@ namespace KWY
             }
         }
 
-        public void OnNotify()
+        public void OnNotify(EGameProgress n)
         {
-            UpdateData();
+            UpdateData(n);
         }
 
-        public void UpdateData()
+        public void UpdateData(EGameProgress n)
         {
             MainUIHandler.UpdateTurnText();
         }

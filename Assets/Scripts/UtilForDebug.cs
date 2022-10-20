@@ -46,6 +46,7 @@ namespace KWY
                 foreach (int i in data.Keys)
                 {
                     data.TryGetValue(i, out int value);
+
                     content += (i + ": " + value + ", ");
                 }
             }

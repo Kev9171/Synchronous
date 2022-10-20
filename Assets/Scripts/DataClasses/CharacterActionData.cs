@@ -4,15 +4,29 @@ using UnityEngine;
 
 namespace KWY
 {
-    public class CharacterActionData
+    public class CharacterActionData : ISubject<int>
     {
+        public List<IObserver<int>> Observers
+        {
+            get;
+            private set;
+        } = new List<IObserver<int>>();
+
+        private readonly int charaId;
+
         public object[] Actions { get; private set; }
 
         int idx = 0;
 
-        public CharacterActionData()
+        public CharacterActionData(int charaId, params IObserver<int>[] observers)
         {
+            this.charaId = charaId;
             Actions = new object[3];
+
+            foreach(IObserver<int> o in observers)
+            {
+                AddObserver(o);
+            }
         }
 
         public int ActionCount { get { return idx >= 3 ? 3 : idx; } }
@@ -53,6 +67,8 @@ namespace KWY
             {
                 Debug.LogError("AddSkilAction Error");
             }
+
+            NotifyObservers();
         }
 
         public void AddMoveAction(ActionType type, int dx, int dy, bool odd, params object[] moveOps)
@@ -78,6 +94,47 @@ namespace KWY
 
             Actions[idx] = new object[] { type, dx, dy, 0, 0 };
             idx++;
+
+            NotifyObservers();
         }
+
+        #region ISubject<int>
+
+        public void AddObserver(IObserver<int> o)
+        {
+            if (Observers.IndexOf(o) < 0)
+            {
+                Observers.Add(o);
+            }
+            else
+            {
+                Debug.LogWarning($"The observer already exists in list: {o}");
+            }
+        }
+        public void RemoveObserver(IObserver<int> o)
+        {
+            int idx = Observers.IndexOf(o);
+            if (idx >= 0)
+            {
+                Observers.RemoveAt(idx); // O(n)
+            }
+            else
+            {
+                Debug.LogError($"Can not remove the observer; It does not exist in list: {o}");
+            }
+        }
+        public void NotifyObservers()
+        {
+            foreach (IObserver<int> o in Observers)
+            {
+                o.OnNotify(charaId);
+            }
+        }
+        public void RemoveAllObservers()
+        {
+            Observers.Clear();
+        }
+
+        #endregion
     }
 }

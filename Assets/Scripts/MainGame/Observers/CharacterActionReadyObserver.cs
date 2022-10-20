@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace KWY
 {
-    public class CharacterActionReadyObserver : IObserver<Character>
+    public class CharacterActionReadyObserver : IObserver<int>
     {
         CharacterUIHandler _characterUIHandler;
 
@@ -20,14 +20,9 @@ namespace KWY
             }
         }
 
-        public void OnNotify(Character t)
+        public void OnNotify(int id)
         {
-            UpdateData(t);
-        }
-
-        public void UpdateData(Character t)
-        {
-            CharacterUIHandler.UpdateCharacterActionIcon(t);
+            CharacterUIHandler.UpdateCharacterActionIcon(id);
         }
 
         private void FindCharacterUIHandler()

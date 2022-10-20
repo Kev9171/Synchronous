@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using Photon.Pun;
 using System;
 
+using DebugUtil;
+
 namespace KWY
 {
     public class MainGameData : MonoBehaviour, ISubject
@@ -21,6 +23,7 @@ namespace KWY
             get;
             private set;
         } = new List<IObserver>();
+
 
         public float TimeLimit { get; private set; }
 
@@ -299,7 +302,7 @@ namespace KWY
 
                 if (d.team == Team.A)
                 {
-                    _charaActionData.Add(id, new CharacterActionData());
+                    _charaActionData.Add(id, new CharacterActionData(id, new CharacterActionReadyObserver()));
                     _isMyCharacter.Add(id, true);
                 }
                 else
@@ -324,10 +327,13 @@ namespace KWY
         }
 
         // serialize custom type으로 바꿔야 할듯...
+        // RPC가 비동기 방식으로 작동될 경우 -> list에 add 시 lock을 걸어주어야 할수도?
+        // 일단은 하나씩 실행되는 것 처럼 보이므로 lock 사용 안했음
 
         [PunRPC]
         private void InitCharacterRPC(int viewId, int id, int team) 
         {
+            //Debug.Log($"start viewId:{viewId}");
             if (PhotonNetwork.IsMasterClient)
             {
                 return;
@@ -366,8 +372,13 @@ namespace KWY
             {
                 _charasTeamB.Add(pc);
 
-                _charaActionData.Add(id, new CharacterActionData());
+                _charaActionData.Add(id, new CharacterActionData(id, new CharacterActionReadyObserver()));
                 _isMyCharacter.Add(id, true);
+
+                if (NullCheck.HasItComponent(pc.CharaObject, "SpriteRenderer", out SpriteRenderer component))
+                {
+                    component.flipX = true;
+                }
             }
 
             // for test
@@ -390,12 +401,15 @@ namespace KWY
                 }
             }
 #endif
+            //Debug.Log($"end viewId:{viewId}");
 
             if (_pCharacters.Count == 6)
             {
                 InitBaseObservers();
                 photonView.RPC("OnGameReadyRPC", RpcTarget.All);
             }
+
+            
         }
 
         private GameObject PhotonInstantiate(CID cid, Vector3Int loc)
@@ -425,7 +439,7 @@ namespace KWY
             // add observer
 
             // character
-            // 일단 자신의 캐릭터만
+            // 일단 자신의 캐릭터만 (현재 UI 업데이트는 자신의 캐릭터만 됨)
             foreach (PlayableCharacter p in MyTeamCharacter)
             {
                 p.Chara.AddObserver(new CharacterObserver());
@@ -435,7 +449,9 @@ namespace KWY
             player.AddObserver(new PlayerObserver());
 
             // main data
-            AddObserver(new GameProgressObserver());
+            //AddObserver(new GameProgressObserver());
+            //AddObserver(new CharacterActionReadyObserver());
+            //AddObserver(new GameProgressSubscriber());
         }
         #endregion
 
@@ -510,6 +526,8 @@ namespace KWY
         {
             Observers.Clear();
         }
+
+        
         #endregion
     }
 
@@ -544,6 +562,53 @@ namespace KWY
             }
 
             return v;
+        }
+    }
+
+    class GameProgressSubscriber : ISubject
+    {
+        public List<IObserver> Observers
+        {
+            get;
+            private set;
+        } = new List<IObserver>();
+
+        public void AddObserver(IObserver o)
+        {
+            if (Observers.IndexOf(o) < 0)
+            {
+                Observers.Add(o);
+            }
+            else
+            {
+                Debug.LogWarning($"The observer already exists in list: {o}");
+            }
+        }
+
+        public void RemoveObserver(IObserver o)
+        {
+            int idx = Observers.IndexOf(o);
+            if (idx >= 0)
+            {
+                Observers.RemoveAt(idx); // O(n)
+            }
+            else
+            {
+                Debug.LogError($"Can not remove the observer; It does not exist in list: {o}");
+            }
+        }
+
+        public void NotifyObservers()
+        {
+            foreach (IObserver o in Observers)
+            {
+                o.OnNotify();
+            }
+        }
+
+        public void RemoveAllObservers()
+        {
+            Observers.Clear();
         }
     }
 }

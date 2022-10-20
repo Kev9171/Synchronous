@@ -81,7 +81,6 @@ namespace KWY
                 // 이동 넣었을 경우 하이라이트를 위한 임시 좌표 변경
                 SelChara.SetTilePos(clickV);
 
-                turnReady.ShowCharacterActionPanel(SelChara.Pc.Id);
                 SetSelClear();
 
                 mouseInput.Mouse.MouseClick.performed += OnClick;
@@ -149,7 +148,6 @@ namespace KWY
                         ray.CurvedMultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, true, ((SkillBase)SelAction).directions.Count);
                     }
 
-                    turnReady.ShowCharacterActionPanel(SelChara.Pc.Id);
                     SetSelClear();
 
                     mouseInput.Mouse.MouseClick.performed += OnClick;
@@ -192,7 +190,6 @@ namespace KWY
                         ray.CurvedMultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, false, ((SkillBase)SelAction).directions.Count);
                     }
 
-                    turnReady.ShowCharacterActionPanel(SelChara.Pc.Id);
                     SetSelClear();
 
                     mouseInput.Mouse.MouseClick.performed += OnClick;
@@ -237,7 +234,6 @@ namespace KWY
             mouseInput.Mouse.MouseClick.performed -= OnClick;
             mouseInput.Mouse.MouseClick.performed -= OnClickSkillDirection;
 
-            //showingSkillManager.ShowSkillPanel(-1);
             characterUIHandler.HideAllSkillSelPanel();
 
             highLighter.ClearHighlight();
@@ -255,9 +251,6 @@ namespace KWY
         {
             SelChara = chara;
             SelAction = null;
-
-            /*showingSkillManager.ShowSkillPanel(data.GetCharacterNth(cid));
-            HighlightCharacter(cid);*/
 
             // 스킬 선택 패널
             characterUIHandler.ShowSkillSelPanel(SelChara);
@@ -280,11 +273,6 @@ namespace KWY
             {
                 p.CharaObject.transform.localScale = new Vector3(0.7f, 0.7f, 1);
             }
-
-            /*foreach (CID c in data.CharacterObjects.Keys)
-            {
-                data.CharacterObjects[c].transform.localScale = new Vector3(0.7f, 0.7f, 1);
-            }*/
         }
 
         public void HighlightCharacter(Character chara)
@@ -310,9 +298,6 @@ namespace KWY
 
             if (hit.collider != null)
             {
-                //CID cid = hit.collider.gameObject.GetComponent<Character>();
-                //SetSelChara(cid);
-
                 Character c = hit.collider.gameObject.GetComponent<Character>();
                 SetSelChara(c);
             }
