@@ -1,4 +1,4 @@
-#define TEST
+//#define TEST
 
 using System.Collections;
 using UnityEngine;
@@ -137,24 +137,6 @@ namespace KWY
 
             // event Àü¼Û
             gameEvent.RaiseEventTurnReady(ActionData.CreateActionData(data.CharaActionData));
-        }
-
-        public void ShowCharacterActionPanel(int id)
-        {
-            for (int i = 0; i < data.CharaActionData[id].ActionCount; i++)
-            {
-                // TODO
-
-                /*object[] t = (object[])data.CharaActionData[cid].Actions[i];
-                if (ActionType.Move == (ActionType)(t[0]))
-                {
-                    charaPanels[cid].SetSelActionImg(i, MoveManager.MoveData.icon);
-                }
-                else
-                {
-                    charaPanels[cid].SetSelActionImg(i, SkillManager.GetData((SID)(t[1])).icon);
-                }*/
-            }
         }
 
         #endregion

@@ -24,7 +24,6 @@ namespace KWY
 
         MainGameData data;
 
-        GameManager gameManager;
         Simulation simulation;
 
         [Tooltip("Info 띄우는데 필요한 최소 클릭 시간; move 일 경우 없음")]
@@ -65,7 +64,7 @@ namespace KWY
             if (data.MyPlayer.Mp >= psb.cost)
             {
                 mouseInput.Mouse.MouseClick.performed += OnClick;
-                GameManager gm = GameObject.Find("GameManager").GetComponent<GameManager>();
+                //GameManager gm = GameObject.Find("GameManager").GetComponent<GameManager>();
                 data.MyPlayer.SubMp(psb.cost);
 
                 Debug.Log("스킬 발동");
@@ -169,26 +168,17 @@ namespace KWY
                 }
             }
 
-            if (!gameManager)
+            GameObject oo = GameObject.Find("UICanvas");
+
+            if (!oo)
             {
-                GameObject o = GameObject.Find("UICanvas");
+                Debug.Log("Can not find game object named: UICanvas");
+            }
 
-                if (!o)
-                {
-                    Debug.Log("Can not find game object named: GameManager");
-                }
-
-                gameManager = o.GetComponent<GameManager>();
-                if (!gameManager)
-                {
-                    Debug.Log("Can not find component at UICanvas: GameManager");
-                }
-
-                simulation = o.GetComponent<Simulation>();
-                if (!simulation)
-                {
-                    Debug.Log("Can not find component at UICanvas: Simulation");
-                }
+            simulation = oo.GetComponent<Simulation>();
+            if (!simulation)
+            {
+                Debug.Log("Can not find component at UICanvas: Simulation");
             }
         }
         private void Update()
