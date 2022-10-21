@@ -149,8 +149,11 @@ namespace KWY
         {
             foreach (Vector3Int position in map.cellBounds.allPositionsWithin)
             {
+                // 아래 if 문으로 안감
+                // TODO_ERROR
                 if (map.HasTile(position))
                 {
+                    
                     List<GameObject> ch = new List<GameObject>();
 
                     ch = getInitialChar(map.CellToWorld(position));

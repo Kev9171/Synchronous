@@ -75,7 +75,7 @@ namespace KWY
         public void OnClickClose()
         {
             // Leave the room 
-            if (PhotonNetwork.LeaveRoom(false))
+            if (PhotonNetwork.LeaveRoom(true))
             {
                 Debug.Log("Leave the room...");
             }

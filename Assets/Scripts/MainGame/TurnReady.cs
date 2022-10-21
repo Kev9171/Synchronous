@@ -35,6 +35,9 @@ namespace KWY
         private CharacterControl characterControl;
 
         [SerializeField]
+        private RectTransform characterPanel;
+
+        [SerializeField]
         Transform UICanvasTransform;
 
         private float time;
@@ -75,6 +78,8 @@ namespace KWY
             // 캐릭터 선택 가능하도록
             characterUIHandler.CharaPanelSelectable = true;
             characterControl.StartControl();
+
+            characterPanel.anchoredPosition = new Vector2(-250, 0);
 
             // 확대된 캐릭터 원래 크기로 초기화 및 임시 좌표 초기화
             foreach (PlayableCharacter c in data.MyTeamCharacter)

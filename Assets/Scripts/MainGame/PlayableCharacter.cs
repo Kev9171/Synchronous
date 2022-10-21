@@ -35,6 +35,14 @@ namespace KWY
             }
         }
 
+        public Team Team
+        {
+            get
+            {
+                return _team;
+            }
+        }
+
         public PlayableCharacter(GameObject charaObject, int id, Team team)
         {
             _charaObject = charaObject;

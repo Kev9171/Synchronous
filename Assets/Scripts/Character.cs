@@ -570,19 +570,13 @@ namespace KWY
         {
             observers.Clear();
         }
+
         #endregion
 
         public void OnPhotonInstantiate(PhotonMessageInfo info)
         {
             Debug.Log(PhotonNetwork.GetPhotonView(GetComponent<PhotonView>().ViewID).gameObject.GetComponent<Character>());
 
-        }
-
-        [PunRPC]
-        public void TestRPC()
-        {
-            Debug.Log(Pc); // null
-            Debug.Log(this);
         }
     }
 }
