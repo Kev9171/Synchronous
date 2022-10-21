@@ -61,9 +61,14 @@ namespace KWY
                     TurnReadyState();
                     break;
                 case STATE.Simul: // start simul
-                    SimulationState(
-                        new ActionData((Dictionary<int, object[]>)data[0])
-                        );
+                    if (PhotonNetwork.IsMasterClient)
+                    {
+                        SimulationState(new ActionData((Dictionary<int, object[]>)data[0]));
+                    }
+                    else
+                    {
+                        SimulationState();
+                    }
                     break;
                 case STATE.GameOver: // game over
                     GameOverState((TICK_RESULT)data[0]);
@@ -97,8 +102,36 @@ namespace KWY
             turnReady.StartTurnReadyState();
         }
 
+        private void SimulationState()
+        {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                Debug.LogError("SimulationState() must be called only on B-client");
+                return;
+            }
+
+            nowState = STATE.Simul;
+
+            nowState = STATE.Simul;
+
+            // end turnready state
+            turnReady.EndTurnReadyState();
+
+            // move camera
+            cameraController.SetCameraSimul();
+
+            // start simulation state
+            simulation.StartSimulationState();
+        }
+
         private void SimulationState(ActionData actionData)
         {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                Debug.LogError("SimulationState() must be called only on master client");
+                return;
+            }
+
             nowState = STATE.Simul;
 
             // end turnready state

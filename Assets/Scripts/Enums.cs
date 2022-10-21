@@ -86,7 +86,6 @@ namespace KWY
     }
     public enum TICK_RESULT
     {
-        KEEP_GOING = 0,
         DRAW = 1,
         MASTER_WIN = 2,
         CLIENT_WIN = 3

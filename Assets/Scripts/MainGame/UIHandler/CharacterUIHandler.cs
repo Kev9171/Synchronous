@@ -112,8 +112,6 @@ namespace KWY
 
         public void UpdateCharacterActionIcon(int id)
         {
-            Debug.Log("UpdateCharacterAcionIcon");
-
             CharacterActionData data = MainGameData.Instance.GetActionData(id);
 
             charaUIs[id].ResetSelActionImg();

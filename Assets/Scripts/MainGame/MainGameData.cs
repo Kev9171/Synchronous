@@ -61,6 +61,9 @@ namespace KWY
         private readonly List<PlayableCharacter> _charasTeamB = new List<PlayableCharacter>();
         private readonly Dictionary<int, bool> _isMyCharacter = new Dictionary<int, bool>();
 
+        private int _notBreakDownTeamA = 0;
+        private int _notBreakDownTeamB = 0;
+
 
         #region Public Fields        
         public List<PSID> PlayerSkillList { get { return _playerSkillList; } }
@@ -69,7 +72,17 @@ namespace KWY
         public Dictionary<int, PlayableCharacter> PCharacters { get { return _pCharacters; } }
         public List<PlayableCharacter> CharasTeamA { get { return _charasTeamA; } }
         public List<PlayableCharacter> CharasTeamB { get { return _charasTeamB; } }
-        public Dictionary<int, bool> IsMyCharacter { get { return _isMyCharacter; } }
+        public Dictionary<int, bool> IsMyCharacter { 
+            get 
+            { 
+                if (!PhotonNetwork.IsMasterClient)
+                {
+                    Debug.LogError("Sub-client has no data on _breakDown");
+                    return null;
+                }
+                return _isMyCharacter; 
+            } 
+        }
         public List<PlayableCharacter> MyTeamCharacter
         {
             get
@@ -98,6 +111,22 @@ namespace KWY
                     return _charasTeamA;
                 }
             }
+        }
+
+        // TODO
+        // 데이터 변경이 없는 상태일 때도 모든 observer에 notify를 하고 있음
+        // 특정 옵저버만 notify를 할 수있고
+        // 옵저버를 관리해줄 수 있는 클래스 만들기
+
+        public int NotBreakDownTeamA 
+        { 
+            set { _notBreakDownTeamA = value; NotifyObservers(); }
+            get { return _notBreakDownTeamA; } 
+        }
+        public int NotBreakDownTeamB 
+        { 
+            set { _notBreakDownTeamB = value; NotifyObservers(); }
+            get { return _notBreakDownTeamB; } 
         }
 
         public Player MyPlayer
@@ -304,10 +333,14 @@ namespace KWY
                 {
                     _charaActionData.Add(id, new CharacterActionData(id, new CharacterActionReadyObserver()));
                     _isMyCharacter.Add(id, true);
+
+                    _notBreakDownTeamA++;
                 }
                 else
                 {
                     _isMyCharacter.Add(id, false);
+
+                    _notBreakDownTeamB++;
                 }
 
                 photonView.RPC(
@@ -448,10 +481,16 @@ namespace KWY
             // player
             player.AddObserver(new PlayerObserver());
 
-            // main data
-            //AddObserver(new GameProgressObserver());
-            //AddObserver(new CharacterActionReadyObserver());
-            //AddObserver(new GameProgressSubscriber());
+
+            if (PhotonNetwork.IsMasterClient)
+            {
+                foreach(PlayableCharacter p in PCharacters.Values)
+                {
+                    p.Chara.AddObserver(new CharacterBreakDownObserver());
+                }
+
+                AddObserver(new GameOverObserver());
+            }
         }
         #endregion
 
@@ -466,6 +505,8 @@ namespace KWY
         private void Awake()
         {
             Instance = this;
+
+            IdHandler.ClearId();
 
             photonView = PhotonView.Get(this);
             if (!photonView)
@@ -562,6 +603,11 @@ namespace KWY
             }
 
             return v;
+        }
+
+        public static void ClearId()
+        {
+            id = 0;
         }
     }
 

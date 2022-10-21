@@ -1,3 +1,5 @@
+#define TEST
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,6 +24,9 @@ namespace KWY
         [SerializeField]
         private MainGameEvent gameEvent;
 
+        [SerializeField]
+        private RectTransform characterPanel;
+
         #region Private Fields
         [Tooltip("Game data about player and characters")]
         [SerializeField]
@@ -31,6 +36,8 @@ namespace KWY
         private int maxTimeLine;
         private int finActions;
         private float simulationIntervalSeconds;
+
+        private bool isSimulating = false;
 
         [Tooltip("이 값은 시뮬레이션 종료 후 다음 진행까지 얼마나 대기 하고 있을 것인가에 대한 int 값으로 logic data에서 지정하고 있는 interval 단위")]
         [SerializeField]
@@ -43,10 +50,19 @@ namespace KWY
         {
             playerSkillPanel.SetData(data.PlayerSkillList);
         }
+        public void StartSimulationState()
+        {
+            characterPanel.anchoredPosition = new Vector2(250, 0);
+
+            simulCanvas.SetActive(true);
+        }
+
 
         public void StartSimulationState(ActionData actionData)
         {
             this.actionData = actionData;
+
+            characterPanel.anchoredPosition = new Vector2(250, 0);
 
             simulCanvas.SetActive(true);
 
@@ -65,50 +81,21 @@ namespace KWY
             simulCanvas.SetActive(false);
         }
 
-        
-        private TICK_RESULT CheckGameEnd()
-        {
-            // 0: 계속 진행
-            // 1: 무승부
-            // 2: MasterClient 승
-            // 3: OtherClient 승
-
-            bool a = true;
-            bool b = true;
-            
-            foreach(PlayableCharacter p in data.MyTeamCharacter)
-            {
-                if (!p.Chara.BreakDown)
-                {
-                    // not end
-                    a = false;
-                    break;
-                }
-            }
-
-            foreach(PlayableCharacter p in data.OtherTeamCharacter)
-            {
-                if (!p.Chara.BreakDown)
-                {
-                    // not end
-                    b = false;
-                    break;
-                }
-            }
-
-            if (a && b) return TICK_RESULT.DRAW;
-            else if (a && !b) return TICK_RESULT.CLIENT_WIN;
-            else if (!a && b) return TICK_RESULT.MASTER_WIN;
-            else return TICK_RESULT.KEEP_GOING;
-        }
-
         #endregion
 
         #region Simulation 
 
         private void StartSimulation()
         {
+#if TEST
+            DataController.Instance.ModifyCharacterHp(0, -200);
+            DataController.Instance.ModifyCharacterHp(1, -200);
+            DataController.Instance.ModifyCharacterHp(2, -200);
+            return;
+#endif
+
             Debug.Log("Simulation starts...");
+            isSimulating = true;
 
             maxTimeLine = -1;
             foreach (int t in actionData.Data.Keys)
@@ -168,6 +155,7 @@ namespace KWY
             if (finActions == data.PCharacters.Count)
             {
                 finActions = 0;
+                isSimulating = false;
                 SimulationEnd();
             }
         }
@@ -314,6 +302,14 @@ namespace KWY
         private void Awake()
         {
             simulationIntervalSeconds = LogicData.Instance.SimulationIntervalSeconds;
+        }
+
+        private void Update()
+        {
+            if (isSimulating)
+            {
+
+            }
         }
 
         #endregion
