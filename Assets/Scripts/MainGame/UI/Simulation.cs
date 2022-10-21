@@ -168,6 +168,14 @@ namespace KWY
             if (finActions == data.PCharacters.Count)
             {
                 finActions = 0;
+                foreach (PlayableCharacter p in data.PCharacters.Values)
+                {
+                    p.Chara.SetMoveIdx(0);
+                }
+                //foreach (Character ch in data.Characters)
+                //{
+                //    ch.SetMoveIdx(0);
+                //}
                 SimulationEnd();
             }
         }
@@ -208,12 +216,14 @@ namespace KWY
                     if (type == ActionType.Move)
                     {
                         StartCoroutine(DoCharaMove(id, new Vector2Int((int)d[2], (int)d[3])));
+                        data.PCharacters[id].Chara.SetMoveIdx(1);
                         yield return new WaitForSeconds(simulationIntervalSeconds);
                     }
                     else if (type == ActionType.Skill)
                     {
                         yield return new WaitForSeconds(SkillManager.GetData((SID)d[2]).triggerTime);
                         StartCoroutine(DoCharaSkill(id, (SID)d[2], (SkillDicection)d[3], new Vector2Int((int)d[2], (int)d[3])));
+                        data.PCharacters[id].Chara.SetMoveIdx(1);
                         yield return new WaitForSeconds(SkillManager.GetData((SID)d[2]).castingTime);
                     }
                 }
@@ -238,28 +248,14 @@ namespace KWY
         {
             if (actionData.Data.TryGetValue(id, out var value))
             {
-                //foreach (object[] d in value)
-                //{
-                //    int time = (int)d[0];
-
-                //    ActionType t = (ActionType)d[1];
-
-                //    if (t == ActionType.Move)
-                //    {
-                //        Vector2Int vec = new Vector2Int((int)d[2], (int)d[3]);
-                //        List<Vector2Int> des = y % 2 == 0 ? action.areaEvenY : action.areaOddY;
-                //        List<Vector2Int> cur = y % 2 != 0 ? action.areaEvenY : action.areaOddY;
-                //        int idx = cur.IndexOf(vec);
-
-                //    }
-                //}
-                for (int i = 0; i < value.Length; i++)
+                int y2 = y;
+                for (int i = data.PCharacters[id].Chara.moveIdx; i < value.Length; i++)
                 {
                     object[] d = (object[])value[i];
                     if ((ActionType)d[1] == ActionType.Move)
                     {
                         Vector2Int vec = new Vector2Int((int)d[2], (int)d[3]);
-                        List<Vector2Int> v = y != 0 ? action.areaEvenY : action.areaOddY;
+                        List<Vector2Int> v = y2 % 2 != 0 ? action.areaEvenY : action.areaOddY;
                         //List<Vector2Int> cur = y % 2 != 0 ? action.areaEvenY : action.areaOddY;
                         int idx = v.IndexOf(vec);
                         Vector2Int newVec = v[5 - idx] * (-1);
@@ -268,36 +264,54 @@ namespace KWY
                         d[2] = newVec.x;
                         d[3] = newVec.y;
                         value[i] = d;
+                        y2 += (int)d[3];
+                        Debug.Log("index: " + i + ", value[i] " + value[i] + ", moveIdx: " + data.PCharacters[id].Chara.moveIdx);
                     }
                 }
                 actionData.Data[id] = value;
             }
             else
                 Debug.Log("no char matching cid");
-            /*if (actionData.Data.TryGetValue(id, out var value))
+        }
+            //if (actionData.Data.TryGetValue(id, out var value))
+            //{
+
+
+            //    foreach (object[] d in value)
+            //    {
+            //        int time = (int)d[0];
+
+            //        ActionType t = (ActionType)d[1];
+
+        public void showAction(int cid)
+        {
+            if (actionData.Data.TryGetValue(cid, out var value))
             {
-
-
-                foreach (object[] d in value)
-                {
-                    int time = (int)d[0];
-
-                    ActionType t = (ActionType)d[1];
-
-                    if (t == ActionType.Move)
-                    {
-                        Vector2Int vec = new Vector2Int((int)d[2], (int)d[3]);
-                        List<Vector2Int> des = y % 2 == 0 ? action.areaEvenY : action.areaOddY;
-                        List<Vector2Int> cur = y % 2 != 0 ? action.areaEvenY : action.areaOddY;
-                        int idx = cur.IndexOf(vec);
-                    }
-                }
                 for (int i = 0; i < value.Length; i++)
                 {
-                    Debug.Log(value[0] + ", " + value[1] + ", " + value[2] + ", " + value[3]);
+                    object[] d = (object[])value[i];
+                    if ((ActionType)d[1] == ActionType.Move)
+                    {
+                        Debug.Log("Move Action: " + d[2] + ", " + d[3]);
+                    }
                 }
-            }*/
+            }
         }
+
+        //IEnumerator DoCharaMove(int cid, Vector2Int v)
+        //{
+        //    //data.WholeCharacters[cid].MoveTo(v);
+        //    data.WholeCharacters[cid].photonView.RPC("MoveTo", RpcTarget.All, v.x, v.y);
+        //    showActions.ShowMoveLog(cid);
+        //    yield return null;
+        //}
+
+        //IEnumerator DoCharaSkill(int cid, SID sid, SkillDicection dir)
+        //{
+        //    data.WholeCharacters[cid].SpellSkill(sid, dir);
+        //    showActions.ShowSkillLog(cid, sid);
+        //    yield return null;
+        //}
 
         /// <summary>
         /// Called when the simulation ended

@@ -78,14 +78,11 @@ namespace KWY
 
         public void Skill1(InputAction.CallbackContext context)
         {
-            if (data.MyPlayer.Skill1(SelChara))
-            {
-                mouseInput.Mouse.MouseClick.performed -= Skill1;
-            }
-
-            /*map = GameObject.Find("Tilemap").GetComponent<Tilemap>();
-            chCtrl = GameObject.Find("CharacterControl").GetComponent<CharacterControl>();
-            //mouseInput.Mouse.MouseClick.performed += chCtrl.OnClick;
+            //if (data.MyPlayer.Skill1(SelChara))
+            //{
+            //    mouseInput.Mouse.MouseClick.performed -= Skill1;
+            //}
+            map = GameObject.Find("Tilemap").GetComponent<Tilemap>();
 
             if (SelChara == null) return;
             Debug.Log("clicked " + SelChara);
@@ -98,15 +95,16 @@ namespace KWY
             if (map.HasTile(clickV))
             {
                 TilemapControl TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
+                Simulation sim = GameObject.Find("UICanvas").GetComponent<Simulation>();
                 if (clickV.y % 2 != SelChara.TilePos.y % 2)
                 {
-                    simulation.ChangeAction((int)SelChara.Cb.cid, clickV.y % 2, MoveManager.MoveData);
+                    sim.ChangeAction((int)SelChara.Cb.cid, clickV.y, MoveManager.MoveData);
                 }
                 SelChara.Teleport(clickV);
-
+                sim.showAction((int)SelChara.Cb.cid);
 
                 mouseInput.Mouse.MouseClick.performed -= Skill1;
-            }*/
+            }
         }
 
         public void OnClick(InputAction.CallbackContext context)

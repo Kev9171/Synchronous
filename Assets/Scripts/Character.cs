@@ -53,6 +53,7 @@ namespace KWY
         [SerializeField] private float movementSpeed;
         private Vector2 destination;
         public Vector3Int TilePos;
+        public int moveIdx { get; private set; }
 
         private Tilemap map, hlMap;
         private TilemapControl TCtrl;
@@ -342,8 +343,6 @@ namespace KWY
 
                 worldPos = newPos;
 
-
-
                 //if (map.CellToWorld(nowPos).x < des.x)
                 //    gameObject.GetComponent<SpriteRenderer>().flipX = false;
                 //else if (map.CellToWorld(nowPos).x > des.x)
@@ -424,9 +423,16 @@ namespace KWY
             }
         }
 
+        public void SetMoveIdx(int value)
+        {
+            if (value != 0)
+                moveIdx += value;
+            else
+                moveIdx = 0;
+        }
+
         public void SpellSkill(SID sid, SkillDicection direction, Vector2Int v)
         {
-            nowMove = false;
             nowMove = false;
             SkillBase SelSkill = SkillManager.GetData(sid);
             if (SelSkill.areaAttack)
@@ -464,6 +470,7 @@ namespace KWY
             TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
 
             TilePos = map.WorldToCell(transform.position);
+            SetMoveIdx(0);
         }
 
         private void Start()
