@@ -2,18 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DontDestoryObject : MonoBehaviour
+namespace PickScene
 {
-    private void Awake()
+    public class DontDestoryObject : MonoBehaviour
     {
-        var obj = FindObjectsOfType<DontDestoryObject>();
-        if (obj.Length == 1)
+        private void Awake()
         {
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
+            var obj = FindObjectsOfType<DontDestoryObject>();
+            if (obj.Length == 1)
+            {
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }
+

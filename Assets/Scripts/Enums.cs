@@ -51,10 +51,11 @@ namespace KWY
 
     public enum STATE : int
     {
-        StandBy = 0,
-        TurnReady = 1,
-        Simul = 2,
-        GameOver = 3
+        IDLE = 0,
+        StandBy = 1,
+        TurnReady = 2,
+        Simul = 3,
+        GameOver = 4
     }
 
     // À°°¢Çü ¹æÇâ
@@ -76,5 +77,24 @@ namespace KWY
         WEB_REQUEST_PROTOCOL_ERROR = 102,
         WEB_REQUEST_ERROR = 103,
         CANNOT_FIND_FILE = 201,
+    }
+
+    public enum Team : short
+    {
+        A = 0,
+        B = 1,
+    }
+    public enum TICK_RESULT
+    {
+        DRAW = 1,
+        MASTER_WIN = 2,
+        CLIENT_WIN = 3
+    };
+
+    public enum WINLOSE
+    {
+        WIN = 1,
+        LOSE = 2,
+        DRAW = 3
     }
 }

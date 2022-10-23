@@ -24,7 +24,6 @@ namespace KWY
 
         MainGameData data;
 
-        GameManager gameManager;
         Simulation simulation;
 
         [Tooltip("Info 띄우는데 필요한 최소 클릭 시간; move 일 경우 없음")]
@@ -65,7 +64,7 @@ namespace KWY
             if (data.MyPlayer.Mp >= psb.cost)
             {
                 mouseInput.Mouse.MouseClick.performed += OnClick;
-                GameManager gm = GameObject.Find("GameManager").GetComponent<GameManager>();
+                //GameManager gm = GameObject.Find("GameManager").GetComponent<GameManager>();
                 data.MyPlayer.SubMp(psb.cost);
 
                 Debug.Log("스킬 발동");
@@ -78,31 +77,8 @@ namespace KWY
 
         public void Skill1(InputAction.CallbackContext context)
         {
-            //if (data.MyPlayer.Skill1(SelChara))
-            //{
-            //    mouseInput.Mouse.MouseClick.performed -= Skill1;
-            //}
-            map = GameObject.Find("Tilemap").GetComponent<Tilemap>();
-
-            if (SelChara == null) return;
-            Debug.Log("clicked " + SelChara);
-            Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
-
-            mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
-
-            Vector3Int clickV = map.WorldToCell(mousePosition);
-
-            if (map.HasTile(clickV))
+            if (data.MyPlayer.Skill1(SelChara))
             {
-                TilemapControl TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
-                Simulation sim = GameObject.Find("UICanvas").GetComponent<Simulation>();
-                if (clickV.y % 2 != SelChara.TilePos.y % 2)
-                {
-                    sim.ChangeAction((int)SelChara.Cb.cid, clickV.y, MoveManager.MoveData);
-                }
-                SelChara.Teleport(clickV);
-                sim.showAction((int)SelChara.Cb.cid);
-
                 mouseInput.Mouse.MouseClick.performed -= Skill1;
             }
         }
@@ -167,26 +143,17 @@ namespace KWY
                 }
             }
 
-            if (!gameManager)
+            GameObject oo = GameObject.Find("UICanvas");
+
+            if (!oo)
             {
-                GameObject o = GameObject.Find("UICanvas");
+                Debug.Log("Can not find game object named: UICanvas");
+            }
 
-                if (!o)
-                {
-                    Debug.Log("Can not find game object named: GameManager");
-                }
-
-                gameManager = o.GetComponent<GameManager>();
-                if (!gameManager)
-                {
-                    Debug.Log("Can not find component at UICanvas: GameManager");
-                }
-
-                simulation = o.GetComponent<Simulation>();
-                if (!simulation)
-                {
-                    Debug.Log("Can not find component at UICanvas: Simulation");
-                }
+            simulation = oo.GetComponent<Simulation>();
+            if (!simulation)
+            {
+                Debug.Log("Can not find component at UICanvas: Simulation");
             }
         }
         private void Update()

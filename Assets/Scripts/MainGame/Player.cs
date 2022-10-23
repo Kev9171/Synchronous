@@ -21,7 +21,7 @@ namespace KWY
             private set;
         } = 0;
 
-        public Image playerImg
+        public Image PlayerImg
         {
             get;
             private set;
@@ -41,14 +41,12 @@ namespace KWY
         CharacterControl chCtrl;
         [SerializeField]
         MouseInput mouseInput;
-        [SerializeField]
-        Simulation simulation;
 
 
         public void InitData(Image icon, int initialMp)
         {
             Mp = initialMp;
-            playerImg = icon;
+            PlayerImg = icon;
         }
 
         public void AddMp(int value)
@@ -80,12 +78,13 @@ namespace KWY
 
             if (map.HasTile(clickV))
             {
-                if (clickV.y % 2 != selChara.TempTilePos.y % 2)
+                TilemapControl TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
+                if (clickV.y % 2 != selChara.TilePos.y % 2)
                 {
-                    simulation.ChangeAction(selChara.Pc.Id, clickV.y % 2, MoveManager.MoveData);
+                    GameManager.Instance.Simulation.ChangeAction((int)selChara.Cb.cid, clickV.y, MoveManager.MoveData);
                 }
                 selChara.Teleport(clickV);
-
+                GameManager.Instance.Simulation.ShowAction(selChara.Pc.Id);
 
                 SkillCount++;
                 return true;
