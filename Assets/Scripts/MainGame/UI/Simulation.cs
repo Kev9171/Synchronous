@@ -37,7 +37,6 @@ namespace KWY
         private int finActions;
         private float simulationIntervalSeconds;
 
-        private bool isSimulating = false;
 
         [Tooltip("이 값은 시뮬레이션 종료 후 다음 진행까지 얼마나 대기 하고 있을 것인가에 대한 int 값으로 logic data에서 지정하고 있는 interval 단위")]
         [SerializeField]
@@ -95,7 +94,6 @@ namespace KWY
 #endif
 
             Debug.Log("Simulation starts...");
-            isSimulating = true;
 
             maxTimeLine = -1;
             foreach (int t in actionData.Data.Keys)
@@ -155,7 +153,10 @@ namespace KWY
             if (finActions == data.PCharacters.Count)
             {
                 finActions = 0;
-                isSimulating = false;
+                foreach (PlayableCharacter p in data.PCharacters.Values)
+                {
+                    p.Chara.SetMoveIdx(0);
+                }
                 SimulationEnd();
             }
         }
@@ -196,12 +197,14 @@ namespace KWY
                     if (type == ActionType.Move)
                     {
                         StartCoroutine(DoCharaMove(id, new Vector2Int((int)d[2], (int)d[3])));
+                        data.PCharacters[id].Chara.SetMoveIdx(1);
                         yield return new WaitForSeconds(simulationIntervalSeconds);
                     }
                     else if (type == ActionType.Skill)
                     {
                         yield return new WaitForSeconds(SkillManager.GetData((SID)d[2]).triggerTime);
                         StartCoroutine(DoCharaSkill(id, (SID)d[2], (SkillDicection)d[3], new Vector2Int((int)d[2], (int)d[3])));
+                        data.PCharacters[id].Chara.SetMoveIdx(1);
                         yield return new WaitForSeconds(SkillManager.GetData((SID)d[2]).castingTime);
                     }
                 }
@@ -241,13 +244,14 @@ namespace KWY
 
                 //    }
                 //}
-                for (int i = 0; i < value.Length; i++)
+                int y2 = y;
+                for (int i = data.PCharacters[id].Chara.moveIdx; i < value.Length; i++)
                 {
                     object[] d = (object[])value[i];
                     if ((ActionType)d[1] == ActionType.Move)
                     {
                         Vector2Int vec = new Vector2Int((int)d[2], (int)d[3]);
-                        List<Vector2Int> v = y != 0 ? action.areaEvenY : action.areaOddY;
+                        List<Vector2Int> v = y2 % 2 != 0 ? action.areaEvenY : action.areaOddY;
                         //List<Vector2Int> cur = y % 2 != 0 ? action.areaEvenY : action.areaOddY;
                         int idx = v.IndexOf(vec);
                         Vector2Int newVec = v[5 - idx] * (-1);
@@ -256,6 +260,8 @@ namespace KWY
                         d[2] = newVec.x;
                         d[3] = newVec.y;
                         value[i] = d;
+                        y2 += (int)d[3];
+                        Debug.Log("index: " + i + ", value[i] " + value[i] + ", moveIdx: " + data.PCharacters[id].Chara.moveIdx);
                     }
                 }
                 actionData.Data[id] = value;
@@ -287,6 +293,21 @@ namespace KWY
             }*/
         }
 
+        public void ShowAction(int id)
+        {
+            if (actionData.Data.TryGetValue(id, out var value))
+            {
+                for (int i=0; i<value.Length; i++)
+                {
+                    object[] d = (object[])value[i];
+                    if ((ActionType)d[1] == ActionType.Move)
+                    {
+                        Debug.Log("Move Action: " + d[2] + ", " + d[3]);
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Called when the simulation ended
         /// </summary>
@@ -306,10 +327,6 @@ namespace KWY
 
         private void Update()
         {
-            if (isSimulating)
-            {
-
-            }
         }
 
         #endregion
