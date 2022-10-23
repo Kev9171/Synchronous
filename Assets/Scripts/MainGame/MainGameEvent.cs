@@ -9,15 +9,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-using DebugUtil;
-
 namespace KWY
 {
     public class MainGameEvent : MonoBehaviourPun
     {
+        #region Private Serializable Fields
 
         [Tooltip("The button to send ready to start simulation to server")]
         [SerializeField] private Button readyBtn;
+
+        [SerializeField]
+        private GameManager gameManager;
+
+        #endregion
+
+        #region Private Fields
 
         [Tooltip("다음에 게임이 시작되면 로드될 scene")]
         readonly private string nextLevel = "";
@@ -25,11 +31,9 @@ namespace KWY
         [Tooltip("Unique user id that the server determined")]
         private string UserId;
 
-        private GameObject UICanvas;
-
-        public static MainGameEvent Instance;
        
 
+        #endregion
 
         #region Public Methods
 
@@ -52,11 +56,11 @@ namespace KWY
 
             if (PhotonNetwork.RaiseEvent(evCode, actionData.Data, raiseEventOptions, sendOptions))
             {
-                DebugLog.LogRaiseEvent(evCode, actionData.Data, raiseEventOptions, sendOptions);
+                UtilForDebug.LogRaiseEvent(evCode, actionData.Data, raiseEventOptions, sendOptions);
             }
             else
             {
-                DebugLog.FailedToRaiseEvent(evCode);
+                UtilForDebug.LogErrorRaiseEvent(evCode);
             }
         }
 
@@ -82,28 +86,23 @@ namespace KWY
 
             if (PhotonNetwork.RaiseEvent(evCode, content, raiseEventOptions, sendOptions))
             {
-                DebugLog.LogRaiseEvent(evCode, content, raiseEventOptions, sendOptions);
+                UtilForDebug.LogRaiseEvent(evCode, content, raiseEventOptions, sendOptions);
             }
             else
             {
-                DebugLog.FailedToRaiseEvent(evCode);
+                UtilForDebug.LogErrorRaiseEvent(evCode);
             }
         }
 
         /// <summary>
-        /// Send to 'Game ends' signal to the Server; It must be called ONLY Master Client; content: winnerTeam: int
+        /// Send to 'Game ends' signal to the Server; It must be called ONLY Master Client; content: winnerId: string
         /// </summary>
-        public void RaiseEventGameEnd(TICK_RESULT result)
+        public void RaiseEventGameEnd()
         {
             byte evCode = (byte)EvCode.GameEnd;
 
-            var content = result switch
-            {
-                TICK_RESULT.DRAW => ((int)TICK_RESULT.DRAW),
-                TICK_RESULT.MASTER_WIN => ((int)TICK_RESULT.MASTER_WIN),
-                TICK_RESULT.CLIENT_WIN => ((int)TICK_RESULT.CLIENT_WIN),
-                _ => -1,
-            };
+            var content = UserId; // temp 이긴 유저의 id 값을 content로
+            // content에 이긴 유저의 id 값 넣기
 
             RaiseEventOptions raiseEventOptions = new RaiseEventOptions
             {
@@ -117,11 +116,11 @@ namespace KWY
 
             if (PhotonNetwork.RaiseEvent(evCode, content, raiseEventOptions, sendOptions))
             {
-                DebugLog.LogRaiseEvent(evCode, content, raiseEventOptions, sendOptions);
+                UtilForDebug.LogRaiseEvent(evCode, content, raiseEventOptions, sendOptions);
             }
             else
             {
-                DebugLog.FailedToRaiseEvent(evCode);
+                UtilForDebug.LogErrorRaiseEvent(evCode);
             }
         }
 
@@ -146,11 +145,11 @@ namespace KWY
 
             if (PhotonNetwork.RaiseEvent(evCode, content, raiseEventOptions, sendOptions))
             {
-                DebugLog.LogRaiseEvent(evCode, content, raiseEventOptions, sendOptions);
+                UtilForDebug.LogRaiseEvent(evCode, content, raiseEventOptions, sendOptions);
             }
             else
             {
-                DebugLog.FailedToRaiseEvent(evCode);
+                UtilForDebug.LogErrorRaiseEvent(evCode);
             }
         }
 
@@ -206,12 +205,12 @@ namespace KWY
                 if (PhotonNetwork.IsMasterClient)
                 {
                     Debug.Log("Received simul data!!!!");
-                    GameManager.Instance.SetState(STATE.Simul, (Dictionary<int, object[]>)data[3]); // Note: if data[2] is false, there is no data[3]
+                    gameManager.SetState(1, (Dictionary<int, object[]>)data[3]); // Note: if data[2] is false, there is no data[3]
                 }
                 else
                 {
                     Debug.Log("It is not matser client");
-                    GameManager.Instance.SetState(STATE.Simul);
+                    gameManager.SetState(1);
                 }
             }
         }
@@ -222,20 +221,39 @@ namespace KWY
         /// <param name="eventData">Received data from the server</param>
         private void OnEventSimulEnd(EventData eventData)
         {
-            GameManager.Instance.SetState(STATE.TurnReady);
+            gameManager.SetState(0);
         }
 
         /// <summary>
-        /// Method when the server responses the signal, 'the game ended'; data: [TICK_RESULT: int]
+        /// Method when the server responses the signal, 'the game ended'; data: [winnerId: string]
         /// </summary>
         /// <param name="eventData">Received data from the server</param>
         private void OnEventGameEnd(EventData eventData)
         {
             var data = eventData.CustomData;
 
-            TICK_RESULT result = (TICK_RESULT)data;
+            if (!(data is string))
+            {
+                Debug.LogError("Type Error");
+                return;
+            }
 
-            GameManager.Instance.SetState(STATE.GameOver, result);
+            // 이겻을 경우
+            if ((string)data == this.UserId)
+            {
+                // null 값은 임시
+                GameObject canvas = GameObject.Find("UICanvas");
+                PanelBuilder.ShowWinPanel(canvas.transform, null);
+            }
+            // 졌을 경우
+            else
+            {
+                // null 값은 임시
+                GameObject canvas = GameObject.Find("UICanvas");
+                PanelBuilder.ShowLosePanel(canvas.transform, null);
+            }
+
+            // 게임 종료 후 할 내용들 작성
         }
 
         #endregion
@@ -254,13 +272,6 @@ namespace KWY
             {
                 Debug.LogError("Can not get UserId - Check the server connection");
             }
-
-            UICanvas = GameObject.Find("UICanvas");
-
-            if (!UICanvas)
-            {
-                Debug.Log("Can not find gameobject named: UICanvas");
-            }
         }
 
         public void OnEnable()
@@ -275,7 +286,6 @@ namespace KWY
 
         public void Start()
         {
-            Instance = this;
             // ExitGames.Client.Photon.PhotonPeer.RegisterType(); //ㅠㅠ
         }
 

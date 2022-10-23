@@ -6,8 +6,6 @@ using System.Collections.Concurrent;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-using DebugUtil;
-
 namespace KWY
 {
     public class Character : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback, IPunObservable, ISubject<Character>
@@ -15,7 +13,7 @@ namespace KWY
         [SerializeField]
         CharacterBase _characterBase;
 
-        private readonly List<IObserver<Character>> observers = new List<IObserver<Character>>();
+        private List<IObserver<Character>> observers = new List<IObserver<Character>>();
 
         public PlayableCharacter Pc
         {
@@ -85,17 +83,18 @@ namespace KWY
 
         public void DamageHP(float damage)
         {
-            if (Hp - damage > 0)
+            Hp -= damage;
+            if (Hp < 0) Hp = 0;
+
+            if (Hp == 0)
             {
-                Hp -= damage;
-                Debug.LogFormat("{0} is damaged {1}; Now hp: {2}", Cb.name, damage, Hp);
-            }
-            else if (Hp - damage < 0)
-            {
-                Hp = 0;
                 BreakDown = true;
                 ClearBuff();
                 Debug.LogFormat("{0} is damaged {1}; Now hp: {2}; BREAK DOWN!", Cb.name, damage, Hp);
+            }
+            else
+            {
+                Debug.LogFormat("{0} is damaged {1}; Now hp: {2}", Cb.name, damage, Hp);
             }
 
             NotifyObservers();
@@ -103,40 +102,11 @@ namespace KWY
 
         public void AddMP(float amount)
         {
-            if (Mp + amount > MaxMp)
-            {
-                Mp = MaxMp;
-            }
-            else if (Mp + amount < 0)
-            {
-                Mp = 0;
-            }
-            else
-            {
-                Mp += amount;
-            }
+            Mp += amount;
+            if (Mp > MaxMp) Mp = MaxMp;
+            else if (Mp < 0) Mp = 0;
 
-            Debug.LogFormat($"[id={Pc.Id}]{Cb.name}'s mp is added {amount}; Now mp: {Mp}");
-
-            NotifyObservers();
-        }
-
-        public void AddHp(float amount)
-        {
-            if (Hp + amount > MaxMp)
-            {
-                Hp = MaxHp;
-            }
-            else if (Hp - amount < 0)
-            {
-                Hp = 0;
-            }
-            else
-            {
-                Hp += amount;
-            }
-
-            Debug.LogFormat("{0}'s hp is added {1}; Now hp: {2}", Cb.name, amount, Hp);
+            Debug.LogFormat("{0}'s mp is added {1}; Now mp: {2}", Cb.name, amount, Mp);
 
             NotifyObservers();
         }
@@ -373,8 +343,6 @@ namespace KWY
 
                 worldPos = newPos;
 
-
-
                 //if (map.CellToWorld(nowPos).x < des.x)
                 //    gameObject.GetComponent<SpriteRenderer>().flipX = false;
                 //else if (map.CellToWorld(nowPos).x > des.x)
@@ -458,13 +426,9 @@ namespace KWY
         public void SetMoveIdx(int value)
         {
             if (value != 0)
-            {
                 moveIdx += value;
-            }
             else
-            {
                 moveIdx = 0;
-            }
         }
 
         public void SpellSkill(SID sid, SkillDicection direction, Vector2Int v)
@@ -499,6 +463,7 @@ namespace KWY
         {
             Init();
 
+            
 
             map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
             hlMap = GameObject.Find("HighlightTilemap").GetComponent<Tilemap>();
@@ -539,8 +504,6 @@ namespace KWY
                 
             }
         }
-
-
 
         #endregion
 
@@ -583,13 +546,23 @@ namespace KWY
         {
             observers.Clear();
         }
-
         #endregion
 
         public void OnPhotonInstantiate(PhotonMessageInfo info)
         {
+            Debug.Log(info.photonView.GetInstanceID());
+            Debug.Log(info.photonView);
+
             Debug.Log(PhotonNetwork.GetPhotonView(GetComponent<PhotonView>().ViewID).gameObject.GetComponent<Character>());
 
+            
+        }
+
+        [PunRPC]
+        public void TestRPC()
+        {
+            Debug.Log(Pc); // null
+            Debug.Log(this);
         }
     }
 }

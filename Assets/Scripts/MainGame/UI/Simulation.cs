@@ -1,5 +1,3 @@
-#define TEST
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -24,9 +22,6 @@ namespace KWY
         [SerializeField]
         private MainGameEvent gameEvent;
 
-        [SerializeField]
-        private RectTransform characterPanel;
-
         #region Private Fields
         [Tooltip("Game data about player and characters")]
         [SerializeField]
@@ -36,7 +31,6 @@ namespace KWY
         private int maxTimeLine;
         private int finActions;
         private float simulationIntervalSeconds;
-
 
         [Tooltip("이 값은 시뮬레이션 종료 후 다음 진행까지 얼마나 대기 하고 있을 것인가에 대한 int 값으로 logic data에서 지정하고 있는 interval 단위")]
         [SerializeField]
@@ -49,19 +43,10 @@ namespace KWY
         {
             playerSkillPanel.SetData(data.PlayerSkillList);
         }
-        public void StartSimulationState()
-        {
-            characterPanel.anchoredPosition = new Vector2(250, 0);
-
-            simulCanvas.SetActive(true);
-        }
-
 
         public void StartSimulationState(ActionData actionData)
         {
             this.actionData = actionData;
-
-            characterPanel.anchoredPosition = new Vector2(250, 0);
 
             simulCanvas.SetActive(true);
 
@@ -80,19 +65,49 @@ namespace KWY
             simulCanvas.SetActive(false);
         }
 
+        
+        private TICK_RESULT CheckGameEnd()
+        {
+            // 0: 계속 진행
+            // 1: 무승부
+            // 2: MasterClient 승
+            // 3: OtherClient 승
+
+            bool a = true;
+            bool b = true;
+            
+            foreach(PlayableCharacter p in data.MyTeamCharacter)
+            {
+                if (!p.Chara.BreakDown)
+                {
+                    // not end
+                    a = false;
+                    break;
+                }
+            }
+
+            foreach(PlayableCharacter p in data.OtherTeamCharacter)
+            {
+                if (!p.Chara.BreakDown)
+                {
+                    // not end
+                    b = false;
+                    break;
+                }
+            }
+
+            if (a && b) return TICK_RESULT.DRAW;
+            else if (a && !b) return TICK_RESULT.CLIENT_WIN;
+            else if (!a && b) return TICK_RESULT.MASTER_WIN;
+            else return TICK_RESULT.KEEP_GOING;
+        }
+
         #endregion
 
         #region Simulation 
 
         private void StartSimulation()
         {
-#if TEST
-            DataController.Instance.ModifyCharacterHp(0, -200);
-            DataController.Instance.ModifyCharacterHp(1, -200);
-            DataController.Instance.ModifyCharacterHp(2, -200);
-            return;
-#endif
-
             Debug.Log("Simulation starts...");
 
             maxTimeLine = -1;
@@ -157,6 +172,10 @@ namespace KWY
                 {
                     p.Chara.SetMoveIdx(0);
                 }
+                //foreach (Character ch in data.Characters)
+                //{
+                //    ch.SetMoveIdx(0);
+                //}
                 SimulationEnd();
             }
         }
@@ -229,21 +248,6 @@ namespace KWY
         {
             if (actionData.Data.TryGetValue(id, out var value))
             {
-                //foreach (object[] d in value)
-                //{
-                //    int time = (int)d[0];
-
-                //    ActionType t = (ActionType)d[1];
-
-                //    if (t == ActionType.Move)
-                //    {
-                //        Vector2Int vec = new Vector2Int((int)d[2], (int)d[3]);
-                //        List<Vector2Int> des = y % 2 == 0 ? action.areaEvenY : action.areaOddY;
-                //        List<Vector2Int> cur = y % 2 != 0 ? action.areaEvenY : action.areaOddY;
-                //        int idx = cur.IndexOf(vec);
-
-                //    }
-                //}
                 int y2 = y;
                 for (int i = data.PCharacters[id].Chara.moveIdx; i < value.Length; i++)
                 {
@@ -268,36 +272,22 @@ namespace KWY
             }
             else
                 Debug.Log("no char matching cid");
-            /*if (actionData.Data.TryGetValue(id, out var value))
-            {
-
-
-                foreach (object[] d in value)
-                {
-                    int time = (int)d[0];
-
-                    ActionType t = (ActionType)d[1];
-
-                    if (t == ActionType.Move)
-                    {
-                        Vector2Int vec = new Vector2Int((int)d[2], (int)d[3]);
-                        List<Vector2Int> des = y % 2 == 0 ? action.areaEvenY : action.areaOddY;
-                        List<Vector2Int> cur = y % 2 != 0 ? action.areaEvenY : action.areaOddY;
-                        int idx = cur.IndexOf(vec);
-                    }
-                }
-                for (int i = 0; i < value.Length; i++)
-                {
-                    Debug.Log(value[0] + ", " + value[1] + ", " + value[2] + ", " + value[3]);
-                }
-            }*/
         }
+            //if (actionData.Data.TryGetValue(id, out var value))
+            //{
 
-        public void ShowAction(int id)
+
+            //    foreach (object[] d in value)
+            //    {
+            //        int time = (int)d[0];
+
+            //        ActionType t = (ActionType)d[1];
+
+        public void showAction(int cid)
         {
-            if (actionData.Data.TryGetValue(id, out var value))
+            if (actionData.Data.TryGetValue(cid, out var value))
             {
-                for (int i=0; i<value.Length; i++)
+                for (int i = 0; i < value.Length; i++)
                 {
                     object[] d = (object[])value[i];
                     if ((ActionType)d[1] == ActionType.Move)
@@ -307,6 +297,21 @@ namespace KWY
                 }
             }
         }
+
+        //IEnumerator DoCharaMove(int cid, Vector2Int v)
+        //{
+        //    //data.WholeCharacters[cid].MoveTo(v);
+        //    data.WholeCharacters[cid].photonView.RPC("MoveTo", RpcTarget.All, v.x, v.y);
+        //    showActions.ShowMoveLog(cid);
+        //    yield return null;
+        //}
+
+        //IEnumerator DoCharaSkill(int cid, SID sid, SkillDicection dir)
+        //{
+        //    data.WholeCharacters[cid].SpellSkill(sid, dir);
+        //    showActions.ShowSkillLog(cid, sid);
+        //    yield return null;
+        //}
 
         /// <summary>
         /// Called when the simulation ended
@@ -323,10 +328,6 @@ namespace KWY
         private void Awake()
         {
             simulationIntervalSeconds = LogicData.Instance.SimulationIntervalSeconds;
-        }
-
-        private void Update()
-        {
         }
 
         #endregion

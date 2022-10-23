@@ -1,5 +1,3 @@
-#define NO_LOGIN_SERVER
-
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -44,12 +42,11 @@ namespace KWY
 
             ShowLoadingPanel();
 
-#if NO_LOGIN_SERVER
+            // for test
             LoginCallback(new LoginResData((int)ResCode.TRUE, "OK", 111, "test-email", 1, "temp name", null));
-            return;
-#endif
+
             // original code
-            StartCoroutine(LoginJoinAPI.Instance.LoginPost(id, pw, LoginCallback, ErrorCallback));
+            //StartCoroutine(LoginJoinAPI.Instance.LoginPost(id, pw, LoginCallback, ErrorCallback));
         }
 
         public void LoginCallback(LoginResData data)

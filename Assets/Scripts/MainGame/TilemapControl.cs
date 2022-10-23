@@ -149,20 +149,15 @@ namespace KWY
         {
             foreach (Vector3Int position in map.cellBounds.allPositionsWithin)
             {
-                // 아래 if 문으로 안감
-                // TODO_ERROR
                 if (map.HasTile(position))
                 {
                     List<GameObject> ch = new List<GameObject>();
 
                     ch = getInitialChar(map.CellToWorld(position));
                     if (ch.Count > 0)
-                    {
-                        //Debug.Log("at position: " + position);
-                    }
+                        Debug.Log("at position: " + position);
                     Characters.Add(position, ch);
-                    ///Debug.Log(position);
-
+                    
                     //CustomTile tile = map.GetTile(position) as CustomTile;
                     //tile.getTilePos();
                     //Debug.Log("normal/pos = "+position+", tilename = "+map.GetTile(position).name);
@@ -192,12 +187,12 @@ namespace KWY
                     if (k.gameObject.tag == "Friendly" || k.gameObject.tag == "Enemy")
                     {
                         ch.Add(k.gameObject);
-                        //Debug.Log(k.gameObject.name);
+                        Debug.Log(k.gameObject.name);
                         count++;
                     }
                     //Debug.Log(k.gameObject.name);
                 }
-                //Debug.Log("캐릭터 수: " + count);
+                Debug.Log("캐릭터 수: " + count);
                 if (count > 0)
                 {
                     //Debug.Log(gameObject.name);
@@ -218,9 +213,8 @@ namespace KWY
             //charCount += num;
             if (num > 0)
             {
-                Characters.TryGetValue(pos, out List < GameObject > charnum); // false
+                Characters.TryGetValue(pos, out List < GameObject > charnum);
                 charnum.Add(ch);
-                
                 Characters[pos] = charnum;
                 Debug.Log("added " + ch);
             }

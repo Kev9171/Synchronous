@@ -6,9 +6,8 @@ using UnityEngine.Tilemaps;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Photon.Realtime;
-using KWY;
 
-namespace PickScene
+namespace KWY
 {
     public class PickManager : Singleton<PickManager>
     {

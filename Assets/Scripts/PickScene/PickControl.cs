@@ -6,9 +6,7 @@ using UnityEngine.EventSystems;
 using Photon.Pun;
 using System;
 
-using KWY;
-
-namespace PickScene
+namespace KWY
 {
     public class PickControl : Singleton<PickControl>
     {

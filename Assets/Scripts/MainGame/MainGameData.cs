@@ -1,5 +1,3 @@
-#define TEST
-
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -8,22 +6,15 @@ using System.Collections.Generic;
 using Photon.Pun;
 using System;
 
-using DebugUtil;
-
 namespace KWY
 {
     public class MainGameData : MonoBehaviour, ISubject
     {
-        public static MainGameData Instance;
-
-        private PhotonView photonView;
-
         public List<IObserver> Observers
         {
             get;
             private set;
         } = new List<IObserver>();
-
 
         public float TimeLimit { get; private set; }
 
@@ -61,9 +52,6 @@ namespace KWY
         private readonly List<PlayableCharacter> _charasTeamB = new List<PlayableCharacter>();
         private readonly Dictionary<int, bool> _isMyCharacter = new Dictionary<int, bool>();
 
-        private int _notBreakDownTeamA = 0;
-        private int _notBreakDownTeamB = 0;
-
 
         #region Public Fields        
         public List<PSID> PlayerSkillList { get { return _playerSkillList; } }
@@ -72,17 +60,7 @@ namespace KWY
         public Dictionary<int, PlayableCharacter> PCharacters { get { return _pCharacters; } }
         public List<PlayableCharacter> CharasTeamA { get { return _charasTeamA; } }
         public List<PlayableCharacter> CharasTeamB { get { return _charasTeamB; } }
-        public Dictionary<int, bool> IsMyCharacter { 
-            get 
-            { 
-                if (!PhotonNetwork.IsMasterClient)
-                {
-                    Debug.LogError("Sub-client has no data on _breakDown");
-                    return null;
-                }
-                return _isMyCharacter; 
-            } 
-        }
+        public Dictionary<int, bool> IsMyCharacter { get { return _isMyCharacter; } }
         public List<PlayableCharacter> MyTeamCharacter
         {
             get
@@ -111,22 +89,6 @@ namespace KWY
                     return _charasTeamA;
                 }
             }
-        }
-
-        // TODO
-        // 데이터 변경이 없는 상태일 때도 모든 observer에 notify를 하고 있음
-        // 특정 옵저버만 notify를 할 수있고
-        // 옵저버를 관리해줄 수 있는 클래스 만들기
-
-        public int NotBreakDownTeamA 
-        { 
-            set { _notBreakDownTeamA = value; NotifyObservers(); }
-            get { return _notBreakDownTeamA; } 
-        }
-        public int NotBreakDownTeamB 
-        { 
-            set { _notBreakDownTeamB = value; NotifyObservers(); }
-            get { return _notBreakDownTeamB; } 
         }
 
         public Player MyPlayer
@@ -265,11 +227,6 @@ namespace KWY
 
         private void InitCharacters()
         {
-            if (!PhotonNetwork.IsMasterClient)
-            {
-                return;
-            }
-
             List<CharaData> tList = new List<CharaData>
             {
                 new CharaData(CID.Flappy, -3, 0, Team.A),
@@ -329,120 +286,43 @@ namespace KWY
                     _charasTeamB.Add(pc);
                 }
 
-                if (d.team == Team.A)
+                if (PhotonNetwork.IsMasterClient && d.team == Team.A)
                 {
-                    _charaActionData.Add(id, new CharacterActionData(id, new CharacterActionReadyObserver()));
+                    _charaActionData.Add(id, new CharacterActionData());
                     _isMyCharacter.Add(id, true);
-
-                    _notBreakDownTeamA++;
+                }
+                else if (!PhotonNetwork.IsMasterClient && d.team == Team.B)
+                {
+                    _charaActionData.Add(id, new CharacterActionData());
+                    _isMyCharacter.Add(id, true);
                 }
                 else
                 {
                     _isMyCharacter.Add(id, false);
-
-                    _notBreakDownTeamB++;
                 }
 
-                photonView.RPC(
-                    "InitCharacterRPC", RpcTarget.Others,
-                    chara.GetPhotonView().ViewID, id, ((int)d.team));
             }
+
 
             InitBaseObservers();
         }
 
-
-        [PunRPC]
-        private void OnGameReadyRPC()
-        {
-            Debug.Log("OnGameReadyRPC");
-            GameManager.Instance.SetState(STATE.StandBy);
-        }
-
         // serialize custom type으로 바꿔야 할듯...
-        // RPC가 비동기 방식으로 작동될 경우 -> list에 add 시 lock을 걸어주어야 할수도?
-        // 일단은 하나씩 실행되는 것 처럼 보이므로 lock 사용 안했음
 
         [PunRPC]
-        private void InitCharacterRPC(int viewId, int id, int team) 
+        private void InitCharactersRPC(int id1, int id2, int id3, int v1, int v2, int v3) 
         {
-            //Debug.Log($"start viewId:{viewId}");
-            if (PhotonNetwork.IsMasterClient)
+            List<int> ids = new List<int>() { id1, id2, id3 };
+            List<int> vIds = new List<int>() { v1, v2, v3 };
+
+            for (int i= 0; i < ids.Count; i++)
             {
-                return;
+                GameObject c1 = PhotonNetwork.GetPhotonView(vIds[0]).gameObject;
+
+                PlayableCharacter pc = new PlayableCharacter(c1, ids[0], Team.B);
+
+
             }
-
-            Team _team = (Team)team;
-
-            // get object by photonViewId
-            PhotonView _photonView = PhotonNetwork.GetPhotonView(viewId);
-            if (!_photonView)
-            {
-                Debug.Log($"Can not find PhotonView id: {id}");
-                return;
-            }
-
-            GameObject chara = _photonView.gameObject;
-            if (!chara)
-            {
-                Debug.Log($"Can not find gameobject on photonView id: {id}");
-                return;
-            }
-
-            PlayableCharacter pc = new PlayableCharacter(chara, id, _team);
-
-            _pCharacters.Add(id, pc);
-            chara.GetComponent<Character>().SetData(pc);
-
-            // Master Client
-            if (_team == Team.A)
-            {
-                _charasTeamA.Add(pc);
-                _isMyCharacter.Add(id, false);
-            }
-            // other client
-            else
-            {
-                _charasTeamB.Add(pc);
-
-                _charaActionData.Add(id, new CharacterActionData(id, new CharacterActionReadyObserver()));
-                _isMyCharacter.Add(id, true);
-
-                if (NullCheck.HasItComponent(pc.CharaObject, "SpriteRenderer", out SpriteRenderer component))
-                {
-                    component.flipX = true;
-                }
-            }
-
-            // for test
-#if TEST
-            if (_pCharacters.Count == 6)
-            {
-                Debug.Log("_pCharacters:");
-                foreach (PlayableCharacter p in _pCharacters.Values)
-                {
-                    Debug.Log(p);
-                }
-            }
-
-            if (_charasTeamB.Count == 3)
-            {
-                Debug.Log("_myTeamCharacter(B):");
-                foreach (PlayableCharacter p in _charasTeamB)
-                {
-                    Debug.Log(p);
-                }
-            }
-#endif
-            //Debug.Log($"end viewId:{viewId}");
-
-            if (_pCharacters.Count == 6)
-            {
-                InitBaseObservers();
-                photonView.RPC("OnGameReadyRPC", RpcTarget.All);
-            }
-
-            
         }
 
         private GameObject PhotonInstantiate(CID cid, Vector3Int loc)
@@ -472,8 +352,7 @@ namespace KWY
             // add observer
 
             // character
-            // 일단 자신의 캐릭터만 (현재 UI 업데이트는 자신의 캐릭터만 됨)
-            foreach (PlayableCharacter p in MyTeamCharacter)
+            foreach (PlayableCharacter p in _pCharacters.Values)
             {
                 p.Chara.AddObserver(new CharacterObserver());
             }
@@ -481,20 +360,12 @@ namespace KWY
             // player
             player.AddObserver(new PlayerObserver());
 
-
-            if (PhotonNetwork.IsMasterClient)
-            {
-                foreach(PlayableCharacter p in PCharacters.Values)
-                {
-                    p.Chara.AddObserver(new CharacterBreakDownObserver());
-                }
-
-                AddObserver(new GameOverObserver());
-            }
+            // main data
+            AddObserver(new GameProgressObserver());
         }
+
         #endregion
 
-        
         public ResultData CreateResultData()
         {
             return new ResultData(MyTeamCharacter, MyPlayer);
@@ -504,17 +375,6 @@ namespace KWY
 
         private void Awake()
         {
-            Instance = this;
-
-            IdHandler.ClearId();
-
-            photonView = PhotonView.Get(this);
-            if (!photonView)
-            {
-                Debug.LogError("Can not find photonview on this object (MainGameData)");
-                return;
-            }
-
             GameObject t = GameObject.FindGameObjectWithTag("Map");
             if (t)
             {
@@ -526,8 +386,6 @@ namespace KWY
             }
         }
         #endregion
-
-        
 
         #region ISubject Methods
         public void AddObserver(IObserver o)
@@ -567,8 +425,6 @@ namespace KWY
         {
             Observers.Clear();
         }
-
-        
         #endregion
     }
 
@@ -603,58 +459,6 @@ namespace KWY
             }
 
             return v;
-        }
-
-        public static void ClearId()
-        {
-            id = 0;
-        }
-    }
-
-    class GameProgressSubscriber : ISubject
-    {
-        public List<IObserver> Observers
-        {
-            get;
-            private set;
-        } = new List<IObserver>();
-
-        public void AddObserver(IObserver o)
-        {
-            if (Observers.IndexOf(o) < 0)
-            {
-                Observers.Add(o);
-            }
-            else
-            {
-                Debug.LogWarning($"The observer already exists in list: {o}");
-            }
-        }
-
-        public void RemoveObserver(IObserver o)
-        {
-            int idx = Observers.IndexOf(o);
-            if (idx >= 0)
-            {
-                Observers.RemoveAt(idx); // O(n)
-            }
-            else
-            {
-                Debug.LogError($"Can not remove the observer; It does not exist in list: {o}");
-            }
-        }
-
-        public void NotifyObservers()
-        {
-            foreach (IObserver o in Observers)
-            {
-                o.OnNotify();
-            }
-        }
-
-        public void RemoveAllObservers()
-        {
-            Observers.Clear();
         }
     }
 }

@@ -1,5 +1,3 @@
-#define NO_LOGIN_SERVER
-
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -191,12 +189,11 @@ namespace KWY
 
             ShowLoadingPanel();
 
-#if NO_LOGIN_SERVER
+            // for test
             CheckIdCallback(new IdCheckResData((int)ResCode.TRUE, "OK"));
-            return;
-#endif
+
             // original code
-            StartCoroutine(LoginJoinAPI.Instance.IdCheckPost(id, CheckIdCallback, ErrorCallback));
+            //StartCoroutine(LoginJoinAPI.Instance.IdCheckPost(id, CheckIdCallback, ErrorCallback));
         }
 
         public void OnClickNameCheckBtn()
@@ -211,12 +208,11 @@ namespace KWY
 
             ShowLoadingPanel();
 
-#if NO_LOGIN_SERVER
+            // for test
             CheckNameCallback(new NameCheckResData((int)ResCode.TRUE, "OK"));
-            return;
-#endif
+
             // original code
-            StartCoroutine(LoginJoinAPI.Instance.NameCheckPost(name, CheckNameCallback, ErrorCallback));
+            //StartCoroutine(LoginJoinAPI.Instance.NameCheckPost(name, CheckNameCallback, ErrorCallback));
         }
 
         public void OnClickJoinBtn()
@@ -231,10 +227,7 @@ namespace KWY
             string name = NameInput.text.Trim();
             string pw = PwInput.text.Trim();
 
-#if NO_LOGIN_SERVER
-            return;
-#endif
-            StartCoroutine(LoginJoinAPI.Instance.JoinPost(id, name, pw, JoinCallback, ErrorCallback));
+            //StartCoroutine(LoginJoinAPI.Instance.JoinPost(id, name, pw, JoinCallback, ErrorCallback));
         }
 
         public void JoinedCompleteCallback()
