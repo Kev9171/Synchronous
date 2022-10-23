@@ -8,12 +8,7 @@ namespace KWY
 {
     public class RayTest : MonoBehaviour
     {
-        [SerializeField]
-        TilemapControl tilemapcontrol;
-        [SerializeField]
-        Tilemap map;
-
-        private int layerMask = (1 << 6) | (1 << 8);
+        public LayerMask layerMask;
         RaycastHit2D[] hits;
         private List<Vector2> correction = new List<Vector2>();
         private List<Vector2> direction = new List<Vector2>();
@@ -131,29 +126,10 @@ namespace KWY
             for (int i = 0; i < hits.Length; i++)
             {
                 RaycastHit2D hit = hits[i];
-                hit.transform.GetComponent<SpriteRenderer>().color = Color.red;
-
-                if (hit.transform.gameObject.layer == 6)
+                //hit.transform.GetComponent<SpriteRenderer>().color = Color.red;
+                if (sb.isDamage)
                 {
-                    if (sb.isDamage)
-                    {
-                        hit.transform.GetComponent<Character>().DamageHP(sb.value);
-                    }
-                }
-                else if (hit.transform.gameObject.layer == 8)
-                {
-                    Vector3Int v = map.WorldToCell(hit.transform.position);
-                    List<GameObject> list = tilemapcontrol.getCharList(v);
-                    for (int j = 0; j < list.Count; j++)
-                    {
-                        if (list[j].transform.gameObject.layer == 6)
-                        {
-                            if (sb.isDamage)
-                            {
-                                hit.transform.GetComponent<Character>().DamageHP(sb.value);
-                            }
-                        }
-                    }
+                    hit.transform.GetComponent<Character>().DamageHP(sb.value);
                 }
             }
             lastPos = lastPos + dp * d;

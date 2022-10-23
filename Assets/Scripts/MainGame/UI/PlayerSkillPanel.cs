@@ -18,7 +18,7 @@ namespace KWY
 
         #region Private Fields
 
-        readonly Dictionary<PSID, GameObject> skillBtns = new Dictionary<PSID, GameObject>();
+        Dictionary<PSID, GameObject> skillBtns = new Dictionary<PSID, GameObject>();
 
         #endregion
 
@@ -34,6 +34,29 @@ namespace KWY
                 pskill.GetComponent<PlayerSkillBtn>().SetData(psb);
 
                 skillBtns.Add(psid, pskill);
+            }
+        }
+
+
+        public void UpdateUI()
+        {
+            int nowMP = data.PlayerMp;
+
+            foreach(var psid in skillBtns.Keys)
+            {
+                int needMP = PlayerSkillManager.GetData(psid).cost;
+
+                if (needMP > nowMP)
+                {
+                    // gray filter
+                    skillBtns[psid].GetComponent<Image>().color = canNotUseSkillColor;
+                }
+                else
+                {
+                    // no filter
+                    skillBtns[psid].GetComponent<Image>().color = new Color(1, 1, 1, 1);
+                }
+
             }
         }
 

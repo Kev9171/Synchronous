@@ -13,6 +13,9 @@ namespace KWY
         Tilemap map;
 
         [SerializeField]
+        ManageShowingSkills showingSkillManager;
+
+        [SerializeField]
         MapHighLighter highLighter;
 
         [SerializeField]
@@ -20,9 +23,6 @@ namespace KWY
 
         [SerializeField]
         RayTest ray;
-
-        [SerializeField]
-        CharacterUIHandler characterUIHandler;
 
         public Character SelChara { get; private set; }
         public ActionBase SelAction { get; private set; }
@@ -76,12 +76,12 @@ namespace KWY
 
             if (map.HasTile(clickV) && (SelChara.TempTilePos.y % 2 == 0 ? SelAction.areaEvenY : SelAction.areaOddY).Contains(deltaXY))
             {
-                data.CharaActionData[SelChara.Pc.Id].AddMoveAction(ActionType.Move, (int)deltaXY.x, (int)deltaXY.y, SelChara.TempTilePos.y%2!=0);
+                data.CharaActionData[SelChara.Cb.cid].AddMoveAction(ActionType.Move, (int)deltaXY.x, (int)deltaXY.y, SelChara.TempTilePos.y%2!=0);
 
                 // 이동 넣었을 경우 하이라이트를 위한 임시 좌표 변경
                 SelChara.SetTilePos(clickV);
 
-                turnReady.ShowCharacterActionPanel(SelChara.Pc.Id);
+                turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                 SetSelClear();
 
                 mouseInput.Mouse.MouseClick.performed += OnClick;
@@ -136,20 +136,10 @@ namespace KWY
                 if (SelOk > 0)
                 {
                     // 확정
-                    data.CharaActionData[SelChara.Pc.Id].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Right, clickX, clickY);
-
-                    if (((SkillBase)SelAction).areaAttack)
-                    {
-                        Vector3Int v = new Vector3Int(clickX, clickY, 0);
-                        skillSpawner.Activate(map.CellToWorld(v));
-                        skillSpawner.Destroy(((SkillBase)SelAction).triggerTime);   // triggerTime만큼 스킬 지속후 삭제
-                    }
-                    else
-                    {
-                        ray.CurvedMultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, true, ((SkillBase)SelAction).directions.Count);
-                    }
-
-                    turnReady.ShowCharacterActionPanel(SelChara.Pc.Id);
+                    data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Right);
+                    
+                    SelChara.SelTilePos.Set(clickX, clickY, 0);
+                    turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                     SetSelClear();
 
                     mouseInput.Mouse.MouseClick.performed += OnClick;
@@ -179,20 +169,10 @@ namespace KWY
                 if (SelOk < 0)
                 {
                     // 확정
-                    data.CharaActionData[SelChara.Pc.Id].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Left, clickX, clickY);
+                    data.CharaActionData[SelChara.Cb.cid].AddSkillAction(ActionType.Skill, ((SkillBase)SelAction).sid, SkillDicection.Left);
 
-                    if (((SkillBase)SelAction).areaAttack)
-                    {
-                        Vector3Int v = new Vector3Int(clickX, clickY, 0);
-                        skillSpawner.Activate(map.CellToWorld(v));
-                        skillSpawner.Destroy(((SkillBase)SelAction).triggerTime);
-                    }
-                    else
-                    {
-                        ray.CurvedMultipleRay(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), ((SkillBase)SelAction).directions, false, ((SkillBase)SelAction).directions.Count);
-                    }
-
-                    turnReady.ShowCharacterActionPanel(SelChara.Pc.Id);
+                    SelChara.SelTilePos.Set(clickX, clickY, 0);
+                    turnReady.ShowCharacterActionPanel(SelChara.Cb.cid);
                     SetSelClear();
 
                     mouseInput.Mouse.MouseClick.performed += OnClick;
@@ -237,8 +217,7 @@ namespace KWY
             mouseInput.Mouse.MouseClick.performed -= OnClick;
             mouseInput.Mouse.MouseClick.performed -= OnClickSkillDirection;
 
-            //showingSkillManager.ShowSkillPanel(-1);
-            characterUIHandler.HideAllSkillSelPanel();
+            showingSkillManager.ShowSkillPanel(-1);
 
             highLighter.ClearHighlight();
             HighlightCharacterClear();
@@ -251,19 +230,23 @@ namespace KWY
             highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? SelAction.areaEvenY : SelAction.areaOddY);
         }
 
-        public void SetSelChara(Character chara)
+        public void SetSelChara(CID cid)
         {
-            SelChara = chara;
+            SelChara = null;
+
+            Character c = data.GetCharacter(cid);
+
+            if (c == null)
+            {
+                Debug.LogErrorFormat("Can not select - cid: {0}", cid);
+                return;
+            }
+
             SelAction = null;
 
-            /*showingSkillManager.ShowSkillPanel(data.GetCharacterNth(cid));
-            HighlightCharacter(cid);*/
-
-            // 스킬 선택 패널
-            characterUIHandler.ShowSkillSelPanel(SelChara);
-            HighlightCharacter(SelChara);
-
-
+            SelChara = c;
+            showingSkillManager.ShowSkillPanel(data.GetCharacterNth(cid));
+            HighlightCharacter(cid);
             highLighter.ClearHighlight();
 
             mouseInput.Mouse.MouseClick.performed += OnClick;
@@ -276,31 +259,29 @@ namespace KWY
 
         public void HighlightCharacterClear()
         {
-            foreach(PlayableCharacter p in data.PCharacters.Values)
-            {
-                p.CharaObject.transform.localScale = new Vector3(0.7f, 0.7f, 1);
-            }
-
-            /*foreach (CID c in data.CharacterObjects.Keys)
+            foreach (CID c in data.CharacterObjects.Keys)
             {
                 data.CharacterObjects[c].transform.localScale = new Vector3(0.7f, 0.7f, 1);
-            }*/
+            }
         }
 
-        public void HighlightCharacter(Character chara)
+        public void HighlightCharacter(CID cid)
         {
-            foreach (PlayableCharacter c in data.MyTeamCharacter)
+            foreach(CID c in data.CharacterObjects.Keys)
             {
-                if (c.Chara.Equals(chara))
+                if (c == cid)
                 {
-                    c.Chara.gameObject.transform.localScale = new Vector3(1, 1, 1);
+                    data.CharacterObjects[c].transform.localScale = new Vector3(1, 1, 1);
                 }
                 else
                 {
-                    c.Chara.gameObject.transform.localScale = new Vector3(0.7f, 0.7f, 1);
+                    data.CharacterObjects[c].transform.localScale = new Vector3(0.7f, 0.7f, 1);
                 }
+                
             }
+            
         }
+
 
         public void OnClick(InputAction.CallbackContext context)
         {
@@ -310,11 +291,8 @@ namespace KWY
 
             if (hit.collider != null)
             {
-                //CID cid = hit.collider.gameObject.GetComponent<Character>();
-                //SetSelChara(cid);
-
-                Character c = hit.collider.gameObject.GetComponent<Character>();
-                SetSelChara(c);
+                CID cid = hit.collider.gameObject.GetComponent<Character>().Cb.cid;
+                SetSelChara(cid);
             }
         }
 
