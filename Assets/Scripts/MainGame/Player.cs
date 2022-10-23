@@ -63,14 +63,9 @@ namespace KWY
             NotifyObservers();
         }
 
-        public bool Skill1(Character selChara)
+        public bool Skill1(Character selChara, Vector2 mousePosition)
         {
-            Debug.Log("Skill1");
-
             if (selChara == null) return false;
-            Debug.Log("clicked " + selChara);
-
-            Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
 
             mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
 

@@ -232,7 +232,6 @@ namespace KWY
                 {
                     charnum.Remove(ch);
                     Characters[pos] = charnum;
-                    Debug.Log("deleted " + ch);
                 }
                 else
                     Debug.Log(ch + " not found");

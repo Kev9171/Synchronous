@@ -12,7 +12,7 @@ using DebugUtil;
 
 namespace KWY
 {
-    public class MainGameData : MonoBehaviour, ISubject
+    public class MainGameData : MonoBehaviour, ISubject, ISubject<EGameProgress>
     {
         public static MainGameData Instance;
 
@@ -23,6 +23,12 @@ namespace KWY
             get;
             private set;
         } = new List<IObserver>();
+
+        public List<IObserver<EGameProgress>> ProgressObservers
+        {
+            get;
+            private set;
+        } = new List<IObserver<EGameProgress>>();
 
 
         public float TimeLimit { get; private set; }
@@ -41,7 +47,7 @@ namespace KWY
             set
             {
                 turnNum = value;
-                NotifyObservers();
+                NotifyObservers(EGameProgress.TURN_NUM);
             }
         }
 
@@ -74,12 +80,7 @@ namespace KWY
         public List<PlayableCharacter> CharasTeamB { get { return _charasTeamB; } }
         public Dictionary<int, bool> IsMyCharacter { 
             get 
-            { 
-                if (!PhotonNetwork.IsMasterClient)
-                {
-                    Debug.LogError("Sub-client has no data on _breakDown");
-                    return null;
-                }
+            {
                 return _isMyCharacter; 
             } 
         }
@@ -169,75 +170,6 @@ namespace KWY
 
             this.TimeLimit = LogicData.Instance.TimeLimit;
 
-            //_characters.Add(TestCharacter()); // test 
-
-            /*// for prototype
-            if (PhotonNetwork.IsMasterClient)
-            {
-                // 캐릭터 태그 추가
-                for (int i = 0; i < tCharas.Length; i++)
-                {
-                    if (i < 3)
-                    {
-                        tCharas[i].tag = "Friendly";
-                        tCharas[i].layer = 7;
-                    }
-                    else
-                    {
-                        tCharas[i].tag = "Enemy";
-                        tCharas[i].layer = 6;
-                    }
-                }
-
-                // 0 1 2 추가
-                _characters.Add(tCharas[0].GetComponent<Character>());
-                _characters.Add(tCharas[1].GetComponent<Character>());
-                _characters.Add(tCharas[2].GetComponent<Character>());
-
-                _charaObjects.Add(_characters[0].Cb.cid, tCharas[0]);
-                _charaObjects.Add(_characters[1].Cb.cid, tCharas[1]);
-                _charaObjects.Add(_characters[2].Cb.cid, tCharas[2]);
-            }
-            else
-            {
-                for (int i = 0; i < tCharas.Length; i++)
-                {
-                    if (i < 3)
-                    {
-                        tCharas[i].tag = "Enemy";
-                        tCharas[i].layer = 6;
-                    }
-                    else
-                    {
-                        tCharas[i].tag = "Friendly";
-                        tCharas[i].layer = 7;
-                    }
-                }
-
-                _characters.Add(tCharas[3].GetComponent<Character>());
-                _characters.Add(tCharas[4].GetComponent<Character>());
-                _characters.Add(tCharas[5].GetComponent<Character>());
-
-                _charaObjects.Add(_characters[0].Cb.cid, tCharas[3]);
-                _charaObjects.Add(_characters[1].Cb.cid, tCharas[4]);
-                _charaObjects.Add(_characters[2].Cb.cid, tCharas[5]);
-            }
-
-            foreach (CID cid in _charaObjects.Keys)
-            {
-                _charaActionData.Add(cid, new CharacterActionData());
-            }
-
-            // test
-            _wholeCharacters.Add((int)(_characters[0].Cb.cid), tCharas[0].GetComponent<Character>());
-            _wholeCharacters.Add((int)(_characters[1].Cb.cid), tCharas[1].GetComponent<Character>());
-            _wholeCharacters.Add((int)(_characters[2].Cb.cid), tCharas[2].GetComponent<Character>());
-
-            _wholeCharacters.Add(((int)(_characters[0].Cb.cid)) + 100, tCharas[3].GetComponent<Character>());
-            _wholeCharacters.Add(((int)(_characters[1].Cb.cid)) + 100, tCharas[4].GetComponent<Character>());
-            _wholeCharacters.Add(((int)(_characters[2].Cb.cid)) + 100, tCharas[5].GetComponent<Character>());*/
-
-
             // DontDestroyOnLoad 에 있는 캐릭터들 좌표와 타입 가져오기
             // 일단 아래 내용으로 가져왔다고 치고
 
@@ -283,8 +215,6 @@ namespace KWY
 
             foreach (CharaData d in tList)
             {
-                /*GameObject g = CharacterResources.LoadCharacter(d.cid);
-                Debug.Log(g.name);*/
                 GameObject chara;
                 if (chara = PhotonInstantiate(d.cid, d.loc))
                 {
@@ -335,12 +265,16 @@ namespace KWY
                     _isMyCharacter.Add(id, true);
 
                     _notBreakDownTeamA++;
+
+                    chara.tag = "Friendly";
                 }
                 else
                 {
                     _isMyCharacter.Add(id, false);
 
                     _notBreakDownTeamB++;
+
+                    chara.tag = "Enemy";
                 }
 
                 photonView.RPC(
@@ -399,6 +333,8 @@ namespace KWY
             {
                 _charasTeamA.Add(pc);
                 _isMyCharacter.Add(id, false);
+
+                chara.tag = "Enemy";
             }
             // other client
             else
@@ -407,6 +343,8 @@ namespace KWY
 
                 _charaActionData.Add(id, new CharacterActionData(id, new CharacterActionReadyObserver()));
                 _isMyCharacter.Add(id, true);
+
+                chara.tag = "Friendly";
 
                 if (NullCheck.HasItComponent(pc.CharaObject, "SpriteRenderer", out SpriteRenderer component))
                 {
@@ -491,6 +429,8 @@ namespace KWY
 
                 AddObserver(new GameOverObserver());
             }
+
+            AddObserver(new GameProgressObserver());
         }
         #endregion
 
@@ -568,7 +508,39 @@ namespace KWY
             Observers.Clear();
         }
 
-        
+        public void NotifyObservers(EGameProgress p)
+        {
+            foreach(IObserver<EGameProgress> o in ProgressObservers)
+            {
+                o.OnNotify(p);
+            }
+        }
+
+        public void AddObserver(IObserver<EGameProgress> o)
+        {
+            if (ProgressObservers.IndexOf(o) < 0)
+            {
+                ProgressObservers.Add(o);
+            }
+            else
+            {
+                Debug.LogWarning($"The observer already exists in list: {o}");
+            }
+        }
+
+        public void RemoveObserver(IObserver<EGameProgress> o)
+        {
+            int idx = ProgressObservers.IndexOf(o);
+            if (idx >= 0)
+            {
+                ProgressObservers.RemoveAt(idx); // O(n)
+            }
+            else
+            {
+                Debug.LogError($"Can not remove the observer; It does not exist in list: {o}");
+            }
+        }
+
         #endregion
     }
 

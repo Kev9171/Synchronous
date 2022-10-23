@@ -205,7 +205,6 @@ namespace KWY
                 // 아직 테스트 하지 못하였음!!!!!!!!
                 if (PhotonNetwork.IsMasterClient)
                 {
-                    Debug.Log("Received simul data!!!!");
                     GameManager.Instance.SetState(STATE.Simul, (Dictionary<int, object[]>)data[3]); // Note: if data[2] is false, there is no data[3]
                 }
                 else

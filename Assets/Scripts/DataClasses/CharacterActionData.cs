@@ -97,6 +97,11 @@ namespace KWY
 
             NotifyObservers();
         }
+        public void ClearActionData()
+        {
+            idx = 0;
+
+        }
 
         #region ISubject<int>
 

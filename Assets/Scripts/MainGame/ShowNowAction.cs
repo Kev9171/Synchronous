@@ -32,10 +32,11 @@ namespace KWY
 
             Sprite icon = data.PCharacters[id].Chara.Cb.icon;
             string name = "Move";
+            float duration = 1f;
 
             if (PhotonNetwork.IsMasterClient)
             {
-                StartCoroutine(ShowActionLog(icon, name, data.IsMyCharacter[id]));
+                StartCoroutine(ShowActionLog(icon, name, data.IsMyCharacter[id], duration));
             }
             else
             {
@@ -49,10 +50,11 @@ namespace KWY
 
             Sprite icon = data.PCharacters[id].Chara.Cb.icon;
             string name = SkillManager.GetData(sid).name;
+            float duration = SkillManager.GetData(sid).castingTime;
 
             if (PhotonNetwork.IsMasterClient)
             {
-                StartCoroutine(ShowActionLog(icon, name, data.IsMyCharacter[id]));
+                StartCoroutine(ShowActionLog(icon, name, data.IsMyCharacter[id], duration));
             }
             else
             {
@@ -65,10 +67,11 @@ namespace KWY
         {
             Sprite icon = data.PCharacters[id].Chara.Cb.icon;
             string name = "Move";
+            float duration = 1f;
 
             if (!PhotonNetwork.IsMasterClient)
             {
-                StartCoroutine(ShowActionLog(icon, name, !data.IsMyCharacter[id]));
+                StartCoroutine(ShowActionLog(icon, name, !data.IsMyCharacter[id], duration));
             }
             else
             {
@@ -81,10 +84,11 @@ namespace KWY
         {
             Sprite icon = data.PCharacters[id].Chara.Cb.icon;
             string name = SkillManager.GetData(sid).name;
+            float duration = SkillManager.GetData(sid).castingTime;
 
             if (!PhotonNetwork.IsMasterClient)
             {
-                StartCoroutine(ShowActionLog(icon, name, !data.IsMyCharacter[id]));
+                StartCoroutine(ShowActionLog(icon, name, !data.IsMyCharacter[id], duration));
             }
             else
             {
@@ -92,21 +96,19 @@ namespace KWY
             }
         }
 
-        IEnumerator ShowActionLog(Sprite icon, string name, bool left)
+        IEnumerator ShowActionLog(Sprite icon, string name, bool left, float duration)
         {
             if (left)
             {
-                Instantiate(leftActionPiecePrefab, leftSkillLinePanel.transform).GetComponent<ActionPiece>().SetData(icon, name);
-                //GameObject o = PhotonNetwork.Instantiate("Prefabs/UI/Main/LeftSKill", Vector3.zero, Quaternion.identity);
-                //o.transform.parent = leftSkillLinePanel.transform;
-                //o.GetComponent<ActionPiece>().SetData(icon, name);
+                Instantiate(leftActionPiecePrefab, leftSkillLinePanel.transform)
+                    .GetComponent<ActionPiece>()
+                    .SetDataAndStart(icon, name, duration);
             }
             else
             {
-                Instantiate(rightActionPiecePrefab, rightSkillLinePanel.transform).GetComponent<ActionPiece>().SetData(icon, name);
-                //GameObject o = PhotonNetwork.Instantiate("Prefabs/UI/Main/RightSkill", Vector3.zero, Quaternion.identity);
-                //o.transform.parent = rightSkillLinePanel.transform;
-                //o.GetComponent<ActionPiece>().SetData(icon, name);
+                Instantiate(rightActionPiecePrefab, rightSkillLinePanel.transform)
+                    .GetComponent<ActionPiece>()
+                    .SetDataAndStart(icon, name, duration);
             }
 
             yield return null;

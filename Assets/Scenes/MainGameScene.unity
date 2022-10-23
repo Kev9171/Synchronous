@@ -218,7 +218,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 134885409}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -432,7 +432,6 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
-  - {fileID: 183041436}
   - {fileID: 1489451886}
   - {fileID: 1525828508}
   - {fileID: 193942604}
@@ -440,6 +439,7 @@ RectTransform:
   - {fileID: 1414391422}
   - {fileID: 1766580898}
   - {fileID: 35393127}
+  - {fileID: 183041436}
   - {fileID: 1082090821}
   m_Father: {fileID: 0}
   m_RootOrder: 8
@@ -2419,7 +2419,7 @@ RectTransform:
   - {fileID: 1186811101}
   - {fileID: 1634524035}
   m_Father: {fileID: 134885409}
-  m_RootOrder: 0
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -5250,7 +5250,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4967304204022119408, guid: 8d2336f15d961c94d80f72e7d666cefa, type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4967304204022119408, guid: 8d2336f15d961c94d80f72e7d666cefa, type: 3}
       propertyPath: m_AnchorMax.x
@@ -6451,7 +6451,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 134885409}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -6774,7 +6774,7 @@ RectTransform:
   - {fileID: 160284890}
   - {fileID: 709006515}
   m_Father: {fileID: 134885409}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -6958,7 +6958,7 @@ RectTransform:
   - {fileID: 107734384}
   - {fileID: 624665551}
   m_Father: {fileID: 134885409}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -7931,7 +7931,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 134885409}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -8805,7 +8805,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5568541473494206623, guid: 25aa507e85a4d42438ffa7ea04f54e04, type: 3}
       propertyPath: m_RootOrder
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5568541473494206623, guid: 25aa507e85a4d42438ffa7ea04f54e04, type: 3}
       propertyPath: m_AnchorMax.x
@@ -8888,6 +8888,34 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 183041436}
     m_Modifications:
+    - target: {fileID: 9451924359896910, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9451924359896910, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9451924359896910, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 9451924359896910, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9451924359896910, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 9451924359896910, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: KWY.CharacterPanel, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 9451924359896910, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 84635298757626614, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0

@@ -1,4 +1,4 @@
-#define TEST
+//#define TEST
 
 using System.Collections;
 using System.Collections.Generic;
@@ -139,7 +139,6 @@ namespace KWY
             int i = 0;
             foreach (int id in data.PCharacters.Keys)
             {
-                Debug.Log("action start");
                 task[i] = new Task(DoAction(id));
                 task[i++].Finished += delegate (bool t) {
                     if (!t) Notify();
@@ -213,7 +212,8 @@ namespace KWY
 
         IEnumerator DoCharaMove(int id, Vector2Int v)
         {
-            data.PCharacters[id].CharaObject.GetComponent<PhotonView>().RPC("MoveTo", RpcTarget.All, v.x, v.y);
+            //data.PCharacters[id].CharaObject.GetComponent<PhotonView>().RPC("MoveTo", RpcTarget.All, v.x, v.y);
+            data.PCharacters[id].Chara.MoveTo(v.x, v.y);
             showActions.ShowMoveLog(id);
             yield return null;
         }
