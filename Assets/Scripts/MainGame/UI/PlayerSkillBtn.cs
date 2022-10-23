@@ -22,6 +22,10 @@ namespace KWY
         MouseInput mouseInput;
         CharacterControl chCtrl;
 
+        MainGameData data;
+
+        Simulation simulation;
+
         [Tooltip("Info 띄우는데 필요한 최소 클릭 시간; move 일 경우 없음")]
         public float minClickTime = 1;
 
@@ -57,15 +61,15 @@ namespace KWY
         {
             MainGameData data = GameObject.Find("GameData").GetComponent<MainGameData>();
 
-            if (data.PlayerMp >= psb.cost)
+            if (data.MyPlayer.Mp >= psb.cost)
             {
                 mouseInput.Mouse.MouseClick.performed += OnClick;
-                GameManager gm = GameObject.Find("GameManager").GetComponent<GameManager>();
-                gm.UpdatePlayerMP(-psb.cost);
+                //GameManager gm = GameObject.Find("GameManager").GetComponent<GameManager>();
+                data.MyPlayer.SubMp(psb.cost);
 
                 Debug.Log("스킬 발동");
             }
-            else 
+            else
             {
                 Debug.Log("마나 부족");
             }
@@ -73,29 +77,8 @@ namespace KWY
 
         public void Skill1(InputAction.CallbackContext context)
         {
-            map = GameObject.Find("Tilemap").GetComponent<Tilemap>();
-            chCtrl = GameObject.Find("CharacterControl").GetComponent<CharacterControl>();
-            mouseInput.Mouse.MouseClick.performed += chCtrl.OnClick;
-
-            if (chCtrl.SelChara == null) return;
-
-            Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
-
-            // 바로 WorldToCell 함수에 집어넣지 말것! (???)
-            mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
-
-            // 사용 x
-            // Vector3Int clickV = map.WorldToCell(mouseInput.Mouse.MouseClick.performed += OnClickMoveDirection;);
-
-            // 클릭 된 좌표 맵 좌표로 변환
-            Vector3Int clickV = map.WorldToCell(mousePosition);
-
-            if (map.HasTile(clickV))
+            if (data.MyPlayer.Skill1(SelChara))
             {
-                SelChara.TilePos = clickV;
-                Vector3 newPos = map.CellToWorld(clickV);
-                newPos.y += 0.1f;
-                SelChara.transform.position = newPos;
                 mouseInput.Mouse.MouseClick.performed -= Skill1;
             }
         }
@@ -114,6 +97,8 @@ namespace KWY
                 mouseInput.Mouse.MouseClick.performed -= OnClick;
                 mouseInput.Mouse.MouseClick.performed += Skill1;
             }
+            else
+                Debug.Log("no char");
         }
 
 
@@ -138,6 +123,39 @@ namespace KWY
         }
 
         #region MonoBehaviour CallBacks
+
+        private void Start()
+        {
+            if (!data)
+            {
+                GameObject o = GameObject.Find("GameData");
+
+                if (!o)
+                {
+                    Debug.Log("Can not find game object named: GameData");
+                }
+
+                data = o.GetComponent<MainGameData>();
+
+                if (!data)
+                {
+                    Debug.Log("Can not find component at GameData: MainGameData");
+                }
+            }
+
+            GameObject oo = GameObject.Find("UICanvas");
+
+            if (!oo)
+            {
+                Debug.Log("Can not find game object named: UICanvas");
+            }
+
+            simulation = oo.GetComponent<Simulation>();
+            if (!simulation)
+            {
+                Debug.Log("Can not find component at UICanvas: Simulation");
+            }
+        }
         private void Update()
         {
             if (isClick)
