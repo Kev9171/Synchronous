@@ -153,14 +153,16 @@ namespace KWY
                 // TODO_ERROR
                 if (map.HasTile(position))
                 {
-                    
                     List<GameObject> ch = new List<GameObject>();
 
                     ch = getInitialChar(map.CellToWorld(position));
                     if (ch.Count > 0)
+                    {
                         //Debug.Log("at position: " + position);
+                    }
                     Characters.Add(position, ch);
-                    
+                    ///Debug.Log(position);
+
                     //CustomTile tile = map.GetTile(position) as CustomTile;
                     //tile.getTilePos();
                     //Debug.Log("normal/pos = "+position+", tilename = "+map.GetTile(position).name);
@@ -216,8 +218,9 @@ namespace KWY
             //charCount += num;
             if (num > 0)
             {
-                Characters.TryGetValue(pos, out List < GameObject > charnum);
+                Characters.TryGetValue(pos, out List < GameObject > charnum); // false
                 charnum.Add(ch);
+                
                 Characters[pos] = charnum;
                 Debug.Log("added " + ch);
             }
