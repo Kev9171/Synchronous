@@ -184,7 +184,7 @@ namespace KWY
             {
                 foreach (Collider2D k in objects)
                 {
-                    if (k.gameObject.name != "Tilemap" && k.gameObject.name != "HighlightTilemap")
+                    if (k.gameObject.tag == "Friendly" || k.gameObject.tag == "Enemy")
                     {
                         ch.Add(k.gameObject);
                         Debug.Log(k.gameObject.name);
