@@ -81,31 +81,6 @@ namespace KWY
             {
                 mouseInput.Mouse.MouseClick.performed -= Skill1;
             }
-
-            /*map = GameObject.Find("Tilemap").GetComponent<Tilemap>();
-            chCtrl = GameObject.Find("CharacterControl").GetComponent<CharacterControl>();
-            //mouseInput.Mouse.MouseClick.performed += chCtrl.OnClick;
-
-            if (SelChara == null) return;
-            Debug.Log("clicked " + SelChara);
-            Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
-
-            mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
-
-            Vector3Int clickV = map.WorldToCell(mousePosition);
-
-            if (map.HasTile(clickV))
-            {
-                TilemapControl TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
-                if (clickV.y % 2 != SelChara.TilePos.y % 2)
-                {
-                    simulation.ChangeAction((int)SelChara.Cb.cid, clickV.y % 2, MoveManager.MoveData);
-                }
-                SelChara.Teleport(clickV);
-
-
-                mouseInput.Mouse.MouseClick.performed -= Skill1;
-            }*/
         }
 
         public void OnClick(InputAction.CallbackContext context)

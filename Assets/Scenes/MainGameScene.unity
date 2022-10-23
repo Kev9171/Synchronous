@@ -7339,7 +7339,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   map: {fileID: 461010248}
   chCtrl: {fileID: 627332755}
-  simulation: {fileID: 134885414}
 --- !u!4 &1652176867
 Transform:
   m_ObjectHideFlags: 0
@@ -8604,7 +8603,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   readyBtn: {fileID: 1710340621}
-  gameManager: {fileID: 776724095}
 --- !u!1 &1902936912 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2066076434692316287, guid: 61d59f458c104b244818431d30d4a0c0, type: 3}
