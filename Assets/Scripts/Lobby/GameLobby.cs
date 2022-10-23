@@ -12,7 +12,10 @@ using Photon.Realtime;
 
 using PhotonPlayer = Photon.Realtime.Player;
 
-namespace KWY
+using DebugUtil;
+using KWY;
+
+namespace Lobby
 {
     public class GameLobby : MonoBehaviour
     {
@@ -59,6 +62,8 @@ namespace KWY
         readonly private string previousLevel = "StartScene";
 
         float timeLimit;
+
+        SLobbyData lobbyData;
 
         public bool myReady { get; set; } = false;
         public bool otherReady { get; set; } = false;
@@ -189,6 +194,13 @@ namespace KWY
 
         private void Start()
         {
+            lobbyData = Resources.Load<SLobbyData>("Lobby/OLobbyData");
+
+            if (!lobbyData)
+            {
+                Debug.LogError("Can not find lobbyData");
+            }
+
             LeftUserPanel.GetComponent<UserProfilePanel>().LoadNowUser();
 
             // join 한 경우 이미 들어와있는 플레이어 정보 로드
@@ -203,7 +215,8 @@ namespace KWY
                 }
             }
 
-            this.timeLimit = MasterManager.GameSettings.GameLobbyTimerTime;
+            //this.timeLimit = MasterManager.GameSettings.GameLobbyTimerTime;
+            timeLimit = lobbyData.startCountDownSeconds;
 
             TimerObject.InitTimer(timeLimit, TimeOut, CountDownText);
 

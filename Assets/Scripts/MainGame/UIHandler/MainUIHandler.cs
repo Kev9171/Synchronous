@@ -20,7 +20,6 @@ namespace KWY
 
         public void UpdateTurnText()
         {
-            Debug.Log($"UpdateTurnText, now: {data.TurnNum}");
             turnText.text = data.TurnNum.ToString();
         }
     }

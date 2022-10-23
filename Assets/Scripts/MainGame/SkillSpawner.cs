@@ -10,6 +10,7 @@ public class SkillSpawner : MonoBehaviour
 
     public void Activate(Vector2 basePos)
     {
+        Debug.Log("Activate");
         clone.Add(Instantiate(target, new Vector3(basePos.x, basePos.y, 0), Quaternion.identity));
     }
 

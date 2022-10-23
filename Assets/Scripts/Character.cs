@@ -176,8 +176,8 @@ namespace KWY
 
         public void ResetTempPos()
         {
-            map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
-            TempTilePos = TilePos;
+            //map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
+            TempTilePos = TilePos; // 2nd 클라이언트의 경우 TilePos값에 변동 없음 -> 일단 RPC로 동기화 함
         }
 
         public override string ToString()
@@ -225,7 +225,6 @@ namespace KWY
 
         #region Simulation Functions
 
-        [PunRPC]
         public void MoveTo(int x, int y)
         {
             Vector2Int dir = new Vector2Int(x, y);
@@ -250,10 +249,10 @@ namespace KWY
                 Debug.Log("nowpos = " + nowPos + ", despos = " + map.WorldToCell(des));
                 Debug.Log(gameObject.name + ": desNum->" + charsOnDes + ", curNum->" + charsOnCur);
 
-                if (map.CellToWorld(nowPos).x < des.x)
+                /*if (map.CellToWorld(nowPos).x < des.x)
                     gameObject.GetComponent<SpriteRenderer>().flipX = false;
                 else if(map.CellToWorld(nowPos).x > des.x)
-                    gameObject.GetComponent<SpriteRenderer>().flipX = true;
+                    gameObject.GetComponent<SpriteRenderer>().flipX = true;*/
 
                 if (charsOnDes > 1)
                 {
@@ -290,7 +289,7 @@ namespace KWY
                     nowMove = true;
                     gameObject.GetComponent<BoxCollider2D>().offset = Vector2.zero;
 
-                    Debug.Log("noone on tile");
+                    //Debug.Log("noone on tile");
                 }
 
                 if (charsOnCur > 1)
@@ -352,9 +351,16 @@ namespace KWY
             {
                 Debug.LogFormat("{0} / {1} can not go to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, map.WorldToCell(des));
             }
+
+            PhotonView.Get(this).RPC("SyncTilePosRPC", RpcTarget.Others, TilePos.x, TilePos.y);
         }
 
         [PunRPC]
+        public void SyncTilePosRPC(int x, int y)
+        {
+            TilePos = new Vector3Int(x, y, 0);
+        }
+
         public void Teleport(Vector3Int vec)
         {
             if (map.HasTile(vec))
@@ -588,8 +594,6 @@ namespace KWY
 
         public void OnPhotonInstantiate(PhotonMessageInfo info)
         {
-            Debug.Log(PhotonNetwork.GetPhotonView(GetComponent<PhotonView>().ViewID).gameObject.GetComponent<Character>());
-
         }
     }
 }

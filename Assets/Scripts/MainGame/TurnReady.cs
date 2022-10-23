@@ -75,10 +75,14 @@ namespace KWY
             // 스킬 선택 패널 전부 초기화
             characterUIHandler.HideAllSkillSelPanel();
 
+            // 액션 예약 아이콘 초기화
+            characterUIHandler.ClearCharactersActionIcon();
+
             // 캐릭터 선택 가능하도록
             characterUIHandler.CharaPanelSelectable = true;
             characterControl.StartControl();
 
+            // 캐릭터 정보 표시 패널 이동
             characterPanel.anchoredPosition = new Vector2(-250, 0);
 
             // 확대된 캐릭터 원래 크기로 초기화 및 임시 좌표 초기화

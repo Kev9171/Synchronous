@@ -91,6 +91,10 @@ namespace KWY
             {
                 selSkillUIs[id].gameObject.SetActive(true);
             }
+            else
+            {
+                Debug.LogError($"There is no entrolled character id={id}");
+            }
         }
 
         public void ShowSkillSelPanel(Character chara)
@@ -129,6 +133,20 @@ namespace KWY
                 {
                     charaUIs[id].SetSelActionImg(i, SkillManager.SkillData[(SID)o[1]].icon);
                 }
+            }
+        }
+
+        public void ClearCharacterActionIcon(int id)
+        {
+            MainGameData.Instance.GetActionData(id).ClearActionData();
+            charaUIs[id].ResetSelActionImg();
+        }
+
+        public void ClearCharactersActionIcon()
+        {
+            foreach(PlayableCharacter pc in MainGameData.Instance.MyTeamCharacter)
+            {
+                ClearCharacterActionIcon(pc.Id);
             }
         }
 

@@ -11,10 +11,11 @@ using UnityEngine.UI;
 using TMPro;
 
 using DebugUtil;
+using KWY;
 
 using PhotonPlayer = Photon.Realtime.Player;
 
-namespace KWY
+namespace Lobby
 {
     public class LobbyEvent : MonoBehaviourPunCallbacks
     {
