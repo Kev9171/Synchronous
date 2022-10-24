@@ -240,11 +240,12 @@ namespace KWY
             Vector2Int realDir = TransFromY(dir);
             Vector3Int nowPos = TilePos;
             Vector3 des = map.CellToWorld(new Vector3Int(nowPos.x + realDir.x, nowPos.y + realDir.y, nowPos.z));
-            TilePos = map.WorldToCell(des);
-            des.y += 0.1f;
 
             if (map.HasTile(map.WorldToCell(des)))
             {
+                TilePos = map.WorldToCell(des);
+                des.y += 0.1f;
+
                 TCtrl.updateCharNum(map.WorldToCell(des), 1, gameObject);
                 TCtrl.updateCharNum(nowPos, -1, gameObject);
 
