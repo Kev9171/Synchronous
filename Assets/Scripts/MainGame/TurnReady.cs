@@ -88,7 +88,7 @@ namespace KWY
             // 확대된 캐릭터 원래 크기로 초기화 및 임시 좌표 초기화
             foreach (PlayableCharacter c in data.MyTeamCharacter)
             {
-                c.Chara.ResetTempPos();
+                c.Chara.ResetTempPosAndMp();
                 c.CharaObject.transform.localScale = new Vector3(0.7f, 0.7f, 1);
             }
 

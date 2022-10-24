@@ -102,7 +102,7 @@ namespace KWY
             }
             foreach(PlayableCharacter p in data.PCharacters.Values)
             {
-                p.Chara.ResetTempPos();
+                p.Chara.ResetTempPosAndMp();
             }
 
             //StartCoroutine(StartAction(-1));

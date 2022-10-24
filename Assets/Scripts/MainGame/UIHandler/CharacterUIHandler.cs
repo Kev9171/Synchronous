@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using UI;
+
 namespace KWY
 {
     public class CharacterUIHandler : MonoBehaviour
@@ -93,7 +95,7 @@ namespace KWY
             }
             else
             {
-                Debug.LogError($"There is no entrolled character id={id}");
+                Debug.LogError($"There is no entrolled character id={id} or this character is not mine");
             }
         }
 
@@ -104,9 +106,9 @@ namespace KWY
 
         public void UpdateCharacterStatusUI(Character chara)
         {
-            if (charaUIs.TryGetValue(chara.Pc.Id, out _))
+            if (charaUIs.TryGetValue(chara.Pc.Id, out CharacterPanel cp))
             {
-                charaUIs[chara.Pc.Id].UpdateUI(chara);
+                cp.UpdateUI(chara);
             }
             else
             {

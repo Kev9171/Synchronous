@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace KWY
+using KWY;
+
+namespace UI
 {
     public static class PanelBuilder
     {
@@ -56,7 +58,6 @@ namespace KWY
             return buffInfoPanel;
         }
 
-        // 아직 미완성 인자 확인 필요
         public static void ShowResultPanel(Transform parent, WINLOSE result, ResultData data)
         {
             GameObject resultPanel = GameObject.Instantiate(
@@ -67,6 +68,17 @@ namespace KWY
 
             resultPanel.transform.SetParent(parent, false);
             resultPanel.GetComponent<ResultPanel>().SetData(result, data);
+        }
+
+        public static void ShowFadeOutText(Transform parent, string content)
+        {
+            GameObject fadeOutText = GameObject.Instantiate(
+                Resources.Load(
+                    "Prefabs/UI/Game/FadeOutText",
+                    typeof(GameObject))) as GameObject;
+
+            fadeOutText.transform.SetParent(parent, false);
+            fadeOutText.GetComponent<FadeOutText>().Init(content);
         }
     }
 }

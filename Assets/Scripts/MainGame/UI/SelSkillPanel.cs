@@ -2,7 +2,9 @@ using TMPro;
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace KWY
+using KWY;
+
+namespace UI
 {
     [RequireComponent(typeof(CanvasRenderer))]
     public class SelSkillPanel : MonoBehaviour

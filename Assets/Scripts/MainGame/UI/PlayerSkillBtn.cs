@@ -4,6 +4,8 @@ using UnityEngine.UI;
 using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
 
+using UI;
+
 namespace KWY
 {
     [RequireComponent(typeof(CanvasRenderer))]
@@ -62,6 +64,8 @@ namespace KWY
             else
             {
                 Debug.Log("마나 부족");
+                GameObject canvas = GameObject.Find("UICanvas");
+                PanelBuilder.ShowFadeOutText(canvas.transform, "Not enough Mp to use this skill!");
             }
         }
 

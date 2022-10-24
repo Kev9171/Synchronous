@@ -12,8 +12,8 @@ namespace KWY
         public CID cid;
         public string characterName;
         public string characterEx;
-        public float hp;
-        public float atk;
+        public int hp;
+        public int atk;
         public float spd;
         public Sprite icon;
         // 나중에 캐릭터와 패시브 object 분리... 하기 일단 통합...
