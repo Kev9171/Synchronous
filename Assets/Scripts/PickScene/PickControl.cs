@@ -5,13 +5,15 @@ using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using Photon.Pun;
 using System;
-
 using KWY;
+using UI;
 
 namespace PickScene
 {
     public class PickControl : Singleton<PickControl>
     {
+        private readonly int NullCID = -1;
+
         [SerializeField] Tilemap map;
         [SerializeField] GameObject ClientCharacters, MasterClientCharacters;
         [SerializeField] private List<GameObject> deployableList = new List<GameObject>(); // Storing deployable character information
@@ -20,9 +22,18 @@ namespace PickScene
         private GameObject[] charArray = new GameObject[10]; // Initial storage of instantiated characters
         private List<Vector3Int> deployPositionList = new List<Vector3Int>(); // Initial storage of deployable tiles
         private int deployCounter; // Deployable character number
-        private List<Character> pCharacters = new List<Character>(); // A list with character information during the game
+        private List<PickCharacter> pCharacters = new List<PickCharacter>(); // A list with character information during the game
         //private Dictionary<CID, GameObject> pCharacterObjects = new Dictionary<CID, GameObject>();
         private Dictionary<CID, Vector3Int> deployDontDestroy = new Dictionary<CID, Vector3Int>();
+
+
+        [SerializeField]
+        GameObject Canvas;
+
+        private int selectedCid;
+        private readonly string spawnableTileName = "tileWater_full";
+        Dictionary<CID, Vector3Int> setLocList = new Dictionary<CID, Vector3Int>();
+        Dictionary<CID, GameObject> setCidList = new Dictionary<CID, GameObject>();
 
         #region Private Fields
 
@@ -37,14 +48,14 @@ namespace PickScene
             mouseInput.Mouse.MouseClick.performed += OnClick;
         }
 
-        public void SetSelClear()
+        public void StopControl()
         {
             mouseInput.Mouse.MouseClick.performed -= OnClick;
         }
 
         public void SetSelChara(CID cid)
         {
-            Character c = GetCertainCharacter(cid);
+            PickCharacter c = GetCertainCharacter(cid);
             if (c == null)
             {
                 Debug.LogErrorFormat("Can not select - cid: {0}", cid);
@@ -64,7 +75,7 @@ namespace PickScene
             Debug.Log("Character destroyed: " + cid);
             deployPositionList.Add(deployDontDestroy[cid]); // Recover deployable tile
             deployDontDestroy.Remove(cid);
-            foreach (Character ch in pCharacters)
+            foreach (PickCharacter ch in pCharacters)
             {
                 if (ch.Cb.cid == cid)
                 {
@@ -76,9 +87,9 @@ namespace PickScene
             deployCounter++;
         }
 
-        public Character GetCertainCharacter(CID cid)
+        public PickCharacter GetCertainCharacter(CID cid)
         {
-            foreach (Character c in pCharacters)
+            foreach (PickCharacter c in pCharacters)
             {
                 if (c.Cb.cid == cid)
                 {
@@ -94,14 +105,14 @@ namespace PickScene
             {
                 if (PhotonNetwork.IsMasterClient)
                 {
-                    if (map.HasTile(position) && position.x < 0 && map.GetSprite(position).name == "tileWater_full")
+                    if (map.HasTile(position) && position.x < 0 && map.GetSprite(position).name == spawnableTileName)
                     {
                         deployPositionList.Add(position);
                     }
                 }
                 else
                 {
-                    if (map.HasTile(position) && position.x > 0 && map.GetSprite(position).name == "tileWater_full")
+                    if (map.HasTile(position) && position.x > 0 && map.GetSprite(position).name == spawnableTileName)
                     {
                         deployPositionList.Add(position);
                     }
@@ -109,16 +120,170 @@ namespace PickScene
             }
         }
 
+        public void OnCharaSelected(CID cid)
+        {
+            selectedCid = (int)cid;
+
+            // 캐릭터 아이콘이 클릭되면 실행
+            StartControl();
+        }
+
+        public void SelectedCharaClear()
+        {
+            selectedCid = NullCID;
+        }
+
         public void OnClick(InputAction.CallbackContext context)
         {
+            if (selectedCid == NullCID)
+            {
+                Debug.Log("Error");
+                return;
+            }
+
             Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
+            Ray ray = Camera.main.ScreenPointToRay(mousePosition);
+            RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
+
+            if (hit.collider == null) // Instantiate turns off Box Collider 2D option
+            {
+                mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
+
+                CID sCID = (CID)selectedCid;
+                Vector3Int cellV = map.WorldToCell(mousePosition);
+                Vector3 worldV = map.CellToWorld(cellV);
+                Sprite sprite = map.GetSprite(cellV);
+
+                if (!sprite)
+                {
+                    // 맵이 클릭되지 않았을 때 아무 반응 x
+                    return;
+                }
+
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    if (mousePosition.x < 0 && map.GetSprite(cellV).name == spawnableTileName)
+                    {
+                        if (setLocList.ContainsValue(cellV))
+                        {
+                            PanelBuilder.ShowFadeOutText(Canvas.transform, "Only one character can be set on one tile");
+                            StopControl();
+                            return;
+                        }
+
+                        if (setCidList.ContainsKey(sCID))
+                        {
+                            Destroy(setCidList[sCID]);
+                            setCidList.Remove(sCID);
+                            setLocList.Remove(sCID);
+                        }
+
+                        GameObject o = Instantiate(PickCharacterResources.LoadCharacter((CID)selectedCid), worldV, Quaternion.identity);
+                        setLocList.Add(sCID, cellV);
+                        setCidList.Add(sCID, o);
+
+                        StopControl();
+                        SelectedCharaClear();
+                    }
+                    else
+                    {
+                        PanelBuilder.ShowFadeOutText(Canvas.transform, "it is not selectable tile on your side");
+                        StopControl();
+                        return;
+                    }
+                }
+                else
+                {
+                    if (mousePosition.x > 0 && map.GetSprite(cellV).name == spawnableTileName)
+                    {
+                        if (setLocList.ContainsValue(cellV))
+                        {
+                            PanelBuilder.ShowFadeOutText(Canvas.transform, "Only one character can be set on one tile");
+                            StopControl();
+                            return;
+                        }
+
+                        if (setCidList.ContainsKey(sCID))
+                        {
+                            Destroy(setCidList[sCID]);
+                            setCidList.Remove(sCID);
+                            setLocList.Remove(sCID);
+                        }
+
+                        GameObject o = Instantiate(PickCharacterResources.LoadCharacter((CID)selectedCid), worldV, Quaternion.identity);
+                        o.GetComponent<SpriteRenderer>().flipX = true;
+                        setLocList.Add(sCID, cellV);
+                        setCidList.Add(sCID, o);
+
+                        StopControl();
+                        SelectedCharaClear();
+                    }
+                    else
+                    {
+                        PanelBuilder.ShowFadeOutText(Canvas.transform, "it is not selectable tile on your side");
+                        StopControl();
+                        return;
+                    }
+                }
+            }
+
+
+
+            /*Vector3Int clickV = map.WorldToCell(mousePosition);
+
+            if (map.HasTile(clickV) && PickManager.Instance.ClickedBtn != null && deployableList.Contains(PickManager.Instance.ClickedBtn.CharacterPrefab))
+            {
+                mousePosition = map.GetCellCenterWorld(clickV); // Place only one character per tile
+                mousePosition.y += (float)0.1; // Place your character in the center of a tile
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    if (mousePosition.x < 0 && map.GetSprite(clickV).name == spawnableTileName)
+                    {
+                        int prefabEnum = (int)Enum.Parse(typeof(CID), PickManager.Instance.ClickedBtn.CharacterPrefab.name); // To use enum as index of charArray
+                        charArray[prefabEnum] = Instantiate(PickManager.Instance.ClickedBtn.CharacterPrefab, mousePosition, Quaternion.identity);
+                        pCharacters.Add(charArray[prefabEnum].GetComponent<PickCharacter>());
+
+                        unDeployableList.Add(PickManager.Instance.ClickedBtn.CharacterPrefab);
+                        deployableList.Remove(PickManager.Instance.ClickedBtn.CharacterPrefab);
+                        deployPositionList.Remove(clickV);
+                        deployDontDestroy.Add(charArray[prefabEnum].GetComponent<PickCharacter>().Cb.cid, clickV);
+
+                        charArray[prefabEnum].transform.parent = MasterClientCharacters.transform;
+                        charArray[prefabEnum].GetComponent<BoxCollider2D>().enabled = true;
+                        PickManager.Instance.PickClear();
+                        deployCounter--;
+                    }
+                }
+                else
+                {
+                    if (mousePosition.x > 0 && map.GetSprite(clickV).name == spawnableTileName)
+                    {
+                        int prefabEnum = (int)Enum.Parse(typeof(CID), PickManager.Instance.ClickedBtn.CharacterPrefab.name);
+                        charArray[prefabEnum] = Instantiate(PickManager.Instance.ClickedBtn.CharacterPrefab, mousePosition, Quaternion.identity);
+                        pCharacters.Add(charArray[prefabEnum].GetComponent<PickCharacter>());
+                        //pCharacterObjects.Add(pCharacters[deployCounter].Cb.cid, firstDeployed[deployCounter]);
+
+                        unDeployableList.Add(PickManager.Instance.ClickedBtn.CharacterPrefab);
+                        deployableList.Remove(PickManager.Instance.ClickedBtn.CharacterPrefab); // Remove from list of deployable characters
+                        deployPositionList.Remove(clickV); // Remove from list of available locations
+                        deployDontDestroy.Add(charArray[prefabEnum].GetComponent<PickCharacter>().Cb.cid, clickV);
+
+                        charArray[prefabEnum].transform.parent = ClientCharacters.transform;
+                        charArray[prefabEnum].GetComponent<SpriteRenderer>().flipX = true;
+                        charArray[prefabEnum].GetComponent<BoxCollider2D>().enabled = true;
+                        PickManager.Instance.PickClear(); // Disable button prefab
+                        deployCounter--;
+                    }
+                }
+            }*/
+            /*Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
             Ray ray = Camera.main.ScreenPointToRay(mousePosition);
             RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
 
             // When clicking on a character
             if (hit.collider != null)
             {
-                CID cid = hit.collider.gameObject.GetComponent<Character>().Cb.cid;
+                CID cid = hit.collider.gameObject.GetComponent<PickCharacter>().Cb.cid;
                 SetSelChara(cid);
             }
 
@@ -137,12 +302,12 @@ namespace PickScene
                         {
                             int prefabEnum = (int)Enum.Parse(typeof(CID), PickManager.Instance.ClickedBtn.CharacterPrefab.name); // To use enum as index of charArray
                             charArray[prefabEnum] = Instantiate(PickManager.Instance.ClickedBtn.CharacterPrefab, mousePosition, Quaternion.identity);
-                            pCharacters.Add(charArray[prefabEnum].GetComponent<Character>());
+                            pCharacters.Add(charArray[prefabEnum].GetComponent<PickCharacter>());
 
                             unDeployableList.Add(PickManager.Instance.ClickedBtn.CharacterPrefab);
                             deployableList.Remove(PickManager.Instance.ClickedBtn.CharacterPrefab);
                             deployPositionList.Remove(clickV);
-                            deployDontDestroy.Add(charArray[prefabEnum].GetComponent<Character>().Cb.cid, clickV);
+                            deployDontDestroy.Add(charArray[prefabEnum].GetComponent<PickCharacter>().Cb.cid, clickV);
 
                             charArray[prefabEnum].transform.parent = MasterClientCharacters.transform;
                             charArray[prefabEnum].GetComponent<BoxCollider2D>().enabled = true;
@@ -156,13 +321,13 @@ namespace PickScene
                         {
                             int prefabEnum = (int)Enum.Parse(typeof(CID), PickManager.Instance.ClickedBtn.CharacterPrefab.name);
                             charArray[prefabEnum] = Instantiate(PickManager.Instance.ClickedBtn.CharacterPrefab, mousePosition, Quaternion.identity);
-                            pCharacters.Add(charArray[prefabEnum].GetComponent<Character>());
+                            pCharacters.Add(charArray[prefabEnum].GetComponent<PickCharacter>());
                             //pCharacterObjects.Add(pCharacters[deployCounter].Cb.cid, firstDeployed[deployCounter]);
 
                             unDeployableList.Add(PickManager.Instance.ClickedBtn.CharacterPrefab);
                             deployableList.Remove(PickManager.Instance.ClickedBtn.CharacterPrefab); // Remove from list of deployable characters
                             deployPositionList.Remove(clickV); // Remove from list of available locations
-                            deployDontDestroy.Add(charArray[prefabEnum].GetComponent<Character>().Cb.cid, clickV);
+                            deployDontDestroy.Add(charArray[prefabEnum].GetComponent<PickCharacter>().Cb.cid, clickV);
 
                             charArray[prefabEnum].transform.parent = ClientCharacters.transform;
                             charArray[prefabEnum].GetComponent<SpriteRenderer>().flipX = true;
@@ -172,7 +337,7 @@ namespace PickScene
                         }
                     }
                 }
-            }
+            }*/
         }
 
         public void RandomDeployCharacter()
@@ -188,19 +353,34 @@ namespace PickScene
                 charArray[prefabEnum] = Instantiate(deployableList[randomCharNum], posAdaptation, Quaternion.identity);
                 deployableList.Remove(deployableList[randomCharNum]); // Remove from list of deployable characters
                 deployPositionList.Remove(randomPosition); // Remove from list of available locations
-                pCharacters.Add(charArray[prefabEnum].GetComponent<Character>());
+                pCharacters.Add(charArray[prefabEnum].GetComponent<PickCharacter>());
                 //pCharacterObjects.Add(pCharacters[deployCounter].Cb.cid, firstDeployed[deployCounter]);
 
                 charArray[prefabEnum].transform.parent = ClientCharacters.transform;
                 charArray[prefabEnum].GetComponent<SpriteRenderer>().flipX = true;
                 charArray[prefabEnum].GetComponent<BoxCollider2D>().enabled = true;
-                deployDontDestroy.Add(charArray[prefabEnum].GetComponent<Character>().Cb.cid, Vector3Int.FloorToInt(posAdaptation)); // Store CID and location information
+                deployDontDestroy.Add(charArray[prefabEnum].GetComponent<PickCharacter>().Cb.cid, Vector3Int.FloorToInt(posAdaptation)); // Store CID and location information
             }
         }
 
-        #endregion
+        public void SavePickData()
+        {
+            Team team = PhotonNetwork.IsMasterClient ? Team.A : Team.B;
 
-        #region MonoBehaviour CallBacks
+            GameObject o = new GameObject("PickData");
+            PickData component = o.AddComponent<PickData>();
+
+            foreach(CID cid in setCidList.Keys)
+            {
+                component.AddData(cid, setLocList[cid], team);
+            }
+
+            DontDestroyOnLoad(o);
+
+            Debug.Log(component);
+        }
+
+        #endregion
 
         private void Awake()
         {
@@ -210,6 +390,7 @@ namespace PickScene
         {
             mouseInput.Enable();
         }
+
         private void OnDisable()
         {
             mouseInput.Disable();
@@ -217,21 +398,38 @@ namespace PickScene
 
         private void Start()
         {
-            StartControl();
-            deployCounter = 3;
-            GetDeployPosition();
+            //StartControl();
+            //deployCounter = 3;
+            //GetDeployPosition();
         }
+    }
+    class PickCharacterResources
+    {
+        // [Type]_[CID]
+        public static string Flappy_1 = "Prefabs/Characters/PickCharacters/PickFlappy";
+        public static string Flappy2_2 = "Prefabs/Characters/PickCharacters/PickFlappy2";
+        public static string Knight_3 = "Prefabs/Characters/PickCharacters/PickKnight";
 
-        void Update()
+        public static GameObject LoadCharacter(CID cid)
         {
-            //if (mouseInput.Mouse.MouseClick.IsPressed())
-            //{
-            //    //mouseInput.Mouse.MouseClick.performed -= CharMoveSelect;
-            //    //mouseInput.Mouse.MouseClick.performed -= CharAttackSelect;
-            //    //mouseInput.Mouse.MouseClick.performed += OnClick;
-            //}
+            return cid switch
+            {
+                CID.Flappy => Resources.Load<GameObject>(Flappy_1),
+                CID.Flappy2 => Resources.Load<GameObject>(Flappy2_2),
+                CID.Knight => Resources.Load<GameObject>(Knight_3),
+                _ => null,
+            };
         }
 
-        #endregion
+        public static string GetPathCharacter(CID cid)
+        {
+            return cid switch
+            {
+                CID.Flappy => Flappy_1,
+                CID.Flappy2 => Flappy2_2,
+                CID.Knight => Knight_3,
+                _ => null,
+            };
+        }
     }
 }

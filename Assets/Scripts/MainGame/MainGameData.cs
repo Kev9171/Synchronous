@@ -545,7 +545,7 @@ namespace KWY
     }
 
     // temp
-    class CharaData
+    public class CharaData
     {
         public CharaData(CID cid, int x, int y, Team team)
         {
