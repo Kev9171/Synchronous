@@ -21,9 +21,12 @@ public class SkillSpawner : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Enemy")
+        if (collision.gameObject.CompareTag("Enemy"))
         {
-            collision.gameObject.GetComponent<Character>().DamageHP(5);
+            //collision.gameObject.GetComponent<Character>().DamageHP(30);
+            // -30 is temp value;
+            DataController.Instance.ModifyCharacterHp(
+                collision.gameObject.GetComponent<Character>().Pc.Id, -30);
         }
     }
 }

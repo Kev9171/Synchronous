@@ -1,6 +1,8 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
+using System.Collections;
 
 namespace KWY
 {
@@ -14,30 +16,23 @@ namespace KWY
         [SerializeField]
         SLogicData logicData;
 
-        private float activeDuraction = 2f;
-        private float time = 0.0f;
+        private float activeDuration;
 
-        public void SetData(Sprite icon, string skillName)
+        public void SetDataAndStart(Sprite icon, string skillName, float duration)
         {
             charaIcon.sprite = icon;
             skillNameLabel.text = skillName;
+            activeDuration = duration;
+
+            Destroy(gameObject, duration);
+
+            //StartCoroutine("IEStartShowing");
         }
 
-        private void Start()
+        /*IEnumerator IEStartShowing()
         {
-            activeDuraction = logicData.actionLogShowingTime;
-        }
-
-        #region MonoBehaviour CallBacks
-        private void Update()
-        {
-            time += Time.deltaTime;
-
-            if (time > activeDuraction)
-            {
-                Destroy(gameObject);
-            }
-        }
-        #endregion
+            yield return new WaitForSeconds(activeDuration);
+            Destroy(gameObject);
+        }*/
     }
 }

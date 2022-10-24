@@ -1,8 +1,12 @@
+#define TEST
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
+
+using UI;
 
 namespace KWY
 {
@@ -21,7 +25,7 @@ namespace KWY
         ShowNowAction showActions;
 
         [SerializeField]
-        private PlayerSkillPanel playerSkillPanel;
+        GameObject loadingScreen;
 
         [SerializeField]
         private TurnReady turnReady;
@@ -32,26 +36,55 @@ namespace KWY
         [SerializeField]
         Transform UICanvas;
 
-        ActionData nowActionData;
+        STATE nowState = STATE.IDLE;
 
-        STATE nowState = STATE.StandBy;
+        public static GameManager Instance;
+        public TurnReady TurnReady
+        {
+            get { return turnReady; }
+        }
+        public Simulation Simulation
+        {
+            get { return simulation; }
+        }
 
         public void SetState(STATE state, params object[] data)
         {
+#if TEST
+            Debug.Log($"SetState: {state}");
+#endif
             switch (state)
             {
+                case STATE.StandBy: // 게임 시작 준비 완료
+                    TurnStandBy();
+                    break;
                 case STATE.TurnReady: // turn ready
                     TurnReadyState();
                     break;
                 case STATE.Simul: // start simul
-                    SimulationState(
-                        new ActionData((Dictionary<int, object[]>)data[0])
-                        );
+                    if (PhotonNetwork.IsMasterClient)
+                    {
+                        SimulationState(new ActionData((Dictionary<int, object[]>)data[0]));
+                    }
+                    else
+                    {
+                        SimulationState();
+                    }
                     break;
                 case STATE.GameOver: // game over
                     GameOverState((TICK_RESULT)data[0]);
                     break;
             }
+        }
+
+        private void TurnStandBy()
+        {
+            // UI 관련 데이터 연결
+            turnReady.Init();
+            simulation.Init();
+
+            SetState(STATE.TurnReady);
+            loadingScreen.SetActive(false);
         }
 
         private void TurnReadyState()
@@ -70,8 +103,36 @@ namespace KWY
             turnReady.StartTurnReadyState();
         }
 
+        private void SimulationState()
+        {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                Debug.LogError("SimulationState() must be called only on B-client");
+                return;
+            }
+
+            nowState = STATE.Simul;
+
+            nowState = STATE.Simul;
+
+            // end turnready state
+            turnReady.EndTurnReadyState();
+
+            // move camera
+            cameraController.SetCameraSimul();
+
+            // start simulation state
+            simulation.StartSimulationState();
+        }
+
         private void SimulationState(ActionData actionData)
         {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                Debug.LogError("SimulationState() must be called only on master client");
+                return;
+            }
+
             nowState = STATE.Simul;
 
             // end turnready state
@@ -106,19 +167,18 @@ namespace KWY
             }
         }
 
+        private void Awake()
+        {
+            Instance = this;
+        }
+
         // Start is called before the first frame update
         void Start()
         {
+            loadingScreen.SetActive(true);
+
             data.LoadData();
 
-            turnReady.Init();
-            simulation.Init();
-
-
-
-
-            // must be called at end of Start func.
-            SetState(STATE.TurnReady);
         }
 
         // Update is called once per frame

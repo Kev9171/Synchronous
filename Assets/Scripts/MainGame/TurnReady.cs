@@ -1,5 +1,6 @@
+//#define TEST
+
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 using TMPro;
@@ -32,6 +33,9 @@ namespace KWY
 
         [SerializeField]
         private CharacterControl characterControl;
+
+        [SerializeField]
+        private RectTransform characterPanel;
 
         [SerializeField]
         Transform UICanvasTransform;
@@ -71,28 +75,40 @@ namespace KWY
             // 스킬 선택 패널 전부 초기화
             characterUIHandler.HideAllSkillSelPanel();
 
+            // 액션 예약 아이콘 초기화
+            characterUIHandler.ClearCharactersActionIcon();
+
             // 캐릭터 선택 가능하도록
             characterUIHandler.CharaPanelSelectable = true;
             characterControl.StartControl();
 
+            // 캐릭터 정보 표시 패널 이동
+            characterPanel.anchoredPosition = new Vector2(-250, 0);
+
             // 확대된 캐릭터 원래 크기로 초기화 및 임시 좌표 초기화
             foreach (PlayableCharacter c in data.MyTeamCharacter)
             {
-                c.Chara.ResetTempPos();
+                c.Chara.ResetTempPosAndMp();
                 c.CharaObject.transform.localScale = new Vector3(0.7f, 0.7f, 1);
             }
 
             // 버튼 기능 초기화
             readyBtn.GetComponent<TurnReadyBtn>().ResetReady();
 
-            // 플레이어 mp 추가
+            if (PhotonNetwork.IsMasterClient)
+            {
+                DataController.Instance.AddPlayerMp(LogicData.Instance.PlayerMPIncrement);
+                DataController.Instance.AddAllCharactersMp(LogicData.Instance.CharacterMpIncrement);
+            }
+
+            /*// 플레이어 mp 추가
             data.MyPlayer.AddMp(LogicData.Instance.PlayerMPIncrement);
 
             // 캐릭터 mp 추가
             foreach(PlayableCharacter pc in data.MyTeamCharacter)
             {
                 pc.Chara.AddMP(LogicData.Instance.CharacterMpIncrement);
-            }
+            }*/
 
             // show UI
             TurnReadyUI.SetActive(true);
@@ -130,24 +146,6 @@ namespace KWY
 
             // event 전송
             gameEvent.RaiseEventTurnReady(ActionData.CreateActionData(data.CharaActionData));
-        }
-
-        public void ShowCharacterActionPanel(int id)
-        {
-            for (int i = 0; i < data.CharaActionData[id].ActionCount; i++)
-            {
-                // TODO
-
-                /*object[] t = (object[])data.CharaActionData[cid].Actions[i];
-                if (ActionType.Move == (ActionType)(t[0]))
-                {
-                    charaPanels[cid].SetSelActionImg(i, MoveManager.MoveData.icon);
-                }
-                else
-                {
-                    charaPanels[cid].SetSelActionImg(i, SkillManager.GetData((SID)(t[1])).icon);
-                }*/
-            }
         }
 
         #endregion
@@ -200,26 +198,23 @@ namespace KWY
 
         private void TimeOut()
         {
-            if (!PhotonNetwork.IsMasterClient) return;
-
-            data.MyTeamCharacter[0].Chara.DamageHP(50);
-            data.MyTeamCharacter[1].Chara.AddMP(-2);
-
-            PanelBuilder.ShowResultPanel(UICanvasTransform, WINLOSE.WIN, data.CreateResultData());
-
-            data.CharasTeamB[1].Chara.DamageHP(100);
-            Debug.Log(data.CharasTeamB[1].Chara);
-            data.CharasTeamB[1].CharaObject.GetPhotonView().RPC("TestRPC", RpcTarget.Others);
-            Debug.Log("after: " + data.CharasTeamB[1].Chara);
-            return;
+            //PanelBuilder.ShowResultPanel(UICanvasTransform, WINLOSE.WIN, data.CreateResultData());
 
 
             // 캐릭터 선택 못하게 + 스킬 선택 패널 안보이게
             characterUIHandler.CharaPanelSelectable = false;
 
             FillRandomMoveAtEmpty();
+
             ActionData d = ActionData.CreateActionData(data.CharaActionData);
             Debug.Log(d);
+
+#if TEST
+            if (!PhotonNetwork.IsMasterClient) return;
+            DataController.Instance.ModifyCharacterHp(2, -50);
+            DataController.Instance.ModifyCharacterHp(5, -50);
+            return;
+#endif
             gameEvent.RaiseEventTurnReady(d);
         }
 

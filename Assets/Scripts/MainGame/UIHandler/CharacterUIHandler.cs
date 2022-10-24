@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using UI;
+
 namespace KWY
 {
     public class CharacterUIHandler : MonoBehaviour
@@ -27,10 +29,8 @@ namespace KWY
         [SerializeField]
         MainGameData data;
 
-        Dictionary<int, CharacterPanel> charaUIs = new Dictionary<int, CharacterPanel>();
-
-        Dictionary<Character, CharacterPanel> charaPanels = new Dictionary<Character, CharacterPanel>();
-        Dictionary<int, SelSkillPanel> selSkillUIs = new Dictionary<int, SelSkillPanel>();
+        readonly Dictionary<int, CharacterPanel> charaUIs = new Dictionary<int, CharacterPanel>();
+        readonly Dictionary<int, SelSkillPanel> selSkillUIs = new Dictionary<int, SelSkillPanel>();
 
         // 캐릭터 패널을 선택하여 캐릭터 선택 가능 여부
         private bool charaPanelSelectable = false;
@@ -39,7 +39,7 @@ namespace KWY
         {
             set
             {
-                foreach (CharacterPanel cp in charaPanels.Values)
+                foreach (CharacterPanel cp in charaUIs.Values)
                 {
                     cp.Selectable = value;
                 }
@@ -69,21 +69,18 @@ namespace KWY
             selSkillPanel1.SetData(c1.name, c1.Cb.skills);
             charaUIs.Add(charaList[0].Id, characterPanel1);
             selSkillUIs.Add(charaList[0].Id, selSkillPanel1);
-            charaPanels.Add(c1, characterPanel1);
 
             Character c2 = charaList[1].CharaObject.GetComponent<Character>();
             characterPanel2.Init(c2);
             selSkillPanel2.SetData(c2.name, c2.Cb.skills);
             charaUIs.Add(charaList[1].Id, characterPanel2);
             selSkillUIs.Add(charaList[1].Id, selSkillPanel2);
-            charaPanels.Add(c2, characterPanel2);
 
             Character c3 = charaList[2].CharaObject.GetComponent<Character>();
             characterPanel3.Init(c3);
             selSkillPanel3.SetData(c3.name, c3.Cb.skills);
             charaUIs.Add(charaList[2].Id, characterPanel3);
             selSkillUIs.Add(charaList[2].Id, selSkillPanel3);
-            charaPanels.Add(c3, characterPanel3);
 
 
         }
@@ -96,6 +93,10 @@ namespace KWY
             {
                 selSkillUIs[id].gameObject.SetActive(true);
             }
+            else
+            {
+                Debug.LogError($"There is no entrolled character id={id} or this character is not mine");
+            }
         }
 
         public void ShowSkillSelPanel(Character chara)
@@ -105,9 +106,9 @@ namespace KWY
 
         public void UpdateCharacterStatusUI(Character chara)
         {
-            if (charaPanels.TryGetValue(chara, out _))
+            if (charaUIs.TryGetValue(chara.Pc.Id, out CharacterPanel cp))
             {
-                charaPanels[chara].UpdateUI(chara);
+                cp.UpdateUI(chara);
             }
             else
             {
@@ -115,9 +116,40 @@ namespace KWY
             }
         }
 
-        public void UpdateCharacterActionIcon(Character chara)
+        public void UpdateCharacterActionIcon(int id)
         {
-            Debug.Log("UpdateCharacterAcionIcon");
+            CharacterActionData data = MainGameData.Instance.GetActionData(id);
+
+            charaUIs[id].ResetSelActionImg();
+
+            for (int i=0; i<data.ActionCount; i++)
+            {
+                object[] o = (object[])data.Actions[i];
+                ActionType type = (ActionType)o[0];
+
+                if (type == ActionType.Move)
+                {
+                    charaUIs[id].SetSelActionImg(i, MoveManager.MoveData.icon);
+                }
+                else if (type == ActionType.Skill)
+                {
+                    charaUIs[id].SetSelActionImg(i, SkillManager.SkillData[(SID)o[1]].icon);
+                }
+            }
+        }
+
+        public void ClearCharacterActionIcon(int id)
+        {
+            MainGameData.Instance.GetActionData(id).ClearActionData();
+            charaUIs[id].ResetSelActionImg();
+        }
+
+        public void ClearCharactersActionIcon()
+        {
+            foreach(PlayableCharacter pc in MainGameData.Instance.MyTeamCharacter)
+            {
+                ClearCharacterActionIcon(pc.Id);
+            }
         }
 
         public void HideAllSkillSelPanel()

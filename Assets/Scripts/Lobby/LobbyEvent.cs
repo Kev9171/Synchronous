@@ -10,9 +10,12 @@ using UnityEngine.UI;
 
 using TMPro;
 
+using DebugUtil;
+using KWY;
+
 using PhotonPlayer = Photon.Realtime.Player;
 
-namespace KWY
+namespace Lobby
 {
     public class LobbyEvent : MonoBehaviourPunCallbacks
     {
@@ -51,11 +54,11 @@ namespace KWY
 
             if (PhotonNetwork.RaiseEvent(evCode, content, raiseEventOptions, sendOptions))
             {
-                UtilForDebug.LogRaiseEvent(evCode, content, raiseEventOptions, sendOptions);
+                DebugLog.LogRaiseEvent(evCode, content, raiseEventOptions, sendOptions);
             }
             else
             {
-                UtilForDebug.LogErrorRaiseEvent(evCode);
+                DebugLog.FailedToRaiseEvent(evCode);
             }
         }
 

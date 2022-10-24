@@ -6,6 +6,8 @@ using System.Collections.Concurrent;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+using DebugUtil;
+
 namespace KWY
 {
     public class Character : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback, IPunObservable, ISubject<Character>
@@ -13,7 +15,7 @@ namespace KWY
         [SerializeField]
         CharacterBase _characterBase;
 
-        private List<IObserver<Character>> observers = new List<IObserver<Character>>();
+        private readonly List<IObserver<Character>> observers = new List<IObserver<Character>>();
 
         public PlayableCharacter Pc
         {
@@ -33,13 +35,16 @@ namespace KWY
             private set;
         } = new List<Buff>();
         public CharacterBase Cb { get; private set; }
-        public float Hp { get; private set; }
-        public float Mp { get; private set; }
-        public float MaxHp { get; private set; }
-        public float MaxMp { get; private set; }
+        public int Hp { get; private set; }
+        public int Mp { get; private set; }
+        public int MaxHp { get; private set; }
+        public int MaxMp { get; private set; }
         public bool BreakDown { get; private set; }
-        public float Atk { get; private set; }
-        public float Def { get; private set; }
+        public int Atk { get; private set; }
+        public int Def { get; private set; }
+
+        public int TempMp { get; set; }
+
 
         private SkillSpawner skillSpawner;
 
@@ -50,12 +55,12 @@ namespace KWY
 
         public Vector3 worldPos { get; private set; }
 
-        [SerializeField] private float movementSpeed;
+        private readonly float movementSpeed = 0.5f;
         private Vector2 destination;
         public Vector3Int TilePos;
         public int moveIdx { get; private set; }
 
-        private Tilemap map, hlMap;
+        private Tilemap map;
         private TilemapControl TCtrl;
 
         private bool nowMove = false;
@@ -79,34 +84,67 @@ namespace KWY
 
             Atk = Cb.atk;
             Def = 1; // TODO
+
+            TempMp = Mp;
         }
 
-        public void DamageHP(float damage)
+        public void DamageHP(int damage)
         {
-            Hp -= damage;
-            if (Hp < 0) Hp = 0;
-
-            if (Hp == 0)
+            if (Hp - damage > 0)
             {
+                Hp -= damage;
+                Debug.LogFormat("{0} is damaged {1}; Now hp: {2}", Cb.name, damage, Hp);
+            }
+            else if (Hp - damage < 0)
+            {
+                Hp = 0;
                 BreakDown = true;
+                GetComponent<SpriteRenderer>().color = Color.red;
                 ClearBuff();
                 Debug.LogFormat("{0} is damaged {1}; Now hp: {2}; BREAK DOWN!", Cb.name, damage, Hp);
-            }
-            else
-            {
-                Debug.LogFormat("{0} is damaged {1}; Now hp: {2}", Cb.name, damage, Hp);
             }
 
             NotifyObservers();
         }
 
-        public void AddMP(float amount)
+        public void AddMP(int amount)
         {
-            Mp += amount;
-            if (Mp > MaxMp) Mp = MaxMp;
-            else if (Mp < 0) Mp = 0;
+            if (Mp + amount > MaxMp)
+            {
+                Mp = MaxMp;
+            }
+            else if (Mp + amount < 0)
+            {
+                Mp = 0;
+            }
+            else
+            {
+                Mp += amount;
+            }
 
-            Debug.LogFormat("{0}'s mp is added {1}; Now mp: {2}", Cb.name, amount, Mp);
+            TempMp = Mp;
+
+            Debug.LogFormat($"[id={Pc.Id}]{Cb.name}'s mp is added {amount}; Now mp: {Mp}");
+
+            NotifyObservers();
+        }
+
+        public void AddHp(int amount)
+        {
+            if (Hp + amount > MaxMp)
+            {
+                Hp = MaxHp;
+            }
+            else if (Hp - amount < 0)
+            {
+                Hp = 0;
+            }
+            else
+            {
+                Hp += amount;
+            }
+
+            Debug.LogFormat("{0}'s hp is added {1}; Now hp: {2}", Cb.name, amount, Hp);
 
             NotifyObservers();
         }
@@ -144,10 +182,10 @@ namespace KWY
             TempTilePos = pos;
         }
 
-        public void ResetTempPos()
+        public void ResetTempPosAndMp()
         {
-            map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
-            TempTilePos = TilePos;
+            TempTilePos = map.WorldToCell(transform.position);
+            TempMp = Mp;
         }
 
         public override string ToString()
@@ -195,7 +233,6 @@ namespace KWY
 
         #region Simulation Functions
 
-        [PunRPC]
         public void MoveTo(int x, int y)
         {
             Vector2Int dir = new Vector2Int(x, y);
@@ -217,13 +254,13 @@ namespace KWY
                 worldPos = des;
                 destination = des;
                 //nowMove = true;
-                Debug.Log("nowpos = " + nowPos + ", despos = " + map.WorldToCell(des));
-                Debug.Log(gameObject.name + ": desNum->" + charsOnDes + ", curNum->" + charsOnCur);
+                //Debug.Log("nowpos = " + nowPos + ", despos = " + map.WorldToCell(des));
+                //Debug.Log(gameObject.name + ": desNum->" + charsOnDes + ", curNum->" + charsOnCur);
 
-                if (map.CellToWorld(nowPos).x < des.x)
+                /*if (map.CellToWorld(nowPos).x < des.x)
                     gameObject.GetComponent<SpriteRenderer>().flipX = false;
                 else if(map.CellToWorld(nowPos).x > des.x)
-                    gameObject.GetComponent<SpriteRenderer>().flipX = true;
+                    gameObject.GetComponent<SpriteRenderer>().flipX = true;*/
 
                 if (charsOnDes > 1)
                 {
@@ -260,7 +297,7 @@ namespace KWY
                     nowMove = true;
                     gameObject.GetComponent<BoxCollider2D>().offset = Vector2.zero;
 
-                    Debug.Log("noone on tile");
+                    //Debug.Log("noone on tile");
                 }
 
                 if (charsOnCur > 1)
@@ -324,7 +361,6 @@ namespace KWY
             }
         }
 
-        [PunRPC]
         public void Teleport(Vector3Int vec)
         {
             if (map.HasTile(vec))
@@ -342,6 +378,8 @@ namespace KWY
                 int charsOnCur = TCtrl.getCharList(nowPos).Count;
 
                 worldPos = newPos;
+
+
 
                 //if (map.CellToWorld(nowPos).x < des.x)
                 //    gameObject.GetComponent<SpriteRenderer>().flipX = false;
@@ -426,9 +464,13 @@ namespace KWY
         public void SetMoveIdx(int value)
         {
             if (value != 0)
+            {
                 moveIdx += value;
+            }
             else
+            {
                 moveIdx = 0;
+            }
         }
 
         public void SpellSkill(SID sid, SkillDicection direction, Vector2Int v)
@@ -463,10 +505,8 @@ namespace KWY
         {
             Init();
 
-            
 
             map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
-            hlMap = GameObject.Find("HighlightTilemap").GetComponent<Tilemap>();
             TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
 
             TilePos = map.WorldToCell(transform.position);
@@ -495,7 +535,7 @@ namespace KWY
         {
             if (nowMove)
             {
-                transform.position = Vector3.Lerp(gameObject.transform.position, destination, 0.7f);
+                transform.position = Vector3.Lerp(gameObject.transform.position, destination, movementSpeed);
                 if (transform.position == new Vector3(destination.x, destination.y, 0))
                     nowMove = false;
             }
@@ -504,6 +544,8 @@ namespace KWY
                 
             }
         }
+
+
 
         #endregion
 
@@ -546,23 +588,11 @@ namespace KWY
         {
             observers.Clear();
         }
+
         #endregion
 
         public void OnPhotonInstantiate(PhotonMessageInfo info)
         {
-            Debug.Log(info.photonView.GetInstanceID());
-            Debug.Log(info.photonView);
-
-            Debug.Log(PhotonNetwork.GetPhotonView(GetComponent<PhotonView>().ViewID).gameObject.GetComponent<Character>());
-
-            
-        }
-
-        [PunRPC]
-        public void TestRPC()
-        {
-            Debug.Log(Pc); // null
-            Debug.Log(this);
         }
     }
 }

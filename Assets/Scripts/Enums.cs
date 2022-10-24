@@ -51,10 +51,11 @@ namespace KWY
 
     public enum STATE : int
     {
-        StandBy = 0,
-        TurnReady = 1,
-        Simul = 2,
-        GameOver = 3
+        IDLE = 0,
+        StandBy = 1,
+        TurnReady = 2,
+        Simul = 3,
+        GameOver = 4
     }
 
     // À°°¢Çü ¹æÇâ
@@ -85,7 +86,6 @@ namespace KWY
     }
     public enum TICK_RESULT
     {
-        KEEP_GOING = 0,
         DRAW = 1,
         MASTER_WIN = 2,
         CLIENT_WIN = 3

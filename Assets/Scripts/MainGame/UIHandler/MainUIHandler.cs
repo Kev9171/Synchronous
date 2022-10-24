@@ -16,12 +16,10 @@ namespace KWY
 
         public void Init()
         {
-
         }
 
         public void UpdateTurnText()
         {
-            Debug.Log($"UpdateTurnText, now: {data.TurnNum}");
             turnText.text = data.TurnNum.ToString();
         }
     }

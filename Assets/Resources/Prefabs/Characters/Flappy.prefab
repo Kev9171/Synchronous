@@ -183,7 +183,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _characterBase: {fileID: 11400000, guid: da6c8684341450244928e0a87054b797, type: 2}
-  movementSpeed: 0
   TilePos: {x: 0, y: 0, z: 0}
 --- !u!61 &103546757369217082
 BoxCollider2D:

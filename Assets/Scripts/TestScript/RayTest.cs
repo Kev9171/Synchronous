@@ -137,7 +137,9 @@ namespace KWY
                 {
                     if (sb.isDamage)
                     {
-                        hit.transform.GetComponent<Character>().DamageHP(sb.value);
+                        DataController.Instance.ModifyCharacterHp(
+                            hit.transform.GetComponent<Character>().Pc.Id, -sb.value);
+                        //hit.transform.GetComponent<Character>().DamageHP(sb.value);
                     }
                 }
                 else if (hit.transform.gameObject.layer == 8)
@@ -150,7 +152,10 @@ namespace KWY
                         {
                             if (sb.isDamage)
                             {
-                                hit.transform.GetComponent<Character>().DamageHP(sb.value);
+                                DataController.Instance.ModifyCharacterHp(
+                                    hit.transform.GetComponent<Character>().Pc.Id,
+                                    -sb.value);
+                                //hit.transform.GetComponent<Character>().DamageHP(sb.value);
                             }
                         }
                     }

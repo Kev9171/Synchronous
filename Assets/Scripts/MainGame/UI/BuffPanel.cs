@@ -2,7 +2,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-namespace KWY
+using KWY;
+
+namespace UI
 {
     [RequireComponent(typeof(CanvasRenderer))]
     public class BuffPanel : MonoBehaviour

@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+using DebugUtil;
+
 namespace KWY
 {
     public class MainGameEvent : MonoBehaviourPun
@@ -17,9 +19,6 @@ namespace KWY
         [Tooltip("The button to send ready to start simulation to server")]
         [SerializeField] private Button readyBtn;
 
-        [SerializeField]
-        private GameManager gameManager;
-
         [Tooltip("다음에 게임이 시작되면 로드될 scene")]
         readonly private string nextLevel = "";
 
@@ -27,6 +26,8 @@ namespace KWY
         private string UserId;
 
         private GameObject UICanvas;
+
+        public static MainGameEvent Instance;
        
 
 
@@ -51,11 +52,11 @@ namespace KWY
 
             if (PhotonNetwork.RaiseEvent(evCode, actionData.Data, raiseEventOptions, sendOptions))
             {
-                UtilForDebug.LogRaiseEvent(evCode, actionData.Data, raiseEventOptions, sendOptions);
+                DebugLog.LogRaiseEvent(evCode, actionData.Data, raiseEventOptions, sendOptions);
             }
             else
             {
-                UtilForDebug.LogErrorRaiseEvent(evCode);
+                DebugLog.FailedToRaiseEvent(evCode);
             }
         }
 
@@ -81,16 +82,16 @@ namespace KWY
 
             if (PhotonNetwork.RaiseEvent(evCode, content, raiseEventOptions, sendOptions))
             {
-                UtilForDebug.LogRaiseEvent(evCode, content, raiseEventOptions, sendOptions);
+                DebugLog.LogRaiseEvent(evCode, content, raiseEventOptions, sendOptions);
             }
             else
             {
-                UtilForDebug.LogErrorRaiseEvent(evCode);
+                DebugLog.FailedToRaiseEvent(evCode);
             }
         }
 
         /// <summary>
-        /// Send to 'Game ends' signal to the Server; It must be called ONLY Master Client; content: winnerTeam: string
+        /// Send to 'Game ends' signal to the Server; It must be called ONLY Master Client; content: winnerTeam: int
         /// </summary>
         public void RaiseEventGameEnd(TICK_RESULT result)
         {
@@ -98,7 +99,6 @@ namespace KWY
 
             var content = result switch
             {
-                TICK_RESULT.KEEP_GOING => -1,
                 TICK_RESULT.DRAW => ((int)TICK_RESULT.DRAW),
                 TICK_RESULT.MASTER_WIN => ((int)TICK_RESULT.MASTER_WIN),
                 TICK_RESULT.CLIENT_WIN => ((int)TICK_RESULT.CLIENT_WIN),
@@ -117,11 +117,11 @@ namespace KWY
 
             if (PhotonNetwork.RaiseEvent(evCode, content, raiseEventOptions, sendOptions))
             {
-                UtilForDebug.LogRaiseEvent(evCode, content, raiseEventOptions, sendOptions);
+                DebugLog.LogRaiseEvent(evCode, content, raiseEventOptions, sendOptions);
             }
             else
             {
-                UtilForDebug.LogErrorRaiseEvent(evCode);
+                DebugLog.FailedToRaiseEvent(evCode);
             }
         }
 
@@ -146,11 +146,11 @@ namespace KWY
 
             if (PhotonNetwork.RaiseEvent(evCode, content, raiseEventOptions, sendOptions))
             {
-                UtilForDebug.LogRaiseEvent(evCode, content, raiseEventOptions, sendOptions);
+                DebugLog.LogRaiseEvent(evCode, content, raiseEventOptions, sendOptions);
             }
             else
             {
-                UtilForDebug.LogErrorRaiseEvent(evCode);
+                DebugLog.FailedToRaiseEvent(evCode);
             }
         }
 
@@ -205,13 +205,11 @@ namespace KWY
                 // 아직 테스트 하지 못하였음!!!!!!!!
                 if (PhotonNetwork.IsMasterClient)
                 {
-                    Debug.Log("Received simul data!!!!");
-                    gameManager.SetState(STATE.Simul, (Dictionary<int, object[]>)data[3]); // Note: if data[2] is false, there is no data[3]
+                    GameManager.Instance.SetState(STATE.Simul, (Dictionary<int, object[]>)data[3]); // Note: if data[2] is false, there is no data[3]
                 }
                 else
                 {
-                    Debug.Log("It is not matser client");
-                    gameManager.SetState(STATE.Simul);
+                    GameManager.Instance.SetState(STATE.Simul);
                 }
             }
         }
@@ -222,7 +220,7 @@ namespace KWY
         /// <param name="eventData">Received data from the server</param>
         private void OnEventSimulEnd(EventData eventData)
         {
-            gameManager.SetState(STATE.TurnReady);
+            GameManager.Instance.SetState(STATE.TurnReady);
         }
 
         /// <summary>
@@ -233,15 +231,9 @@ namespace KWY
         {
             var data = eventData.CustomData;
 
-            if (!(data is string))
-            {
-                Debug.LogError("Type Error");
-                return;
-            }
-
             TICK_RESULT result = (TICK_RESULT)data;
 
-            gameManager.SetState(STATE.GameOver, result);
+            GameManager.Instance.SetState(STATE.GameOver, result);
         }
 
         #endregion
@@ -281,6 +273,7 @@ namespace KWY
 
         public void Start()
         {
+            Instance = this;
             // ExitGames.Client.Photon.PhotonPeer.RegisterType(); //ㅠㅠ
         }
 
