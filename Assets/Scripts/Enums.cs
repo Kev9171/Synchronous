@@ -26,7 +26,10 @@ namespace KWY
         // temp
         Flappy = 1,
         Flappy2 = 2,
-        Knight = 3
+        Knight = 3,
+        PickFlappy = 4,
+        PickFlappy2 = 5,
+        PickKnight = 6
     }
 
     public enum SID : int

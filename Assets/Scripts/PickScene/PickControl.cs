@@ -5,8 +5,9 @@ using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using Photon.Pun;
 using System;
+using KWY;
 
-namespace KWY
+namespace PickScene
 {
     public class PickControl : Singleton<PickControl>
     {
@@ -18,7 +19,7 @@ namespace KWY
         private GameObject[] charArray = new GameObject[10]; // Initial storage of instantiated characters
         private List<Vector3Int> deployPositionList = new List<Vector3Int>(); // Initial storage of deployable tiles
         private int deployCounter; // Deployable character number
-        private List<Character> pCharacters = new List<Character>(); // A list with character information during the game
+        private List<PickCharacter> pCharacters = new List<PickCharacter>(); // A list with character information during the game
         //private Dictionary<CID, GameObject> pCharacterObjects = new Dictionary<CID, GameObject>();
         private Dictionary<CID, Vector3Int> deployDontDestroy = new Dictionary<CID, Vector3Int>();
 
@@ -42,7 +43,7 @@ namespace KWY
 
         public void SetSelChara(CID cid)
         {
-            Character c = GetCertainCharacter(cid);
+            PickCharacter c = GetCertainCharacter(cid);
             if (c == null)
             {
                 Debug.LogErrorFormat("Can not select - cid: {0}", cid);
@@ -62,9 +63,9 @@ namespace KWY
             Debug.Log("Character destroyed: " + cid);
             deployPositionList.Add(deployDontDestroy[cid]); // Recover deployable tile
             deployDontDestroy.Remove(cid);
-            foreach (Character ch in pCharacters)
+            foreach (PickCharacter ch in pCharacters)
             {
-                if (ch.Cb.cid == cid)
+                if (ch.Pcb.cid == cid)
                 {
                     pCharacters.Remove(ch);
                     break;
@@ -74,11 +75,11 @@ namespace KWY
             deployCounter++;
         }
 
-        public Character GetCertainCharacter(CID cid)
+        public PickCharacter GetCertainCharacter(CID cid)
         {
-            foreach (Character c in pCharacters)
+            foreach (PickCharacter c in pCharacters)
             {
-                if (c.Cb.cid == cid)
+                if (c.Pcb.cid == cid)
                 {
                     return c;
                 }
@@ -116,7 +117,7 @@ namespace KWY
             // When clicking on a character
             if (hit.collider != null)
             {
-                CID cid = hit.collider.gameObject.GetComponent<Character>().Cb.cid;
+                CID cid = hit.collider.gameObject.GetComponent<PickCharacter>().Pcb.cid;
                 SetSelChara(cid);
             }
 
@@ -135,12 +136,12 @@ namespace KWY
                         {
                             int prefabEnum = (int)Enum.Parse(typeof(CID), PickManager.Instance.ClickedBtn.CharacterPrefab.name); // To use enum as index of charArray
                             charArray[prefabEnum] = Instantiate(PickManager.Instance.ClickedBtn.CharacterPrefab, mousePosition, Quaternion.identity);
-                            pCharacters.Add(charArray[prefabEnum].GetComponent<Character>());
+                            pCharacters.Add(charArray[prefabEnum].GetComponent<PickCharacter>());
 
                             unDeployableList.Add(PickManager.Instance.ClickedBtn.CharacterPrefab);
                             deployableList.Remove(PickManager.Instance.ClickedBtn.CharacterPrefab);
                             deployPositionList.Remove(clickV);
-                            deployDontDestroy.Add(charArray[prefabEnum].GetComponent<Character>().Cb.cid, clickV);
+                            deployDontDestroy.Add(charArray[prefabEnum].GetComponent<PickCharacter>().Pcb.cid, clickV);
 
                             charArray[prefabEnum].transform.parent = MasterClientCharacters.transform;
                             charArray[prefabEnum].GetComponent<BoxCollider2D>().enabled = true;
@@ -154,13 +155,13 @@ namespace KWY
                         {
                             int prefabEnum = (int)Enum.Parse(typeof(CID), PickManager.Instance.ClickedBtn.CharacterPrefab.name);
                             charArray[prefabEnum] = Instantiate(PickManager.Instance.ClickedBtn.CharacterPrefab, mousePosition, Quaternion.identity);
-                            pCharacters.Add(charArray[prefabEnum].GetComponent<Character>());
+                            pCharacters.Add(charArray[prefabEnum].GetComponent<PickCharacter>());
                             //pCharacterObjects.Add(pCharacters[deployCounter].Cb.cid, firstDeployed[deployCounter]);
 
                             unDeployableList.Add(PickManager.Instance.ClickedBtn.CharacterPrefab);
                             deployableList.Remove(PickManager.Instance.ClickedBtn.CharacterPrefab); // Remove from list of deployable characters
                             deployPositionList.Remove(clickV); // Remove from list of available locations
-                            deployDontDestroy.Add(charArray[prefabEnum].GetComponent<Character>().Cb.cid, clickV);
+                            deployDontDestroy.Add(charArray[prefabEnum].GetComponent<PickCharacter>().Pcb.cid, clickV);
 
                             charArray[prefabEnum].transform.parent = ClientCharacters.transform;
                             charArray[prefabEnum].GetComponent<SpriteRenderer>().flipX = true;
@@ -186,13 +187,13 @@ namespace KWY
                 charArray[prefabEnum] = Instantiate(deployableList[randomCharNum], posAdaptation, Quaternion.identity);
                 deployableList.Remove(deployableList[randomCharNum]); // Remove from list of deployable characters
                 deployPositionList.Remove(randomPosition); // Remove from list of available locations
-                pCharacters.Add(charArray[prefabEnum].GetComponent<Character>());
+                pCharacters.Add(charArray[prefabEnum].GetComponent<PickCharacter>());
                 //pCharacterObjects.Add(pCharacters[deployCounter].Cb.cid, firstDeployed[deployCounter]);
 
                 charArray[prefabEnum].transform.parent = ClientCharacters.transform;
                 charArray[prefabEnum].GetComponent<SpriteRenderer>().flipX = true;
                 charArray[prefabEnum].GetComponent<BoxCollider2D>().enabled = true;
-                deployDontDestroy.Add(charArray[prefabEnum].GetComponent<Character>().Cb.cid, Vector3Int.FloorToInt(posAdaptation)); // Store CID and location information
+                deployDontDestroy.Add(charArray[prefabEnum].GetComponent<PickCharacter>().Pcb.cid, Vector3Int.FloorToInt(posAdaptation)); // Store CID and location information
             }
         }
 

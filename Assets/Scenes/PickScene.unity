@@ -315,9 +315,22 @@ MonoBehaviour:
   ClientCharacters: {fileID: 1085658494}
   MasterClientCharacters: {fileID: 1058716710}
   deployableList:
-  - {fileID: 1445382690674112773, guid: 2460382867b38be4199fa99d54ae47e4, type: 3}
-  - {fileID: 1326943966758870567, guid: 321733babb0a6974f87b9f2df13e5837, type: 3}
-  - {fileID: 8399122764979910749, guid: 5415c2857bf979c4da96dd0893ed8283, type: 3}
+  - {fileID: 1445382690674112773, guid: 03a45cac1c5eaef46a5b77c28d6a09ef, type: 3}
+  - {fileID: 1326943966758870567, guid: 0cdc02ee8c429c64f8536ac61907b20e, type: 3}
+  - {fileID: 8399122764979910749, guid: 5946fc48b578bfe46b88badfd35a4aa8, type: 3}
+  unDeployableList: []
+  charArray:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  pCharacters: []
 --- !u!1 &776724092
 GameObject:
   m_ObjectHideFlags: 0
@@ -737,12 +750,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9dd54f0cb1e6e749be0447237a71d30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterPrefab: {fileID: 8399122764979910749, guid: 5415c2857bf979c4da96dd0893ed8283, type: 3}
-  chance: 0
-  button:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  characterPrefab: {fileID: 8399122764979910749, guid: 5946fc48b578bfe46b88badfd35a4aa8, type: 3}
 --- !u!1 &963204778
 GameObject:
   m_ObjectHideFlags: 0
@@ -2773,12 +2781,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9dd54f0cb1e6e749be0447237a71d30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterPrefab: {fileID: 1326943966758870567, guid: 321733babb0a6974f87b9f2df13e5837, type: 3}
-  chance: 0
-  button:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  characterPrefab: {fileID: 1326943966758870567, guid: 0cdc02ee8c429c64f8536ac61907b20e, type: 3}
 --- !u!1 &1463007724
 GameObject:
   m_ObjectHideFlags: 0
@@ -3465,12 +3468,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9dd54f0cb1e6e749be0447237a71d30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterPrefab: {fileID: 1445382690674112773, guid: 2460382867b38be4199fa99d54ae47e4, type: 3}
-  chance: 0
-  button:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  characterPrefab: {fileID: 1445382690674112773, guid: 03a45cac1c5eaef46a5b77c28d6a09ef, type: 3}
 --- !u!1 &1902646911
 GameObject:
   m_ObjectHideFlags: 0
