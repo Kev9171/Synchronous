@@ -35,13 +35,16 @@ namespace KWY
             private set;
         } = new List<Buff>();
         public CharacterBase Cb { get; private set; }
-        public float Hp { get; private set; }
-        public float Mp { get; private set; }
-        public float MaxHp { get; private set; }
-        public float MaxMp { get; private set; }
+        public int Hp { get; private set; }
+        public int Mp { get; private set; }
+        public int MaxHp { get; private set; }
+        public int MaxMp { get; private set; }
         public bool BreakDown { get; private set; }
-        public float Atk { get; private set; }
-        public float Def { get; private set; }
+        public int Atk { get; private set; }
+        public int Def { get; private set; }
+
+        public int TempMp { get; set; }
+
 
         private SkillSpawner skillSpawner;
 
@@ -52,12 +55,12 @@ namespace KWY
 
         public Vector3 worldPos { get; private set; }
 
-        [SerializeField] private float movementSpeed;
+        private readonly float movementSpeed = 0.5f;
         private Vector2 destination;
         public Vector3Int TilePos;
         public int moveIdx { get; private set; }
 
-        private Tilemap map, hlMap;
+        private Tilemap map;
         private TilemapControl TCtrl;
 
         private bool nowMove = false;
@@ -81,9 +84,11 @@ namespace KWY
 
             Atk = Cb.atk;
             Def = 1; // TODO
+
+            TempMp = Mp;
         }
 
-        public void DamageHP(float damage)
+        public void DamageHP(int damage)
         {
             if (Hp - damage > 0)
             {
@@ -94,6 +99,7 @@ namespace KWY
             {
                 Hp = 0;
                 BreakDown = true;
+                GetComponent<SpriteRenderer>().color = Color.red;
                 ClearBuff();
                 Debug.LogFormat("{0} is damaged {1}; Now hp: {2}; BREAK DOWN!", Cb.name, damage, Hp);
             }
@@ -101,7 +107,7 @@ namespace KWY
             NotifyObservers();
         }
 
-        public void AddMP(float amount)
+        public void AddMP(int amount)
         {
             if (Mp + amount > MaxMp)
             {
@@ -116,12 +122,14 @@ namespace KWY
                 Mp += amount;
             }
 
+            TempMp = Mp;
+
             Debug.LogFormat($"[id={Pc.Id}]{Cb.name}'s mp is added {amount}; Now mp: {Mp}");
 
             NotifyObservers();
         }
 
-        public void AddHp(float amount)
+        public void AddHp(int amount)
         {
             if (Hp + amount > MaxMp)
             {
@@ -174,10 +182,10 @@ namespace KWY
             TempTilePos = pos;
         }
 
-        public void ResetTempPos()
+        public void ResetTempPosAndMp()
         {
-            //map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
-            TempTilePos = TilePos; // 2nd 클라이언트의 경우 TilePos값에 변동 없음 -> 일단 RPC로 동기화 함
+            TempTilePos = map.WorldToCell(transform.position);
+            TempMp = Mp;
         }
 
         public override string ToString()
@@ -246,8 +254,8 @@ namespace KWY
                 worldPos = des;
                 destination = des;
                 //nowMove = true;
-                Debug.Log("nowpos = " + nowPos + ", despos = " + map.WorldToCell(des));
-                Debug.Log(gameObject.name + ": desNum->" + charsOnDes + ", curNum->" + charsOnCur);
+                //Debug.Log("nowpos = " + nowPos + ", despos = " + map.WorldToCell(des));
+                //Debug.Log(gameObject.name + ": desNum->" + charsOnDes + ", curNum->" + charsOnCur);
 
                 /*if (map.CellToWorld(nowPos).x < des.x)
                     gameObject.GetComponent<SpriteRenderer>().flipX = false;
@@ -351,14 +359,6 @@ namespace KWY
             {
                 Debug.LogFormat("{0} / {1} can not go to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, map.WorldToCell(des));
             }
-
-            PhotonView.Get(this).RPC("SyncTilePosRPC", RpcTarget.Others, TilePos.x, TilePos.y);
-        }
-
-        [PunRPC]
-        public void SyncTilePosRPC(int x, int y)
-        {
-            TilePos = new Vector3Int(x, y, 0);
         }
 
         public void Teleport(Vector3Int vec)
@@ -507,7 +507,6 @@ namespace KWY
 
 
             map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
-            hlMap = GameObject.Find("HighlightTilemap").GetComponent<Tilemap>();
             TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
 
             TilePos = map.WorldToCell(transform.position);
@@ -536,7 +535,7 @@ namespace KWY
         {
             if (nowMove)
             {
-                transform.position = Vector3.Lerp(gameObject.transform.position, destination, 0.7f);
+                transform.position = Vector3.Lerp(gameObject.transform.position, destination, movementSpeed);
                 if (transform.position == new Vector3(destination.x, destination.y, 0))
                     nowMove = false;
             }

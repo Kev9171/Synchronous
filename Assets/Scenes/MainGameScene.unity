@@ -5448,6 +5448,7 @@ MonoBehaviour:
   turnReady: {fileID: 134885413}
   ray: {fileID: 1695663021}
   characterUIHandler: {fileID: 1414391423}
+  canvas: {fileID: 134885412}
 --- !u!1 &709006514
 GameObject:
   m_ObjectHideFlags: 0

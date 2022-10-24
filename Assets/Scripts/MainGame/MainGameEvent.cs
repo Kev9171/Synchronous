@@ -209,7 +209,6 @@ namespace KWY
                 }
                 else
                 {
-                    Debug.Log("It is not matser client");
                     GameManager.Instance.SetState(STATE.Simul);
                 }
             }

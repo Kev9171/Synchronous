@@ -24,13 +24,15 @@ namespace KWY
             skillNameLabel.text = skillName;
             activeDuration = duration;
 
-            StartCoroutine("IEStartShowing");
+            Destroy(gameObject, duration);
+
+            //StartCoroutine("IEStartShowing");
         }
 
-        IEnumerator IEStartShowing()
+        /*IEnumerator IEStartShowing()
         {
             yield return new WaitForSeconds(activeDuration);
             Destroy(gameObject);
-        }
+        }*/
     }
 }

@@ -5,7 +5,9 @@ using UnityEngine.EventSystems;
 using System.Collections.Generic;
 using System.Collections;
 
-namespace KWY
+using KWY;
+
+namespace UI
 {
     [RequireComponent(typeof(CanvasRenderer))]
     public class CharacterPanel : MonoBehaviour
@@ -167,18 +169,6 @@ namespace KWY
 
             // 캐릭터 선택
             charaControl.SetSelChara(chara);
-        }
-
-        /// <summary>
-        /// SetActive(false)가 되면 find 할 수 없으므로 SetActive(false)가 되기 전에 호출하여 참조 넣기
-        /// </summary>
-        /// <param name="characterInfoPanel">CharacterInfoPanel</param>
-        /// <param name="buffInfoPanel">BuffInfoPanel</param>
-        public void LoadInfoPanel(GameObject characterInfoPanel, GameObject buffInfoPanel)
-        {
-            Debug.Log("LoadInfoPanel");
-            //this.characterInfoPanel = characterInfoPanel;
-            //this.buffInfoPanel = buffInfoPanel;
         }
 
         #endregion

@@ -51,14 +51,14 @@ namespace KWY
 
         public void AddMp(int value)
         {
-            Mp += value;
+            Mp = (Mp + value > MaxMp) ? MaxMp : Mp + value;
 
             NotifyObservers();
         }
 
         public void SubMp(int value)
         {
-            Mp -= value;
+            Mp = (Mp - value < 0) ? 0 : Mp - value; 
 
             NotifyObservers();
         }
@@ -73,7 +73,6 @@ namespace KWY
 
             if (map.HasTile(clickV))
             {
-                TilemapControl TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
                 if (clickV.y % 2 != selChara.TilePos.y % 2)
                 {
                     GameManager.Instance.Simulation.ChangeAction((int)selChara.Cb.cid, clickV.y, MoveManager.MoveData);

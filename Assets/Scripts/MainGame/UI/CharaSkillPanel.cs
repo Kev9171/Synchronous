@@ -2,7 +2,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-namespace KWY
+using KWY;
+
+namespace UI
 {
     // attach this at CharaSkillPanel Prefab
     [RequireComponent(typeof(CanvasRenderer))]
@@ -40,12 +42,11 @@ namespace KWY
             {
                 if (control.SelAction == null)
                 {
-                    control.SetSelSkill(@base);
-                    // 일단 스킬 클릭하면 맵에 해당 구역 하이라이트
-                    //highLighter.HighlightMap(control.SelChara.transform.position, @base.area);
-
-                    // 스킬 방향 선택 모드로
-                    control.OnChooseSkillDirectionMode();
+                    if (control.SetSelSkill(@base))
+                    {
+                        // 스킬 방향 선택 모드로
+                        control.OnChooseSkillDirectionMode();
+                    }
                 }
                 
             }
@@ -56,8 +57,6 @@ namespace KWY
                     control.SetSelMove();
                     control.OnChooseMoveDirectionmode();
                 }
-                
-                // 이동 방향 선택 할 수 있도록
             }
             
         }
