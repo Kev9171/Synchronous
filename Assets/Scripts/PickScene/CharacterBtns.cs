@@ -8,15 +8,13 @@ namespace PickScene
 {
     public class CharacterBtns : MonoBehaviour
     {
-        [SerializeField]
-        List<CharacterBase> list = new List<CharacterBase>();
-
+        
         [SerializeField]
         GameObject btnPrefab;
 
         private void Start()
         {
-            foreach(CharacterBase cb in list)
+            foreach(CharacterBase cb in PickControl.Instance.CharaList)
             {
                 GameObject o = Instantiate(btnPrefab);
                 o.GetComponent<CharacterBtn>().Init(cb.icon, cb.cid);

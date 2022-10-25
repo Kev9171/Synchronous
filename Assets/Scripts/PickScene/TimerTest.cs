@@ -9,7 +9,7 @@ namespace PickScene
     public class TimerTest : MonoBehaviour
     {
         // start time value
-        [SerializeField] float startTime;
+        //[SerializeField] float startTime;
 
         // current Time
         float currentTime;
@@ -24,7 +24,7 @@ namespace PickScene
         void Start()
         {
             //resets the currentTime to the start Time 
-            currentTime = startTime;
+            currentTime = PickManager.Instance.timeLimit;
             //displays the UI with the currentTime
             timerText.text = currentTime.ToString();
             // starts the time -- comment this out if you don't want to automagically start
@@ -41,7 +41,6 @@ namespace PickScene
                 // logic current reached 0?
                 if (currentTime <= 0)
                 {
-                    Debug.Log("Timer reached zero.");
                     timerStarted = false;
                     currentTime = 0;
                     PickManager.Instance.Timeout();
