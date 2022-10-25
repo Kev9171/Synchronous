@@ -58,8 +58,8 @@ namespace Lobby
         [SerializeField]
         Timer TimerObject;
 
-        //readonly private string nextLevel = "PickScene";
-        readonly private string nextLevel = "MainGameScene";
+        readonly private string nextLevel = "PickScene";
+        //readonly private string nextLevel = "MainGameScene";
         readonly private string previousLevel = "StartScene";
 
         float timeLimit;
@@ -138,6 +138,7 @@ namespace Lobby
 
         private void TimeOut()
         {
+            // Debug.Log(PhotonNetwork.AutomaticallySyncScene); // true
             // 게임 시작
             if (PhotonNetwork.IsMasterClient)
             {

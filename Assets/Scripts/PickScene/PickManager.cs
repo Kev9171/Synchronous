@@ -6,22 +6,36 @@ using UnityEngine.Tilemaps;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Photon.Realtime;
+using TMPro;
 using KWY;
+using DebugUtil;
 
 namespace PickScene
 {
     public class PickManager : Singleton<PickManager>
     {
-        [SerializeField] private GameObject mainCamera;
-        [SerializeField] private PickControl pickControl;
-        [SerializeField] Tilemap hlMap;
-        private Color transparent = new Color(1, 1, 1, 0);
-        public CharacterBtn ClickedBtn { get; private set; }
+        [SerializeField] public float timeLimit = 30;
 
+        [SerializeField] public float timeSecondsToStart = 10;
+
+        [SerializeField]
+        Timer timer;
+
+        [SerializeField]
+        GameObject timerPanel;
+
+        [SerializeField]
+        TMP_Text countDownText;
+
+        private PhotonView photonView;
+
+        private readonly string nextScene = "MainGameScene";
+
+        int readyCount = 0;
 
         #region Public Methods
 
-        public void ClearHighlight()
+        /*public void ClearHighlight()
         {
             foreach (var pos in hlMap.cellBounds.allPositionsWithin)
             {
@@ -32,23 +46,47 @@ namespace PickScene
                     hlMap.SetColor(localPlace, transparent);
                 }
             }
-        }
+        }*/
 
-        public void PickCharacter(CharacterBtn characterBtn)
+        [PunRPC]
+        public void ReadyToStartRPC()
         {
-            this.ClickedBtn = characterBtn;
-        }
+            readyCount++;
 
-        public void PickClear()
-        {
-            ClickedBtn = null;
+            if (readyCount == 2)
+            {
+                StartCountDown();
+            }
         }
 
         public void Timeout()
         {
-            //PickControl.Instance.RandomDeployCharacter();
+            PickControl.Instance.RandomDeployCharacter();
             PickControl.Instance.SavePickData();
-            SceneManager.LoadScene("MainGameScene");
+            PickControl.Instance.StopSelect();
+
+            photonView.RPC("ReadyToStartRPC", RpcTarget.All);
+        }
+
+        public void StartCountDown()
+        {
+            PhotonNetwork.AutomaticallySyncScene = true;
+
+            countDownText.text = timeSecondsToStart.ToString();
+            timerPanel.gameObject.SetActive(true);
+
+            timer.InitTimer(timeSecondsToStart, StartGame, countDownText);
+
+            timer.StartTimer();
+        }
+
+        public void StartGame()
+        {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                
+                PhotonNetwork.LoadLevel(nextScene);
+            }
         }
 
         #endregion
@@ -57,7 +95,12 @@ namespace PickScene
 
         private void Start()
         {
-            ClearHighlight();
+            photonView = PhotonView.Get(this);
+
+            if (!!NullCheck.HasItComponent<PhotonView>(gameObject, "PhotonView") )
+            {
+                return;
+            }
         }
 
         #endregion

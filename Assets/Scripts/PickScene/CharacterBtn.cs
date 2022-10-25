@@ -31,8 +31,7 @@ namespace PickScene
             if (!NullCheck.HasItComponent<PickControl>(pick, "PickControl")) { return; }
 
             pick.GetComponent<PickControl>().OnCharaSelected(cid);
-
-    }
+        }
     }
 }
 

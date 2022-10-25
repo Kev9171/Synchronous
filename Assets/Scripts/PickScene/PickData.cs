@@ -5,68 +5,57 @@ using UnityEngine;
 using Photon.Pun;
 
 using KWY;
+using DebugUtil;
 
 namespace PickScene
 {
     public class PickData : MonoBehaviour
     {
-        public List<CharaData> Data
+        public static PickData Instance;
+
+        public List<CharaDataForPick> Data
         {
             get;
             private set;
-        } = new List<CharaData>();
+        } = new List<CharaDataForPick>();
+
+        public void AddData(CID cid, int x, int y, Team team)
+        {
+            Data.Add(new CharaDataForPick(cid, x, y, team));
+        }
 
         public void AddData(CID cid, Vector3Int cellV, Team team)
         {
-            Data.Add(new CharaData(cid, cellV.x, cellV.y, team));
+            Data.Add(new CharaDataForPick(cid, cellV.x, cellV.y, team));
         }
 
-        [PunRPC]
-        public void SendDataToMasterRPC()
+        public void SendDataToMaster()
         {
             if (PhotonNetwork.IsMasterClient)
             {
                 return;
             }
-
-            PhotonView photonView = PhotonView.Get(this);
-            foreach(CharaData d in Data)
+            foreach(CharaDataForPick d in Data)
             {
-                photonView.RPC("ReceiveDataFromClientRPC", RpcTarget.Others, (int)d.cid, d.loc.x, d.loc.y, (int)d.team);
+                MainGameData.Instance.photonView.RPC("ReceiveDataFromClientRPC", RpcTarget.MasterClient, (int)d.cid, d.loc.x, d.loc.y, (int)d.team);
             }
-        }
-
-        public void RequestDataToMaster()
-        {
-            if (!PhotonNetwork.IsMasterClient)
-            {
-                return;
-            }
-
-            PhotonView.Get(this).RPC("SendDataToMasterRPC", RpcTarget.Others);
-        }
-
-        [PunRPC]
-        public void ReceiveDataFromClientRPC(int cid, int x, int y, int team)
-        {
-            if (!PhotonNetwork.IsMasterClient)
-            {
-                return;
-            }
-
-            Data.Add(new CharaData((CID)cid, x, y, (Team)team));
-        }
+        }        
 
         public override string ToString()
         {
             string t = "";
 
-            foreach(CharaData d in Data)
+            foreach(CharaDataForPick d in Data)
             {
                 t += $"[cid:{d.cid}, cellV: {d.loc}, team: {d.team}], ";
             }
 
             return t;
+        }
+
+        private void Start()
+        {
+            Instance = this;
         }
     }
 }
