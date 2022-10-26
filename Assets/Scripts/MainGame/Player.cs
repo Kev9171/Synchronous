@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
+using Photon.Pun;
 
 namespace KWY
 {
@@ -75,10 +76,14 @@ namespace KWY
             {
                 if (clickV.y % 2 != selChara.TilePos.y % 2)
                 {
-                    GameManager.Instance.Simulation.ChangeAction((int)selChara.Cb.cid, clickV.y, MoveManager.MoveData);
+                    if (PhotonNetwork.IsMasterClient)
+                    {
+                        GameManager.Instance.Simulation.ChangeAction((int)selChara.Cb.cid, clickV.y);
+                    }
                 }
-                selChara.Teleport(clickV);
-                GameManager.Instance.Simulation.ShowAction(selChara.Pc.Id);
+                //selChara.Teleport(clickV);
+                selChara.photonView.RPC("Teleport", RpcTarget.MasterClient, clickV.x, clickV.y);
+                //GameManager.Instance.Simulation.ShowAction(selChara.Pc.Id);
 
                 SkillCount++;
                 return true;

@@ -378,6 +378,9 @@ namespace KWY
         [PunRPC]
         private void OnGameReadyRPC()
         {
+            // called on both client
+            TilemapControl.Instance.SetTiles();
+
             Debug.Log("OnGameReadyRPC");
             GameManager.Instance.SetState(STATE.StandBy);
         }

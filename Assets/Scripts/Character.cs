@@ -233,6 +233,7 @@ namespace KWY
 
         #region Simulation Functions
 
+        [PunRPC]
         public void MoveTo(int x, int y)
         {
             Vector2Int dir = new Vector2Int(x, y);
@@ -254,6 +255,8 @@ namespace KWY
 
                 worldPos = des;
                 destination = des;
+
+
                 //nowMove = true;
                 //Debug.Log("nowpos = " + nowPos + ", despos = " + map.WorldToCell(des));
                 //Debug.Log(gameObject.name + ": desNum->" + charsOnDes + ", curNum->" + charsOnCur);
@@ -362,8 +365,11 @@ namespace KWY
             }
         }
 
-        public void Teleport(Vector3Int vec)
+        [PunRPC]
+        public void Teleport(int x, int y)
         {
+            Vector3Int vec = new Vector3Int(x, y, 0);
+
             if (map.HasTile(vec))
             {
                 Vector3Int nowPos = TilePos;
@@ -478,6 +484,9 @@ namespace KWY
         {
             nowMove = false;
             SkillBase SelSkill = SkillManager.GetData(sid);
+
+            DataController.Instance.ModifyCharacterMp(Pc.Id, -SelSkill.cost);
+
             if (SelSkill.areaAttack)
             {
                 skillSpawner = SelSkill.area;
@@ -534,6 +543,11 @@ namespace KWY
 
         void Update()
         {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                return;
+            }
+
             if (nowMove)
             {
                 transform.position = Vector3.Lerp(gameObject.transform.position, destination, movementSpeed);
