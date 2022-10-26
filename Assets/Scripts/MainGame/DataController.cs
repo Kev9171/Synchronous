@@ -70,6 +70,26 @@ namespace KWY
 #endif
         }
 
+        public void ModifyCharacterMp(int id, int amount)
+        {
+            photonView.RPC("ModifyCharacterMpRPC", RpcTarget.All, id, amount);
+        }
+
+        [PunRPC]
+        private void ModifyCharacterMpRPC(int id, int amount)
+        {
+            if (data.PCharacters.TryGetValue(id, out PlayableCharacter pc))
+            {
+                pc.Chara.AddMP(amount);
+            }
+#if TEST
+            else
+            {
+                Debug.LogError($"Can not find character id={id}");
+            }
+#endif
+        }
+
         #endregion
 
         private void Start()

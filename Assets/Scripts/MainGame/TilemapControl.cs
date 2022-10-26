@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Photon.Pun;
-using KWY;
+using DebugUtil;
 
 
 namespace KWY
@@ -16,6 +16,9 @@ namespace KWY
         GameObject[] tiles;
         [SerializeField]
         Sprite[] sprites;
+
+        public static TilemapControl Instance;
+        public PhotonView photonview;
 
         private Dictionary<Vector3Int, List<GameObject>> Characters = new Dictionary<Vector3Int, List<GameObject>>();
 
@@ -96,7 +99,6 @@ namespace KWY
 
             //Debug.Log(new Vector3(worldPos.x, worldPos.y + 0.1f, worldPos.z));
         }
-
         public void deactivateAltTile(Vector3 worldPos)
         {
             Vector3 tilePos = new Vector3(worldPos.x, worldPos.y + 0.2f, worldPos.z);
@@ -140,12 +142,24 @@ namespace KWY
         //}
         private void Start()
         {
-            SetTiles();
+            Instance = this;
+
+            //SetTiles();
             //Invoke("SetTiles", 2f);
-            
+
+            if(!NullCheck.HasItComponent<PhotonView>(gameObject, "PhotonView"))
+            {
+                return;
+            }
+            else
+            {
+                photonview = PhotonView.Get(this);
+            }
+
+
         }
 
-        private void SetTiles()
+        public void SetTiles()
         {
             foreach (Vector3Int position in map.cellBounds.allPositionsWithin)
             {
@@ -189,7 +203,7 @@ namespace KWY
             {
                 foreach (Collider2D k in objects)
                 {
-                    if (k.gameObject.tag == "Friendly" || k.gameObject.tag == "Enemy")
+                    if (k.gameObject.CompareTag("Friendly") || k.gameObject.CompareTag("Enemy"))
                     {
                         ch.Add(k.gameObject);
                         //Debug.Log(k.gameObject.name);
@@ -242,6 +256,8 @@ namespace KWY
         {
             return Characters[pos];
         }
+
+
     }
 }
 

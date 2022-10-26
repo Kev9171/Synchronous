@@ -212,8 +212,8 @@ namespace KWY
 
         IEnumerator DoCharaMove(int id, Vector2Int v)
         {
-            //data.PCharacters[id].CharaObject.GetComponent<PhotonView>().RPC("MoveTo", RpcTarget.All, v.x, v.y);
-            data.PCharacters[id].Chara.MoveTo(v.x, v.y);
+            data.PCharacters[id].CharaObject.GetComponent<PhotonView>().RPC("MoveTo", RpcTarget.All, v.x, v.y);
+            //data.PCharacters[id].Chara.MoveTo(v.x, v.y);
             showActions.ShowMoveLog(id);
             yield return null;
         }
@@ -225,7 +225,7 @@ namespace KWY
             yield return null;
         }
 
-        public void ChangeAction(int id, int y, ActionBase action)
+        public void ChangeAction(int id, int y)
         {
             if (actionData.Data.TryGetValue(id, out var value))
             {
@@ -251,7 +251,7 @@ namespace KWY
                     if ((ActionType)d[1] == ActionType.Move)
                     {
                         Vector2Int vec = new Vector2Int((int)d[2], (int)d[3]);
-                        List<Vector2Int> v = y2 % 2 != 0 ? action.areaEvenY : action.areaOddY;
+                        List<Vector2Int> v = y2 % 2 != 0 ? MoveManager.MoveData.areaEvenY : MoveManager.MoveData.areaOddY;
                         //List<Vector2Int> cur = y % 2 != 0 ? action.areaEvenY : action.areaOddY;
                         int idx = v.IndexOf(vec);
                         Vector2Int newVec = v[5 - idx] * (-1);
@@ -291,21 +291,6 @@ namespace KWY
                     Debug.Log(value[0] + ", " + value[1] + ", " + value[2] + ", " + value[3]);
                 }
             }*/
-        }
-
-        public void ShowAction(int id)
-        {
-            if (actionData.Data.TryGetValue(id, out var value))
-            {
-                for (int i=0; i<value.Length; i++)
-                {
-                    object[] d = (object[])value[i];
-                    if ((ActionType)d[1] == ActionType.Move)
-                    {
-                        Debug.Log("Move Action: " + d[2] + ", " + d[3]);
-                    }
-                }
-            }
         }
 
         /// <summary>
