@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89ce9026c72516941a8617dd5cfe0160, type: 3}
   m_Name: KnightSpecial
   m_EditorClassIdentifier: 
-  cost: 7
+  cost: 2
   icon: {fileID: 0}
   name: Knight Special
   castingTime: 3
@@ -46,3 +46,6 @@ MonoBehaviour:
   directions: 
   areaAttack: 1
   area: {fileID: 6941316062329348292, guid: 683939de26b66f745999e25866b13f7b, type: 3}
+  isDamage: 0
+  value: 0
+  dmgMultiplicand: 1.5
