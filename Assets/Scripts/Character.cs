@@ -474,14 +474,15 @@ namespace KWY
             }
         }
 
-        public void SpellSkill(SID sid, SkillDicection direction, Vector2Int v)
+        public void SpellSkill(SID sid, SkillDicection direction, int x, int y)
         {
             nowMove = false;
             SkillBase SelSkill = SkillManager.GetData(sid);
             if (SelSkill.areaAttack)
             {
+                Vector3 v = map.CellToWorld(new Vector3Int(x, y, 0));
                 skillSpawner = SelSkill.area;
-                skillSpawner.Activate(v);
+                skillSpawner.Activate(new Vector2(v.x, v.y));
                 skillSpawner.Destroy(SkillManager.GetData(sid).triggerTime);   // triggerTime만큼 스킬 지속후 삭제
             }
             else
