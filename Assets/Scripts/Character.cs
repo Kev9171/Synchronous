@@ -45,9 +45,6 @@ namespace KWY
 
         public int TempMp { get; set; }
 
-
-        private SkillSpawner skillSpawner;
-
         private RayTest ray;
 
 
@@ -489,10 +486,22 @@ namespace KWY
 
             if (SelSkill.areaAttack)
             {
-                Vector3 v = map.CellToWorld(new Vector3Int(x, y, 0));
-                skillSpawner = SelSkill.area;
-                skillSpawner.Activate(new Vector2(v.x, v.y));
-                skillSpawner.Destroy(SkillManager.GetData(sid).triggerTime);   // triggerTime만큼 스킬 지속후 삭제
+                GameObject o = PhotonNetwork.Instantiate(
+                    SpawnableSkillResources.GetPath(SelSkill.sid),
+                    new Vector3(x, y + 0.1f, 0),
+                    Quaternion.identity);
+
+                if (!NullCheck.HasItComponent<SkillSpawner>(o, "SkillSpawner")) {
+                    // error
+                    return;
+                }
+
+                o.GetComponent<SkillSpawner>().Init(Pc.Team, Atk);
+
+
+                //skillSpawner = SelSkill.area;
+                //skillSpawner.Activate(new Vector2(x, y), Pc.Team, Atk);
+                //skillSpawner.Destroy(SkillManager.GetData(sid).triggerTime);   // triggerTime만큼 스킬 지속후 삭제
             }
             else
             {

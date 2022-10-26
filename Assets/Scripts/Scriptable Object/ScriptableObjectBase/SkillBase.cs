@@ -20,6 +20,8 @@ namespace KWY
         public bool isDamage;
         public int value; // 데미지 또는 버프의 수치
 
+        public float dmgMultiplicand;
+
         public override string ToString()
         {
             return string.Format("SID: {0}, SkillName: {1}, CastingTime: {2}, Cost: {3}", sid, name, castingTime, cost);

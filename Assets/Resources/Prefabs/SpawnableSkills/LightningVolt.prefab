@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &7744491998622111174
+--- !u!1 &5005634571131376312
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,23 +8,24 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4467608931152880094}
-  - component: {fileID: -9107718161418917132}
-  - component: {fileID: 6941316062329348292}
+  - component: {fileID: 5554254177904936343}
+  - component: {fileID: 3136003153744196843}
+  - component: {fileID: 2418642603031395723}
+  - component: {fileID: 6200595137452230246}
   m_Layer: 0
-  m_Name: KnightSpecial
+  m_Name: LightningVolt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4467608931152880094
+--- !u!4 &5554254177904936343
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7744491998622111174}
+  m_GameObject: {fileID: 5005634571131376312}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 0}
@@ -32,13 +33,13 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!60 &-9107718161418917132
+--- !u!60 &3136003153744196843
 PolygonCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7744491998622111174}
+  m_GameObject: {fileID: 5005634571131376312}
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
@@ -57,22 +58,45 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: 0.9738334, y: 1.7834145}
-      - {x: -1.0027337, y: 1.7842962}
-      - {x: -2.0009837, y: 0.15735564}
-      - {x: -0.99851066, y: -1.3727827}
-      - {x: 0.9623915, y: -1.3288466}
-      - {x: 1.9916681, y: 0.14709938}
---- !u!114 &6941316062329348292
+    - - {x: 0.52697945, y: 0.97338307}
+      - {x: -0.46965057, y: 1.0201924}
+      - {x: -1.0126196, y: 0.19449748}
+      - {x: -0.4852093, y: -0.57577103}
+      - {x: 0.5251571, y: -0.6014413}
+      - {x: 0.99663, y: 0.16375142}
+--- !u!114 &2418642603031395723
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7744491998622111174}
+  m_GameObject: {fileID: 5005634571131376312}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff6d4231d4db0e6418a57fd29ba8cac7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 7744491998622111174}
+  target: {fileID: 5005634571131376312}
+  sb: {fileID: 11400000, guid: ef2554089ff18a046bf88bf66ed2c23d, type: 2}
+--- !u!114 &6200595137452230246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5005634571131376312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
