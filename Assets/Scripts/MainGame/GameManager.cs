@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 
+using DebugUtil;
 using UI;
 
 namespace KWY
@@ -35,6 +36,8 @@ namespace KWY
 
         [SerializeField]
         Transform UICanvas;
+
+        //private PhotonView photonView;
 
         STATE nowState = STATE.IDLE;
 
@@ -167,6 +170,7 @@ namespace KWY
             }
         }
 
+
         private void Awake()
         {
             Instance = this;
@@ -177,8 +181,14 @@ namespace KWY
         {
             loadingScreen.SetActive(true);
 
-            data.LoadData();
+            /*photonView = PhotonView.Get(this);
 
+            if (NullCheck.HasItComponent<PhotonView>(gameObject, "PhotonView"))
+            {
+                //return;
+            }*/
+
+            data.LoadData();
         }
 
         // Update is called once per frame

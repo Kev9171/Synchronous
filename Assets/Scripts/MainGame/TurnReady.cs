@@ -157,8 +157,20 @@ namespace KWY
             // 3개의 액션이 모두 정해지지 않은 캐릭터만 이동으로 대체
             foreach (int id in data.CharaActionData.Keys)
             {
-                // 다 정해지지 않았을 경우 move로 추가
-                if (data.CharaActionData[id].ActionCount != 3)
+                // 선택 안된 부분만 랜덤이동 추가
+                for(int i= data.CharaActionData[id].ActionCount; i<3; i++)
+                {
+                    int dx = 0, dy = 0;
+                    while (dx == 0 && dy == 0)
+                    {
+                        dx = Random.Range(-1, 2);
+                        dy = Random.Range(-1, 2);
+                    }
+
+                    data.CharaActionData[id].AddMoveAction(ActionType.Move, dx, dy, true, 0, 0);
+                }
+
+                /*if (data.CharaActionData[id].ActionCount != 3)
                 {
                     data.CharaActionData[id].ClearActions();
                     for (int i = 0; i < 3; i++)
@@ -172,7 +184,7 @@ namespace KWY
 
                         data.CharaActionData[id].AddMoveAction(ActionType.Move, dx, dy, true, 0, 0);
                     }
-                }
+                }*/
             }
         }
 

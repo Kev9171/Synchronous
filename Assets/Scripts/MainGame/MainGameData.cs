@@ -10,13 +10,15 @@ using System;
 
 using DebugUtil;
 
+using PickScene;
+
 namespace KWY
 {
     public class MainGameData : MonoBehaviour, ISubject, ISubject<EGameProgress>
     {
         public static MainGameData Instance;
 
-        private PhotonView photonView;
+        public PhotonView photonView;
 
         public List<IObserver> Observers
         {
@@ -170,18 +172,6 @@ namespace KWY
 
             this.TimeLimit = LogicData.Instance.TimeLimit;
 
-            // DontDestroyOnLoad 에 있는 캐릭터들 좌표와 타입 가져오기
-            // 일단 아래 내용으로 가져왔다고 치고
-
-            if (PhotonNetwork.IsMasterClient)
-            {
-                InitCharacters();
-            }
-            else
-            {
-
-            }
-
 
             // 확인용 코드
             /*foreach (PlayableCharacter c in _charactersDict.Values)
@@ -202,18 +192,21 @@ namespace KWY
                 return;
             }
 
-            List<CharaData> tList = new List<CharaData>
+            /*List<CharaDataForPick> tList = new List<CharaDataForPick>
             {
-                new CharaData(CID.Flappy, -3, 0, Team.A),
-                new CharaData(CID.Flappy2, -3, 1, Team.A),
-                new CharaData(CID.Knight, -3, 2, Team.A),
+                new CharaDataForPick(CID.Flappy, -3, 0, Team.A),
+                new CharaDataForPick(CID.Flappy2, -3, 1, Team.A),
+                new CharaDataForPick(CID.Knight, -3, 2, Team.A),
 
-                new CharaData(CID.Flappy, 5, 0, Team.B),
-                new CharaData(CID.Flappy2, 5, 1, Team.B),
-                new CharaData(CID.Knight, 5, 2, Team.B),
-            };
+                new CharaDataForPick(CID.Flappy, 5, 0, Team.B),
+                new CharaDataForPick(CID.Flappy2, 5, 1, Team.B),
+                new CharaDataForPick(CID.Knight, 5, 2, Team.B),
+            };*/
 
-            foreach (CharaData d in tList)
+            // get data from pickdata
+
+            Debug.Log(PickData.Instance);
+            foreach (CharaDataForPick d in PickData.Instance.Data)
             {
                 GameObject chara;
                 if (chara = PhotonInstantiate(d.cid, d.loc))
@@ -286,19 +279,134 @@ namespace KWY
         }
 
 
+        /// <summary>
+        /// Must be called after LoadData()
+        /// </summary>
+        private void InitBaseObservers()
+        {
+            // add observer
+
+            // character
+            // 일단 자신의 캐릭터만 (현재 UI 업데이트는 자신의 캐릭터만 됨)
+            foreach (PlayableCharacter p in MyTeamCharacter)
+            {
+                p.Chara.AddObserver(new CharacterObserver());
+            }
+
+            // player
+            player.AddObserver(new PlayerObserver());
+
+
+            if (PhotonNetwork.IsMasterClient)
+            {
+                foreach(PlayableCharacter p in PCharacters.Values)
+                {
+                    p.Chara.AddObserver(new CharacterBreakDownObserver());
+                }
+
+                AddObserver(new GameOverObserver());
+            }
+
+            AddObserver(new GameProgressObserver());
+        }
+        #endregion
+
+        
+        public ResultData CreateResultData()
+        {
+            return new ResultData(MyTeamCharacter, MyPlayer);
+        }
+
+        #region MonoBehaviour CallBacks
+
+        private void Awake()
+        {
+            Instance = this;
+
+            IdHandler.ClearId();
+
+            photonView = PhotonView.Get(this);
+            if (!photonView)
+            {
+                Debug.LogError("Can not find photonview on this object (MainGameData)");
+                return;
+            }
+
+            GameObject t = GameObject.FindGameObjectWithTag("Map");
+            if (t)
+            {
+                _tileMap = t.GetComponent<Tilemap>();
+            }
+            else
+            {
+                Debug.LogError("Can not find object with tag: 'Map'");
+            }
+        }
+
+        private void Start()
+        {
+            if(!PhotonNetwork.IsMasterClient)
+            {
+                PickScene.PickData.Instance.SendDataToMaster();
+                photonView.RPC("On2ndClientLoadedRPC", RpcTarget.MasterClient);
+            }
+        }
+        #endregion
+
+
+        
+
+        #region PunRPC
+        /// <summary>
+        /// 2nd 클라이언트가 레벨로드가 완료되었을 때 호출
+        /// </summary>
+        [PunRPC]
+        public void On2ndClientLoadedRPC()
+        {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                return;
+            }
+
+            InitCharacters();
+        }
+
+        /// <summary>
+        /// 2nd 클라이언트가 게임 준비 가능 상태일 때 호출
+        /// </summary>
         [PunRPC]
         private void OnGameReadyRPC()
         {
+            // called on both client
+            TilemapControl.Instance.SetTiles();
+
             Debug.Log("OnGameReadyRPC");
             GameManager.Instance.SetState(STATE.StandBy);
+        }
+
+        [PunRPC]
+        public void ReceiveDataFromClientRPC(int cid, int x, int y, int team)
+        {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                return;
+            }
+
+            PickData.Instance.AddData((CID)cid, x, y, (Team)team);
         }
 
         // serialize custom type으로 바꿔야 할듯...
         // RPC가 비동기 방식으로 작동될 경우 -> list에 add 시 lock을 걸어주어야 할수도?
         // 일단은 하나씩 실행되는 것 처럼 보이므로 lock 사용 안했음
 
+        /// <summary>
+        /// 2nd 클라이언트에 생성된 캐릭터의 데이터를 전달해주는 RPC 함수
+        /// </summary>
+        /// <param name="photonViewId">photonView Id</param>
+        /// <param name="id">playable character id</param>
+        /// <param name="team">team</param>
         [PunRPC]
-        private void InitCharacterRPC(int viewId, int id, int team) 
+        private void InitCharacterRPC(int photonViewId, int id, int team)
         {
             //Debug.Log($"start viewId:{viewId}");
             if (PhotonNetwork.IsMasterClient)
@@ -309,7 +417,7 @@ namespace KWY
             Team _team = (Team)team;
 
             // get object by photonViewId
-            PhotonView _photonView = PhotonNetwork.GetPhotonView(viewId);
+            PhotonView _photonView = PhotonNetwork.GetPhotonView(photonViewId);
             if (!_photonView)
             {
                 Debug.Log($"Can not find PhotonView id: {id}");
@@ -379,9 +487,8 @@ namespace KWY
                 InitBaseObservers();
                 photonView.RPC("OnGameReadyRPC", RpcTarget.All);
             }
-
-            
         }
+
 
         private GameObject PhotonInstantiate(CID cid, Vector3Int loc)
         {
@@ -394,80 +501,14 @@ namespace KWY
                     CID.Knight => PhotonNetwork.Instantiate(CharacterResources.Knight_3, _tileMap.CellToWorld(loc), Quaternion.identity),
                     _ => throw new System.NotImplementedException(),
                 };
-            } catch (Exception)
+            }
+            catch (Exception)
             {
                 return null;
             }
-            
-        }
 
-
-        /// <summary>
-        /// Must be called after LoadData()
-        /// </summary>
-        private void InitBaseObservers()
-        {
-            // add observer
-
-            // character
-            // 일단 자신의 캐릭터만 (현재 UI 업데이트는 자신의 캐릭터만 됨)
-            foreach (PlayableCharacter p in MyTeamCharacter)
-            {
-                p.Chara.AddObserver(new CharacterObserver());
-            }
-
-            // player
-            player.AddObserver(new PlayerObserver());
-
-
-            if (PhotonNetwork.IsMasterClient)
-            {
-                foreach(PlayableCharacter p in PCharacters.Values)
-                {
-                    p.Chara.AddObserver(new CharacterBreakDownObserver());
-                }
-
-                AddObserver(new GameOverObserver());
-            }
-
-            AddObserver(new GameProgressObserver());
         }
         #endregion
-
-        
-        public ResultData CreateResultData()
-        {
-            return new ResultData(MyTeamCharacter, MyPlayer);
-        }
-
-        #region MonoBehaviour CallBacks
-
-        private void Awake()
-        {
-            Instance = this;
-
-            IdHandler.ClearId();
-
-            photonView = PhotonView.Get(this);
-            if (!photonView)
-            {
-                Debug.LogError("Can not find photonview on this object (MainGameData)");
-                return;
-            }
-
-            GameObject t = GameObject.FindGameObjectWithTag("Map");
-            if (t)
-            {
-                _tileMap = t.GetComponent<Tilemap>();
-            }
-            else
-            {
-                Debug.LogError("Can not find object with tag: 'Map'");
-            }
-        }
-        #endregion
-
-        
 
         #region ISubject Methods
         public void AddObserver(IObserver o)
@@ -510,7 +551,7 @@ namespace KWY
 
         public void NotifyObservers(EGameProgress p)
         {
-            foreach(IObserver<EGameProgress> o in ProgressObservers)
+            foreach (IObserver<EGameProgress> o in ProgressObservers)
             {
                 o.OnNotify(p);
             }
@@ -544,21 +585,6 @@ namespace KWY
         #endregion
     }
 
-    // temp
-    class CharaData
-    {
-        public CharaData(CID cid, int x, int y, Team team)
-        {
-            this.cid = cid;
-            loc = new Vector3Int(x, y, 0);
-            this.team = team;
-        }
-
-        public CID cid;
-        public Vector3Int loc;
-        public Team team;
-    }
-
     class IdHandler
     {
         static int id = 0;
@@ -580,53 +606,6 @@ namespace KWY
         public static void ClearId()
         {
             id = 0;
-        }
-    }
-
-    class GameProgressSubscriber : ISubject
-    {
-        public List<IObserver> Observers
-        {
-            get;
-            private set;
-        } = new List<IObserver>();
-
-        public void AddObserver(IObserver o)
-        {
-            if (Observers.IndexOf(o) < 0)
-            {
-                Observers.Add(o);
-            }
-            else
-            {
-                Debug.LogWarning($"The observer already exists in list: {o}");
-            }
-        }
-
-        public void RemoveObserver(IObserver o)
-        {
-            int idx = Observers.IndexOf(o);
-            if (idx >= 0)
-            {
-                Observers.RemoveAt(idx); // O(n)
-            }
-            else
-            {
-                Debug.LogError($"Can not remove the observer; It does not exist in list: {o}");
-            }
-        }
-
-        public void NotifyObservers()
-        {
-            foreach (IObserver o in Observers)
-            {
-                o.OnNotify();
-            }
-        }
-
-        public void RemoveAllObservers()
-        {
-            Observers.Clear();
         }
     }
 }
