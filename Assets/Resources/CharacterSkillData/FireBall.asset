@@ -39,3 +39,8 @@ MonoBehaviour:
   - 0
   - 2
   directions: 00000000010000000500000000000000060000000400000003000000050000000600000001000000
+  areaAttack: 0
+  area: {fileID: 0}
+  isDamage: 0
+  value: 0
+  dmgMultiplicand: 1.2
