@@ -490,7 +490,7 @@ namespace KWY
             if (SelSkill.areaAttack)
             {
                 skillSpawner = SelSkill.area;
-                skillSpawner.Activate(v);
+                skillSpawner.Activate(v, Pc.Team, Atk);
                 skillSpawner.Destroy(SkillManager.GetData(sid).triggerTime);   // triggerTime만큼 스킬 지속후 삭제
             }
             else

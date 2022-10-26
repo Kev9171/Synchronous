@@ -192,7 +192,6 @@ namespace KWY
                 return;
             }
 
-
             /*List<CharaDataForPick> tList = new List<CharaDataForPick>
             {
                 new CharaDataForPick(CID.Flappy, -3, 0, Team.A),
@@ -206,8 +205,8 @@ namespace KWY
 
             // get data from pickdata
 
-            Debug.Log(PickScene.PickData.Instance);
-            foreach (CharaDataForPick d in PickScene.PickData.Instance.Data)
+            Debug.Log(PickData.Instance);
+            foreach (CharaDataForPick d in PickData.Instance.Data)
             {
                 GameObject chara;
                 if (chara = PhotonInstantiate(d.cid, d.loc))
