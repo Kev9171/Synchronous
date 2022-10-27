@@ -204,7 +204,8 @@ namespace KWY
 
         public void ResetTempPosAndMp()
         {
-            TempTilePos = map.WorldToCell(transform.position);
+            //TempTilePos = map.WorldToCell(transform.position);
+            TempTilePos = TilePos;
             TempMp = Mp;
         }
 

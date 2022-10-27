@@ -50,7 +50,8 @@ namespace KWY
             int count = 0;
             foreach (GameObject tile in tiles)
             {
-                if (tile.GetComponent<SpriteRenderer>().color == Color.white)
+                //if (tile.GetComponent<SpriteRenderer>().color == Color.white)
+                if(tile.activeSelf)
                     count++;
             }
             return count;
@@ -77,7 +78,8 @@ namespace KWY
                 int idx = checkAltTileIdx(pos);
                 if(idx == -1)
                 {
-                    tiles[num].GetComponent<SpriteRenderer>().color = Color.white;
+                    //tiles[num].GetComponent<SpriteRenderer>().color = Color.white;
+                    tiles[num].SetActive(true);
                     tiles[num].transform.position = pos;
                     tiles[num].transform.localScale = new Vector3(charNum, charNum, 1);
                     tiles[num].GetComponent<SpriteRenderer>().sprite = sprites[checkSpriteIdx(sprite)];
@@ -108,8 +110,9 @@ namespace KWY
             if(idx != -1)
             {
                 tiles[idx].transform.position = Vector3.zero;
-                tiles[idx].GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
-                Debug.Log("alt tile deleted");
+                tiles[idx].SetActive(false);
+               //tiles[idx].GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
+               Debug.Log("alt tile deleted");
             }
             else
                 Debug.Log("no tile found");
