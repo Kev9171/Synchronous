@@ -73,14 +73,15 @@ namespace KWY
         private int _notBreakDownTeamB = 0;
 
 
-        #region Public Fields        
+        #region Public Fields
         public List<PSID> PlayerSkillList { get { return _playerSkillList; } }
 
         public Dictionary<int, CharacterActionData> CharaActionData { get { return _charaActionData; } }
         public Dictionary<int, PlayableCharacter> PCharacters { get { return _pCharacters; } }
         public List<PlayableCharacter> CharasTeamA { get { return _charasTeamA; } }
         public List<PlayableCharacter> CharasTeamB { get { return _charasTeamB; } }
-        public Dictionary<int, bool> IsMyCharacter { 
+        public Dictionary<int, bool> IsMyCharacter
+        { 
             get 
             {
                 return _isMyCharacter; 
