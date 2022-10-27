@@ -6,6 +6,8 @@ using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
 using Photon.Pun;
 
+using UI;
+
 namespace KWY
 {
     public class Player : MonoBehaviour, ISubject<Player>
@@ -43,6 +45,9 @@ namespace KWY
         [SerializeField]
         MouseInput mouseInput;
 
+        [SerializeField]
+        Canvas UICanvas;
+
 
         public void InitData(Image icon, int initialMp)
         {
@@ -67,6 +72,13 @@ namespace KWY
         public bool Skill1(Character selChara, Vector2 mousePosition)
         {
             if (selChara == null) return false;
+
+            if (selChara.BreakDown)
+            {
+                // 아마 실행 되면 안됨
+                PanelBuilder.ShowFadeOutText(UICanvas.transform, "This character is breakdown!");
+                return false;
+            }
 
             mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
 

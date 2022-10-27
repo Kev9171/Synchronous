@@ -148,6 +148,7 @@ namespace KWY
         {
             foreach(PlayableCharacter pc in MainGameData.Instance.MyTeamCharacter)
             {
+                if (pc.Chara.BreakDown) continue;
                 ClearCharacterActionIcon(pc.Id);
             }
         }

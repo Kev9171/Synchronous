@@ -16,6 +16,7 @@ namespace KWY
         CharacterBase _characterBase;
 
         private readonly List<IObserver<Character>> observers = new List<IObserver<Character>>();
+        private readonly Dictionary<string, IObserver<Character>> obDict = new Dictionary<string, IObserver<Character>>();
 
         public PlayableCharacter Pc
         {
@@ -47,6 +48,7 @@ namespace KWY
 
         private RayTest ray;
 
+        public bool BreakDownNotice = false;
 
         public Vector3Int TempTilePos { get; private set; }
 
@@ -85,23 +87,44 @@ namespace KWY
             TempMp = Mp;
         }
 
+        private void BreakDownStatus()
+        {
+            ClearBuff();
+            GetComponent<SpriteRenderer>().color = Color.red;
+
+            if (gameObject.TryGetComponent(out BoxCollider2D c1))
+            {
+                c1.enabled = false;
+            }
+
+            RemoveAllObservers();
+        }
+
         public void DamageHP(int damage)
         {
+            if (BreakDown)
+            {
+                return;
+            }
+
             if (Hp - damage > 0)
             {
                 Hp -= damage;
-                Debug.LogFormat("{0} is damaged {1}; Now hp: {2}", Cb.name, damage, Hp);
+                Debug.LogFormat($"[id={Pc.Id}]{Cb.name} is damaged {damage}; Now hp: {Hp}");
             }
             else if (Hp - damage < 0)
             {
                 Hp = 0;
                 BreakDown = true;
-                GetComponent<SpriteRenderer>().color = Color.red;
-                ClearBuff();
-                Debug.LogFormat("{0} is damaged {1}; Now hp: {2}; BREAK DOWN!", Cb.name, damage, Hp);
+                Debug.LogFormat($"[id={Pc.Id}]{Cb.name} is damaged {damage}; Now hp: {Hp}, BREAK DOWN!!");
             }
 
             NotifyObservers();
+
+            if (BreakDown)
+            {
+                BreakDownStatus();
+            }
         }
 
         public void AddMP(int amount)
@@ -233,6 +256,8 @@ namespace KWY
         [PunRPC]
         public void MoveTo(int x, int y)
         {
+            if (BreakDown) return;
+
             Vector2Int dir = new Vector2Int(x, y);
 
             Vector2Int realDir = TransFromY(dir);
@@ -365,6 +390,8 @@ namespace KWY
         [PunRPC]
         public void Teleport(int x, int y)
         {
+            if (BreakDown) return;
+
             Vector3Int vec = new Vector3Int(x, y, 0);
 
             if (map.HasTile(vec))
@@ -479,6 +506,8 @@ namespace KWY
 
         public void SpellSkill(SID sid, SkillDicection direction, int x, int y)
         {
+            if (BreakDown) return;
+
             nowMove = false;
             SkillBase SelSkill = SkillManager.GetData(sid);
 
@@ -553,6 +582,8 @@ namespace KWY
 
         void Update()
         {
+            if (BreakDown) return;
+
             if (!PhotonNetwork.IsMasterClient)
             {
                 return;
@@ -570,8 +601,6 @@ namespace KWY
             }
         }
 
-
-
         #endregion
 
         #region IObserver Methods
@@ -581,11 +610,18 @@ namespace KWY
             if (observers.IndexOf(o) < 0)
             {
                 observers.Add(o);
+
+                obDict.Add(o.GetType().Name, o);
             }
             else
             {
                 Debug.LogWarning($"The observer already exists in list: {o}");
             }
+        }
+
+        public void RemoveObserver(string observerName)
+        {
+            RemoveObserver(obDict[observerName]);
         }
 
         public void RemoveObserver(IObserver<Character> o)

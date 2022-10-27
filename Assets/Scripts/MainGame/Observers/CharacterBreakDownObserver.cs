@@ -10,17 +10,21 @@ namespace KWY
     {
         public void OnNotify(Character chara)
         {
-            if (chara.BreakDown)
+            if (!chara.BreakDownNotice && chara.BreakDown)
             {
                 Team team = chara.Pc.Team;
 
                 if (team == Team.A)
                 {
                     MainGameData.Instance.NotBreakDownTeamA--;
+                    MainGameData.Instance.CharaActionData.Remove(chara.Pc.Id);
+                    chara.BreakDownNotice = true;
                 }
                 else if (team == Team.B)
                 {
                     MainGameData.Instance.NotBreakDownTeamB--;
+                    MainGameData.Instance.CharaActionData.Remove(chara.Pc.Id);
+                    chara.BreakDownNotice = true;
                 }
             }
         }
