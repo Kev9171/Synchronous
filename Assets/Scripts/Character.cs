@@ -269,10 +269,10 @@ namespace KWY
                 TilePos = map.WorldToCell(des);
                 des.y += 0.1f;
 
-                TCtrl.updateCharNum(map.WorldToCell(des), 1, gameObject);
+                TCtrl.updateCharNum(TilePos, 1, gameObject);
                 TCtrl.updateCharNum(nowPos, -1, gameObject);
 
-                int charsOnDes = TCtrl.getCharList(map.WorldToCell(des)).Count;
+                int charsOnDes = TCtrl.getCharList(TilePos).Count;
                 int charsOnCur = TCtrl.getCharList(nowPos).Count;
 
                 worldPos = des;
@@ -292,13 +292,13 @@ namespace KWY
                 {
                     //map.SetTransformMatrix(map.WorldToCell(des), elevatedTile);
                     //hlMap.SetTransformMatrix(map.WorldToCell(des), elevatedTile);
-                    map.SetTileFlags(map.WorldToCell(des), TileFlags.None);
-                    map.SetColor(map.WorldToCell(des), new Color(1, 1, 1, 0));
+                    map.SetTileFlags(TilePos, TileFlags.None);
+                    map.SetColor(TilePos, new Color(1, 1, 1, 0));
 
-                    Sprite sprite = map.GetTile<CustomTile>(map.WorldToCell(des)).sprite;
+                    Sprite sprite = map.GetTile<CustomTile>(TilePos).sprite;
                     TCtrl.activateAltTile(des, charsOnDes, sprite);
 
-                    List<GameObject> characters = TCtrl.getCharList(map.WorldToCell(des));
+                    List<GameObject> characters = TCtrl.getCharList(TilePos);
 
                     int count = 0;
 
@@ -309,8 +309,7 @@ namespace KWY
                         Vector2 offset = TCtrl.nList[charsOnDes - 1].coordList[count];
                         chara.GetComponent<Character>().destination = (Vector2)chara.GetComponent<Character>().worldPos + offset;
                         chara.GetComponent<Character>().nowMove = true;
-                        //chara.transform.position += new Vector3(-0.1f, 0.5f, 0);
-                        chara.GetComponent<BoxCollider2D>().offset = -offset;
+                        //chara.GetComponent<BoxCollider2D>().offset = -offset;
 
                         //Debug.Log(chara.GetComponent<Character>().destination);
                         //Debug.Log((Vector2)fTiles.nList[charsOnDes - 1].coordList[count] + ", " + (Vector2)fTiles.nList[charsOnDes - 2].coordList[count]);
