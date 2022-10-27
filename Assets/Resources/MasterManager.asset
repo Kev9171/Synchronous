@@ -13,4 +13,3 @@ MonoBehaviour:
   m_Name: MasterManager
   m_EditorClassIdentifier: 
   _gameSettings: {fileID: 11400000, guid: fa60d88f8807c5b4e816c8da59f013ed, type: 2}
-  _testSettings: {fileID: 11400000, guid: ed1a559da9e7ae04fb406929aff40d43, type: 2}

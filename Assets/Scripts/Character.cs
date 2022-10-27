@@ -16,6 +16,7 @@ namespace KWY
         CharacterBase _characterBase;
 
         private readonly List<IObserver<Character>> observers = new List<IObserver<Character>>();
+        private readonly Dictionary<string, IObserver<Character>> obDict = new Dictionary<string, IObserver<Character>>();
 
         public PlayableCharacter Pc
         {
@@ -45,11 +46,9 @@ namespace KWY
 
         public int TempMp { get; set; }
 
-
-        private SkillSpawner skillSpawner;
-
         private RayTest ray;
 
+        public bool BreakDownNotice = false;
 
         public Vector3Int TempTilePos { get; private set; }
 
@@ -88,23 +87,44 @@ namespace KWY
             TempMp = Mp;
         }
 
+        private void BreakDownStatus()
+        {
+            ClearBuff();
+            GetComponent<SpriteRenderer>().color = Color.red;
+
+            if (gameObject.TryGetComponent(out BoxCollider2D c1))
+            {
+                c1.enabled = false;
+            }
+
+            RemoveAllObservers();
+        }
+
         public void DamageHP(int damage)
         {
+            if (BreakDown)
+            {
+                return;
+            }
+
             if (Hp - damage > 0)
             {
                 Hp -= damage;
-                Debug.LogFormat("{0} is damaged {1}; Now hp: {2}", Cb.name, damage, Hp);
+                Debug.LogFormat($"[id={Pc.Id}]{Cb.name} is damaged {damage}; Now hp: {Hp}");
             }
             else if (Hp - damage < 0)
             {
                 Hp = 0;
                 BreakDown = true;
-                GetComponent<SpriteRenderer>().color = Color.red;
-                ClearBuff();
-                Debug.LogFormat("{0} is damaged {1}; Now hp: {2}; BREAK DOWN!", Cb.name, damage, Hp);
+                Debug.LogFormat($"[id={Pc.Id}]{Cb.name} is damaged {damage}; Now hp: {Hp}, BREAK DOWN!!");
             }
 
             NotifyObservers();
+
+            if (BreakDown)
+            {
+                BreakDownStatus();
+            }
         }
 
         public void AddMP(int amount)
@@ -236,6 +256,8 @@ namespace KWY
         [PunRPC]
         public void MoveTo(int x, int y)
         {
+            if (BreakDown) return;
+
             Vector2Int dir = new Vector2Int(x, y);
 
             Vector2Int realDir = TransFromY(dir);
@@ -247,10 +269,10 @@ namespace KWY
                 TilePos = map.WorldToCell(des);
                 des.y += 0.1f;
 
-                TCtrl.updateCharNum(map.WorldToCell(des), 1, gameObject);
+                TCtrl.updateCharNum(TilePos, 1, gameObject);
                 TCtrl.updateCharNum(nowPos, -1, gameObject);
 
-                int charsOnDes = TCtrl.getCharList(map.WorldToCell(des)).Count;
+                int charsOnDes = TCtrl.getCharList(TilePos).Count;
                 int charsOnCur = TCtrl.getCharList(nowPos).Count;
 
                 worldPos = des;
@@ -270,13 +292,13 @@ namespace KWY
                 {
                     //map.SetTransformMatrix(map.WorldToCell(des), elevatedTile);
                     //hlMap.SetTransformMatrix(map.WorldToCell(des), elevatedTile);
-                    map.SetTileFlags(map.WorldToCell(des), TileFlags.None);
-                    map.SetColor(map.WorldToCell(des), new Color(1, 1, 1, 0));
+                    map.SetTileFlags(TilePos, TileFlags.None);
+                    map.SetColor(TilePos, new Color(1, 1, 1, 0));
 
-                    Sprite sprite = map.GetTile<CustomTile>(map.WorldToCell(des)).sprite;
+                    Sprite sprite = map.GetTile<CustomTile>(TilePos).sprite;
                     TCtrl.activateAltTile(des, charsOnDes, sprite);
 
-                    List<GameObject> characters = TCtrl.getCharList(map.WorldToCell(des));
+                    List<GameObject> characters = TCtrl.getCharList(TilePos);
 
                     int count = 0;
 
@@ -287,8 +309,7 @@ namespace KWY
                         Vector2 offset = TCtrl.nList[charsOnDes - 1].coordList[count];
                         chara.GetComponent<Character>().destination = (Vector2)chara.GetComponent<Character>().worldPos + offset;
                         chara.GetComponent<Character>().nowMove = true;
-                        //chara.transform.position += new Vector3(-0.1f, 0.5f, 0);
-                        chara.GetComponent<BoxCollider2D>().offset = -offset;
+                        //chara.GetComponent<BoxCollider2D>().offset = -offset;
 
                         //Debug.Log(chara.GetComponent<Character>().destination);
                         //Debug.Log((Vector2)fTiles.nList[charsOnDes - 1].coordList[count] + ", " + (Vector2)fTiles.nList[charsOnDes - 2].coordList[count]);
@@ -368,6 +389,8 @@ namespace KWY
         [PunRPC]
         public void Teleport(int x, int y)
         {
+            if (BreakDown) return;
+
             Vector3Int vec = new Vector3Int(x, y, 0);
 
             if (map.HasTile(vec))
@@ -482,6 +505,8 @@ namespace KWY
 
         public void SpellSkill(SID sid, SkillDicection direction, int x, int y)
         {
+            if (BreakDown) return;
+
             nowMove = false;
             SkillBase SelSkill = SkillManager.GetData(sid);
 
@@ -489,10 +514,22 @@ namespace KWY
 
             if (SelSkill.areaAttack)
             {
-                Vector3 v = map.CellToWorld(new Vector3Int(x, y, 0));
-                skillSpawner = SelSkill.area;
-                skillSpawner.Activate(new Vector2(v.x, v.y));
-                skillSpawner.Destroy(SkillManager.GetData(sid).triggerTime);   // triggerTime만큼 스킬 지속후 삭제
+                GameObject o = PhotonNetwork.Instantiate(
+                    SpawnableSkillResources.GetPath(SelSkill.sid),
+                    new Vector3(x, y + 0.1f, 0),
+                    Quaternion.identity);
+
+                if (!NullCheck.HasItComponent<SkillSpawner>(o, "SkillSpawner")) {
+                    // error
+                    return;
+                }
+
+                o.GetComponent<SkillSpawner>().Init(Pc.Team, Atk);
+
+
+                //skillSpawner = SelSkill.area;
+                //skillSpawner.Activate(new Vector2(x, y), Pc.Team, Atk);
+                //skillSpawner.Destroy(SkillManager.GetData(sid).triggerTime);   // triggerTime만큼 스킬 지속후 삭제
             }
             else
             {
@@ -544,6 +581,8 @@ namespace KWY
 
         void Update()
         {
+            if (BreakDown) return;
+
             if (!PhotonNetwork.IsMasterClient)
             {
                 return;
@@ -561,8 +600,6 @@ namespace KWY
             }
         }
 
-
-
         #endregion
 
         #region IObserver Methods
@@ -572,11 +609,18 @@ namespace KWY
             if (observers.IndexOf(o) < 0)
             {
                 observers.Add(o);
+
+                obDict.Add(o.GetType().Name, o);
             }
             else
             {
                 Debug.LogWarning($"The observer already exists in list: {o}");
             }
+        }
+
+        public void RemoveObserver(string observerName)
+        {
+            RemoveObserver(obDict[observerName]);
         }
 
         public void RemoveObserver(IObserver<Character> o)

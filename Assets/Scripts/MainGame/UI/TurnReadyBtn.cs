@@ -9,23 +9,9 @@ namespace KWY
     public class TurnReadyBtn : MonoBehaviour
     {
         [SerializeField]
-        TurnReady turnReady;
-
-        [SerializeField]
         TMP_Text ReadyText;
 
         Color IsReadyColor = new Color(210, 210, 210);
-
-
-        // ready 해제는 아직 구현 안함 (text 만 바뀜)
-        public void SendReadyState()
-        {
-            // ready 되었을 때 실행
-            turnReady.OnClickTurnReady();
-
-            // ready 버튼 이미지 변경 or 텍스트 변경
-            this.GetComponent<Image>().color = IsReadyColor;
-        }
 
         public void SetReady(bool state)
         {

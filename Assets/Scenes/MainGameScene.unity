@@ -2787,6 +2787,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 39898869a5550974985f1dc2454842ea, type: 3}
   - {fileID: 21300000, guid: 01ea1e0838b6ba34a8cce622720362c8, type: 3}
   - {fileID: 21300000, guid: 39620a364a925d84f9a3df1ba2e35175, type: 3}
+  photonview: {fileID: 0}
   nList:
   - coordList:
     - {x: 0, y: 0, z: 0}
@@ -6045,6 +6046,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 140848647252565480, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
+      propertyPath: CanvasUI
+      value: 
+      objectReference: {fileID: 134885412}
+    - target: {fileID: 140848647252565480, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
       propertyPath: charaControl
       value: 
       objectReference: {fileID: 627332755}
@@ -6541,6 +6546,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93273bd880a8deb49bfa6c76df3c848c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  photonView: {fileID: 0}
   _playerSkillList: 0100000002000000
   player: {fileID: 1652176866}
 --- !u!4 &1447055417
@@ -7076,6 +7082,10 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 140848647252565480, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
+      propertyPath: CanvasUI
+      value: 
+      objectReference: {fileID: 134885412}
     - target: {fileID: 140848647252565480, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
       propertyPath: charaControl
       value: 
@@ -8925,6 +8935,10 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 140848647252565480, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
+      propertyPath: CanvasUI
+      value: 
+      objectReference: {fileID: 134885412}
     - target: {fileID: 140848647252565480, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
       propertyPath: charaControl
       value: 

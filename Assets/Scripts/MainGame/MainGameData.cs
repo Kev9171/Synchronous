@@ -73,14 +73,15 @@ namespace KWY
         private int _notBreakDownTeamB = 0;
 
 
-        #region Public Fields        
+        #region Public Fields
         public List<PSID> PlayerSkillList { get { return _playerSkillList; } }
 
         public Dictionary<int, CharacterActionData> CharaActionData { get { return _charaActionData; } }
         public Dictionary<int, PlayableCharacter> PCharacters { get { return _pCharacters; } }
         public List<PlayableCharacter> CharasTeamA { get { return _charasTeamA; } }
         public List<PlayableCharacter> CharasTeamB { get { return _charasTeamB; } }
-        public Dictionary<int, bool> IsMyCharacter { 
+        public Dictionary<int, bool> IsMyCharacter
+        { 
             get 
             {
                 return _isMyCharacter; 
@@ -192,7 +193,6 @@ namespace KWY
                 return;
             }
 
-
             /*List<CharaDataForPick> tList = new List<CharaDataForPick>
             {
                 new CharaDataForPick(CID.Flappy, -3, 0, Team.A),
@@ -206,8 +206,8 @@ namespace KWY
 
             // get data from pickdata
 
-            Debug.Log(PickScene.PickData.Instance);
-            foreach (CharaDataForPick d in PickScene.PickData.Instance.Data)
+            Debug.Log(PickData.Instance);
+            foreach (CharaDataForPick d in PickData.Instance.Data)
             {
                 GameObject chara;
                 if (chara = PhotonInstantiate(d.cid, d.loc))

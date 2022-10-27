@@ -14,7 +14,7 @@ namespace KWY
         [SerializeField]
         TMP_Text skillNameLabel;
         [SerializeField]
-        LogicData logicData;
+        SLogicData logicData;
 
         private float activeDuration;
 

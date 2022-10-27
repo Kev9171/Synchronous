@@ -51,6 +51,9 @@ namespace UI
         [SerializeField]
         CharacterControl charaControl;
 
+        [SerializeField]
+        Canvas CanvasUI;
+
         [Tooltip("0 ~ 2 (위에서 부터)")]
         [SerializeField]
         int nthCharacter;
@@ -99,11 +102,8 @@ namespace UI
                 ClearBuffs();
             }
 
-            else
-            {
-                UpdateHP(c.Hp);
-                UpdateMP(c.Mp);
-            }
+            UpdateHP(c.Hp);
+            UpdateMP(c.Mp);
         }
 
         public void UpdateHP(float hp)
@@ -163,7 +163,7 @@ namespace UI
 
             if (chara.BreakDown)
             {
-                Debug.Log("This character is break down. You can not choose");
+                PanelBuilder.ShowFadeOutText(CanvasUI.transform, "This character is break down. You can not choose");
                 return;
             }
 
@@ -217,7 +217,7 @@ namespace UI
             for (float ft = 1f; ft >= 0; ft -= 0.1f)
             {
                 hpBar.value += v;
-                hpLabel.text = Mathf.Floor(hpBar.value * chara.MaxHp).ToString();
+                hpLabel.text = Mathf.Floor(hpBar.value * chara.MaxHp + 0.5f).ToString();
                 yield return new WaitForSeconds(0.1f);
             }
         }
