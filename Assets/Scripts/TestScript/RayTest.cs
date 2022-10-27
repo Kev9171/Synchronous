@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Photon.Pun;
+using DebugUtil;
+
 using Unity.Mathematics;
 
 namespace KWY
@@ -156,6 +158,17 @@ namespace KWY
                         DataController.Instance.ModifyCharacterHp(
                             hit.transform.GetComponent<Character>().Pc.Id, -sb.value);
                         Debug.Log("hit!");
+
+                        GameObject o = PhotonNetwork.Instantiate(
+                    SpawnableSkillResources.GetPath(sb.sid),
+                    new Vector3(hit.transform.position.x, hit.transform.position.y + 0.1f, 0),
+                    Quaternion.identity);
+
+                        if (!NullCheck.HasItComponent<SkillSpawner>(o, "SkillSpawner"))
+                        {
+                            // error
+                            return;
+                        }
                         //hit.transform.GetComponent<Character>().DamageHP(sb.value);
                     }
                 }
@@ -172,6 +185,17 @@ namespace KWY
                                 DataController.Instance.ModifyCharacterHp(
                                     hit.transform.GetComponent<Character>().Pc.Id,
                                     -sb.value);
+
+                                GameObject o = PhotonNetwork.Instantiate(
+                    SpawnableSkillResources.GetPath(sb.sid),
+                    new Vector3(hit.transform.position.x, hit.transform.position.y + 0.1f, 0),
+                    Quaternion.identity);
+
+                                if (!NullCheck.HasItComponent<SkillSpawner>(o, "SkillSpawner"))
+                                {
+                                    // error
+                                    return;
+                                }
                                 //hit.transform.GetComponent<Character>().DamageHP(sb.value);
                             }
                         }
@@ -179,6 +203,8 @@ namespace KWY
                 }
             }
             lastPos = lastPos + dp * d;
+
+            
         }
 
         public void CurvedMultipleRay(Vector2 basePos, SkillBase sb, List<Direction> dir, bool reversed, bool team, int rays)
