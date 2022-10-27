@@ -127,14 +127,18 @@ namespace KWY
             //    Debug.Log(hit.transform.name);
             //}
 
+            int l;
 
             if (!team)
             {
-                layerMask = 1 << 7 | 1 << 8;
+                layerMask = 1 << 6 | 1 << 8;
+                l = 6;
+
             }
             else
             {
-                layerMask = 1 << 6 | 1 << 8;
+                layerMask = 1 << 7 | 1 << 8;
+                l = 7;
             }
 
 
@@ -143,9 +147,9 @@ namespace KWY
             for (int i = 0; i < hits.Length; i++)
             {
                 RaycastHit2D hit = hits[i];
-                hit.transform.GetComponent<SpriteRenderer>().color = Color.red;
 
-                if (hit.transform.gameObject.layer == 6)
+                
+                if (hit.transform.gameObject.layer == l)
                 {
                     if (sb.isDamage)
                     {
@@ -199,14 +203,14 @@ namespace KWY
             {
                 for (int i = 0; i < rays; i++)
                 {
-                    CurvedRay(basePos, sb, dir, i, false, reversed);
+                    CurvedRay(basePos, sb, dir, i, reversed, team);
                 }
             }
             else
             {
                 for (int i = 0; i < rays; i++)
                 {
-                    CurvedRay(basePos, sb, dir, i, true, reversed);
+                    CurvedRay(basePos, sb, dir, i, reversed, team);
                 }
             }
         }
