@@ -53,6 +53,9 @@ namespace KWY
             }
         }
 
+        [SerializeField]
+        GameObject characterEmptyObject;
+
         [Tooltip("Pre-set Possible-to-use Playerskills")]
         [SerializeField]
         private List<PSID> _playerSkillList;
@@ -192,18 +195,6 @@ namespace KWY
             {
                 return;
             }
-
-            /*List<CharaDataForPick> tList = new List<CharaDataForPick>
-            {
-                new CharaDataForPick(CID.Flappy, -3, 0, Team.A),
-                new CharaDataForPick(CID.Flappy2, -3, 1, Team.A),
-                new CharaDataForPick(CID.Knight, -3, 2, Team.A),
-
-                new CharaDataForPick(CID.Flappy, 5, 0, Team.B),
-                new CharaDataForPick(CID.Flappy2, 5, 1, Team.B),
-                new CharaDataForPick(CID.Knight, 5, 2, Team.B),
-            };*/
-
             // get data from pickdata
 
             Debug.Log(PickData.Instance);
@@ -242,6 +233,8 @@ namespace KWY
                 PlayableCharacter pc = new PlayableCharacter(chara, id, d.team);
                 _pCharacters.Add(id, pc);
                 chara.GetComponent<Character>().SetData(pc);
+
+                chara.transform.SetParent(characterEmptyObject.transform);
 
                 // 팀에 맞게 리스트에 추가
                 if (d.team == Team.A)
@@ -436,6 +429,8 @@ namespace KWY
 
             _pCharacters.Add(id, pc);
             chara.GetComponent<Character>().SetData(pc);
+
+            chara.transform.SetParent(characterEmptyObject.transform);
 
             // Master Client
             if (_team == Team.A)
