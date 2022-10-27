@@ -38,6 +38,11 @@ namespace KWY
         private float simulationIntervalSeconds;
 
 
+        private int validCharaNum = 0;
+
+
+        Task[] task;
+
         [Tooltip("이 값은 시뮬레이션 종료 후 다음 진행까지 얼마나 대기 하고 있을 것인가에 대한 int 값으로 logic data에서 지정하고 있는 interval 단위")]
         [SerializeField]
         private int timeAfterSimul = 3;
@@ -109,36 +114,27 @@ namespace KWY
             StartAction();
         }
 
-        /*IEnumerator StartAction(int time)
+        public void StopAllActions()
         {
-            // need codes
-            DoAction(time);
-            yield return new WaitForSeconds(simulationIntervalSeconds);
-
-            TICK_RESULT result = CheckGameEnd();
-            if (result == TICK_RESULT.KEEP_GOING)
+            foreach(Task t in task)
             {
-                if (time <= maxTimeLine + timeAfterSimul)
-                {
-                    StartCoroutine(StartAction(++time));
-                }
-                else
-                {
-                    SimulationEnd();
-                }
+                t.Stop();
             }
-            else
-            {
-                gameEvent.RaiseEventGameEnd(result);
-            }
-        }*/
+        }
 
         void StartAction()
         {
-            Task[] task = new Task[data.PCharacters.Count];
+            validCharaNum = MainGameData.Instance.NotBreakDownTeamA + MainGameData.Instance.NotBreakDownTeamB;
+            task = new Task[validCharaNum];
+            
             int i = 0;
             foreach (int id in data.PCharacters.Keys)
             {
+                if (data.PCharacters[id].Chara.BreakDown)
+                {
+                    continue;
+                }
+
                 task[i] = new Task(DoAction(id));
                 task[i++].Finished += delegate (bool t) {
                     if (!t) Notify();
@@ -149,39 +145,17 @@ namespace KWY
         void Notify()
         {
             finActions++;
-            if (finActions == data.PCharacters.Count)
+            if (finActions == validCharaNum)
             {
                 finActions = 0;
                 foreach (PlayableCharacter p in data.PCharacters.Values)
                 {
+                    if (p.Chara.BreakDown) continue;
                     p.Chara.SetMoveIdx(0);
                 }
                 SimulationEnd();
             }
         }
-
-        /*private void DoAction(int time)
-        {
-            return;
-            *//*if (actionData.Data.TryGetValue(time, out var value))
-            {
-                foreach (object[] d in value)
-                {
-                    int cid = (int)d[0];
-
-                    ActionType type = (ActionType)d[1];
-
-                    if (type == ActionType.Move)
-                    {
-                        StartCoroutine(DoCharaMove(cid, new Vector2Int((int)d[2], (int)d[3])));
-                    }
-                    else if (type == ActionType.Skill)
-                    {
-                        StartCoroutine(DoCharaSkill(cid, (SID)d[2], (SkillDicection)d[3]));
-                    }
-                }
-            }*//*
-        }*/
 
         IEnumerator DoAction(int id)
         {
@@ -201,10 +175,10 @@ namespace KWY
                     }
                     else if (type == ActionType.Skill)
                     {
-                        yield return new WaitForSeconds(SkillManager.GetData((SID)d[2]).triggerTime);
+                        yield return new WaitForSeconds(SkillManager.GetData((SID)d[2]).castingTime);
                         StartCoroutine(DoCharaSkill(id, (SID)d[2], (SkillDicection)d[3], new Vector2Int((int)d[4], (int)d[5])));
                         data.PCharacters[id].Chara.SetMoveIdx(1);
-                        yield return new WaitForSeconds(SkillManager.GetData((SID)d[2]).castingTime);
+                        yield return new WaitForSeconds(SkillManager.GetData((SID)d[2]).triggerTime);
                     }
                 }
             }

@@ -169,22 +169,6 @@ namespace KWY
 
                     data.CharaActionData[id].AddMoveAction(ActionType.Move, dx, dy, true, 0, 0);
                 }
-
-                /*if (data.CharaActionData[id].ActionCount != 3)
-                {
-                    data.CharaActionData[id].ClearActions();
-                    for (int i = 0; i < 3; i++)
-                    {
-                        int dx = 0, dy = 0;
-                        while (dx == 0 && dy == 0)
-                        {
-                            dx = Random.Range(-1, 2);
-                            dy = Random.Range(-1, 2);
-                        }
-
-                        data.CharaActionData[id].AddMoveAction(ActionType.Move, dx, dy, true, 0, 0);
-                    }
-                }*/
             }
         }
 
