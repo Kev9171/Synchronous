@@ -6,66 +6,87 @@ using UnityEngine.Tilemaps;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Photon.Realtime;
+using TMPro;
 using KWY;
+using DebugUtil;
 
 namespace PickScene
 {
     public class PickManager : Singleton<PickManager>
     {
-        [SerializeField] private GameObject mainCamera;
-        [SerializeField] private PickControl pickControl;
-        [SerializeField] Tilemap hlMap;
-        private Color transparent = new Color(1, 1, 1, 0);
-        public CharacterBtn ClickedBtn { get; private set; }
+        [SerializeField] public float timeLimit = 30;
 
-        int time = 0;
-        int tMax;
-        ActionData nowActionData;
-        STATE nowState = 0;
+        [SerializeField] public float timeSecondsToStart = 10;
+
+        [SerializeField]
+        Timer timer;
+
+        [SerializeField]
+        GameObject timerPanel;
+
+        [SerializeField]
+        TMP_Text countDownText;
+
+        private PhotonView photonView;
+
+        private readonly string nextScene = "MainGameScene";
+
+        int readyCount = 0;
 
         #region Public Methods
 
-        public void ClearHighlight()
+        /*public void ClearHighlight()
         {
-            //Vector3 pos = new Vector3(0, 0, 0);
-            //Vector3Int range;
-            //for (float i = -4; i < 5; i += 0.5f)
-            //{
-            //    for (float j = -6; j < 6; j += 0.7f)
-            //    {
-            //        pos.x = j;
-            //        pos.y = i;
-            //        range = hlMap.WorldToCell(pos);
-            //        this.hlMap.SetTileFlags(range, TileFlags.None);
-            //        this.hlMap.SetColor(range, transparent);
-            //    }
-            //}
             foreach (var pos in hlMap.cellBounds.allPositionsWithin)
             {
                 Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
-                Vector3 place = hlMap.CellToWorld(localPlace);
                 if (hlMap.HasTile(localPlace))
                 {
                     hlMap.SetTileFlags(localPlace, TileFlags.None);
                     hlMap.SetColor(localPlace, transparent);
                 }
             }
-        }
+        }*/
 
-        public void PickCharacter(CharacterBtn characterBtn)
+        [PunRPC]
+        public void ReadyToStartRPC()
         {
-            this.ClickedBtn = characterBtn;
-        }
+            readyCount++;
 
-        public void PickClear()
-        {
-            ClickedBtn = null;
+            if (readyCount == 2)
+            {
+                StartCountDown();
+            }
         }
 
         public void Timeout()
         {
             PickControl.Instance.RandomDeployCharacter();
-            SceneManager.LoadScene("MainGameScene");
+            PickControl.Instance.SavePickData();
+            PickControl.Instance.StopSelect();
+
+            photonView.RPC("ReadyToStartRPC", RpcTarget.All);
+        }
+
+        public void StartCountDown()
+        {
+            PhotonNetwork.AutomaticallySyncScene = true;
+
+            countDownText.text = timeSecondsToStart.ToString();
+            timerPanel.gameObject.SetActive(true);
+
+            timer.InitTimer(timeSecondsToStart, StartGame, countDownText);
+
+            timer.StartTimer();
+        }
+
+        public void StartGame()
+        {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                
+                PhotonNetwork.LoadLevel(nextScene);
+            }
         }
 
         #endregion
@@ -74,9 +95,12 @@ namespace PickScene
 
         private void Start()
         {
-            //data.LoadData();
-            //SetState(0);
-            ClearHighlight();
+            photonView = PhotonView.Get(this);
+
+            if (!!NullCheck.HasItComponent<PhotonView>(gameObject, "PhotonView") )
+            {
+                return;
+            }
         }
 
         #endregion

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Photon.Pun;
-using KWY;
+using DebugUtil;
 
 
 namespace KWY
@@ -16,6 +16,9 @@ namespace KWY
         GameObject[] tiles;
         [SerializeField]
         Sprite[] sprites;
+
+        public static TilemapControl Instance;
+        public PhotonView photonview;
 
         private Dictionary<Vector3Int, List<GameObject>> Characters = new Dictionary<Vector3Int, List<GameObject>>();
 
@@ -96,7 +99,6 @@ namespace KWY
 
             //Debug.Log(new Vector3(worldPos.x, worldPos.y + 0.1f, worldPos.z));
         }
-
         public void deactivateAltTile(Vector3 worldPos)
         {
             Vector3 tilePos = new Vector3(worldPos.x, worldPos.y + 0.2f, worldPos.z);
@@ -140,24 +142,41 @@ namespace KWY
         //}
         private void Start()
         {
-            SetTiles();
+            Instance = this;
+
+            //SetTiles();
             //Invoke("SetTiles", 2f);
-            
+
+            if(!NullCheck.HasItComponent<PhotonView>(gameObject, "PhotonView"))
+            {
+                return;
+            }
+            else
+            {
+                photonview = PhotonView.Get(this);
+            }
+
+
         }
 
-        private void SetTiles()
+        public void SetTiles()
         {
             foreach (Vector3Int position in map.cellBounds.allPositionsWithin)
             {
+                // 아래 if 문으로 안감
+                // TODO_ERROR
                 if (map.HasTile(position))
                 {
                     List<GameObject> ch = new List<GameObject>();
 
                     ch = getInitialChar(map.CellToWorld(position));
                     if (ch.Count > 0)
-                        Debug.Log("at position: " + position);
+                    {
+                        //Debug.Log("at position: " + position);
+                    }
                     Characters.Add(position, ch);
-                    
+                    ///Debug.Log(position);
+
                     //CustomTile tile = map.GetTile(position) as CustomTile;
                     //tile.getTilePos();
                     //Debug.Log("normal/pos = "+position+", tilename = "+map.GetTile(position).name);
@@ -184,15 +203,15 @@ namespace KWY
             {
                 foreach (Collider2D k in objects)
                 {
-                    if (k.gameObject.name != "Tilemap" && k.gameObject.name != "HighlightTilemap")
+                    if (k.gameObject.CompareTag("Friendly") || k.gameObject.CompareTag("Enemy"))
                     {
                         ch.Add(k.gameObject);
-                        Debug.Log(k.gameObject.name);
+                        //Debug.Log(k.gameObject.name);
                         count++;
                     }
                     //Debug.Log(k.gameObject.name);
                 }
-                Debug.Log("캐릭터 수: " + count);
+                //Debug.Log("캐릭터 수: " + count);
                 if (count > 0)
                 {
                     //Debug.Log(gameObject.name);
@@ -213,8 +232,9 @@ namespace KWY
             //charCount += num;
             if (num > 0)
             {
-                Characters.TryGetValue(pos, out List < GameObject > charnum);
+                Characters.TryGetValue(pos, out List < GameObject > charnum); // false
                 charnum.Add(ch);
+                
                 Characters[pos] = charnum;
                 Debug.Log("added " + ch);
             }
@@ -226,7 +246,6 @@ namespace KWY
                 {
                     charnum.Remove(ch);
                     Characters[pos] = charnum;
-                    Debug.Log("deleted " + ch);
                 }
                 else
                     Debug.Log(ch + " not found");
@@ -237,6 +256,8 @@ namespace KWY
         {
             return Characters[pos];
         }
+
+
     }
 }
 

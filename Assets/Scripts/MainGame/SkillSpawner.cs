@@ -10,7 +10,7 @@ public class SkillSpawner : MonoBehaviour
 
     public void Activate(Vector2 basePos)
     {
-        clone.Add(Instantiate(target, new Vector3(basePos.x, basePos.y, 0), Quaternion.identity));
+        clone.Add(Instantiate(target, new Vector3(basePos.x, basePos.y + 0.1f, 0), Quaternion.identity));
     }
 
     public void Destroy(float time)
@@ -21,9 +21,12 @@ public class SkillSpawner : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Enemy")
+        if (collision.gameObject.CompareTag("Enemy"))
         {
-            collision.gameObject.GetComponent<Character>().DamageHP(5);
+            //collision.gameObject.GetComponent<Character>().DamageHP(30);
+            // -30 is temp value;
+            DataController.Instance.ModifyCharacterHp(
+                collision.gameObject.GetComponent<Character>().Pc.Id, -30);
         }
     }
 }

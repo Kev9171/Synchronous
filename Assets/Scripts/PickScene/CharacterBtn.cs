@@ -4,15 +4,34 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CharacterBtn : MonoBehaviour
-{
-    [SerializeField] private GameObject characterPrefab;
+using DebugUtil;
 
-    public GameObject CharacterPrefab
+namespace PickScene
+{
+    public class CharacterBtn : MonoBehaviour
     {
-        get
+        CID cid;
+
+        public void Init(Sprite icon, CID cid)
         {
-            return characterPrefab;
+            GetComponent<Image>().sprite = icon;
+            this.cid = cid;
+        }
+
+        private void Start()
+        {
+            gameObject.GetComponent<Button>().onClick.AddListener(OnClicked);
+        }
+
+        public void OnClicked()
+        {
+            GameObject pick = GameObject.Find("PickControl");
+            if (NullCheck.IsGameObjectNull(pick)) { return; }
+
+            if (!NullCheck.HasItComponent<PickControl>(pick, "PickControl")) { return; }
+
+            pick.GetComponent<PickControl>().OnCharaSelected(cid);
         }
     }
 }
+

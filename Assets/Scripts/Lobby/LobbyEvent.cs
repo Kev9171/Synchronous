@@ -10,7 +10,12 @@ using UnityEngine.UI;
 
 using TMPro;
 
-namespace KWY
+using DebugUtil;
+using KWY;
+
+using PhotonPlayer = Photon.Realtime.Player;
+
+namespace Lobby
 {
     public class LobbyEvent : MonoBehaviourPunCallbacks
     {
@@ -49,11 +54,11 @@ namespace KWY
 
             if (PhotonNetwork.RaiseEvent(evCode, content, raiseEventOptions, sendOptions))
             {
-                UtilForDebug.LogRaiseEvent(evCode, content, raiseEventOptions, sendOptions);
+                DebugLog.LogRaiseEvent(evCode, content, raiseEventOptions, sendOptions);
             }
             else
             {
-                UtilForDebug.LogErrorRaiseEvent(evCode);
+                DebugLog.FailedToRaiseEvent(evCode);
             }
         }
 
@@ -94,7 +99,6 @@ namespace KWY
                 // ready 상태 최신화에 대한 ok 사인을 받았으면
                 if ((bool)data[1])
                 {
-                    
                     gameLobby.SetReadyStatus((bool)data[2]);
                 }
                 else
@@ -156,7 +160,7 @@ namespace KWY
             PhotonNetwork.NetworkingClient.EventReceived -= OnEvent;
         }
 
-        public override void OnPlayerEnteredRoom(Player newPlayer)
+        public override void OnPlayerEnteredRoom(PhotonPlayer newPlayer)
         {
             Debug.Log("New player entered the room: " + newPlayer.NickName); ;
 
@@ -164,7 +168,7 @@ namespace KWY
             base.OnPlayerEnteredRoom(newPlayer);
         }
 
-        public override void OnPlayerLeftRoom(Player otherPlayer)
+        public override void OnPlayerLeftRoom(PhotonPlayer otherPlayer)
         {
             Debug.Log("New player left the room: " + otherPlayer.NickName); ;
 

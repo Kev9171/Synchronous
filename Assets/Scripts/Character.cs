@@ -1,88 +1,159 @@
 using Photon.Pun;
+using Photon.Realtime;
 using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+using DebugUtil;
+
 namespace KWY
 {
-    public class Character :MonoBehaviourPunCallbacks, IPunObservable 
+    public class Character : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback, IPunObservable, ISubject<Character>
     {
         [SerializeField]
         CharacterBase _characterBase;
 
+        private readonly List<IObserver<Character>> observers = new List<IObserver<Character>>();
+
+        public PlayableCharacter Pc
+        {
+            get;
+            private set;
+        } = null;
+
+        public List<IObserver<Character>> Observers
+        {
+            get;
+            private set;
+        } = new List<IObserver<Character>>();
+
+        public List<Buff> Buffs
+        {
+            get;
+            private set;
+        } = new List<Buff>();
         public CharacterBase Cb { get; private set; }
-        public List<Buff> Buffs { get; private set; }
-        public float Hp { get; private set; }
-        public float Mp { get; private set; }
+        public int Hp { get; private set; }
+        public int Mp { get; private set; }
+        public int MaxHp { get; private set; }
+        public int MaxMp { get; private set; }
         public bool BreakDown { get; private set; }
+        public int Atk { get; private set; }
+        public int Def { get; private set; }
+
+        public int TempMp { get; set; }
+
+
+        private SkillSpawner skillSpawner;
+
+        private RayTest ray;
+
+
         public Vector3Int TempTilePos { get; private set; }
-        public Vector3Int SelTilePos { get; private set; }
 
         public Vector3 worldPos { get; private set; }
 
-        public static readonly float MaxMp = 10;
-
-        [SerializeField] private float movementSpeed;
+        private readonly float movementSpeed = 0.5f;
         private Vector2 destination;
         public Vector3Int TilePos;
+        public int moveIdx { get; private set; }
 
-        private Tilemap map, hlMap;
+        private Tilemap map;
         private TilemapControl TCtrl;
 
         private bool nowMove = false;
 
-        private SkillSpawner skillSpawner;
-        [SerializeField] private RayTest ray;
-        public Character(CharacterBase cb)
+        public void SetData(PlayableCharacter pc)
         {
-            Cb = cb;
-            Buffs = new List<Buff>();
-            Hp = cb.hp;
-            Mp = 0;
-            BreakDown = false;
+            Pc = pc;
         }
 
-        public Character(CharacterBase cb, Vector3Int pos)
+        private void Init()
         {
-            Cb = cb;
-            Buffs = new List<Buff>();
-            Hp = cb.hp;
-            Mp = 0;
+            Cb = _characterBase;
+
+            Hp = Cb.hp;
+            Mp = 0; // TODO
+
             BreakDown = false;
-            TempTilePos = pos;
-            Debug.Log("position: "+pos);
+
+            MaxHp = Cb.hp;
+            MaxMp = 10;
+
+            Atk = Cb.atk;
+            Def = 1; // TODO
+
+            TempMp = Mp;
         }
 
-        public void DamageHP(float damage)
+        public void DamageHP(int damage)
         {
-            Hp -= damage;
-            if (Hp < 0) Hp = 0;
-
-            if (Hp == 0)
+            if (Hp - damage > 0)
             {
+                Hp -= damage;
+                Debug.LogFormat("{0} is damaged {1}; Now hp: {2}", Cb.name, damage, Hp);
+            }
+            else if (Hp - damage < 0)
+            {
+                Hp = 0;
                 BreakDown = true;
+                GetComponent<SpriteRenderer>().color = Color.red;
                 ClearBuff();
                 Debug.LogFormat("{0} is damaged {1}; Now hp: {2}; BREAK DOWN!", Cb.name, damage, Hp);
             }
-            else
-            {
-                Debug.LogFormat("{0} is damaged {1}; Now hp: {2}", Cb.name, damage, Hp);
-            }
+
+            NotifyObservers();
         }
 
-        public void AddMP(float amount)
+        public void AddMP(int amount)
         {
-            Mp += amount;
-            if (Mp > MaxMp) Mp = MaxMp;
+            if (Mp + amount > MaxMp)
+            {
+                Mp = MaxMp;
+            }
+            else if (Mp + amount < 0)
+            {
+                Mp = 0;
+            }
+            else
+            {
+                Mp += amount;
+            }
 
-            Debug.LogFormat("{0}'s mp is added {1}; Now mp: {2}", Cb.name, amount, Mp);
+            TempMp = Mp;
+
+            Debug.LogFormat($"[id={Pc.Id}]{Cb.name}'s mp is added {amount}; Now mp: {Mp}");
+
+            NotifyObservers();
+        }
+
+        public void AddHp(int amount)
+        {
+            if (Hp + amount > MaxMp)
+            {
+                Hp = MaxHp;
+            }
+            else if (Hp - amount < 0)
+            {
+                Hp = 0;
+            }
+            else
+            {
+                Hp += amount;
+            }
+
+            Debug.LogFormat("{0}'s hp is added {1}; Now hp: {2}", Cb.name, amount, Hp);
+
+            NotifyObservers();
         }
 
         public void AddBuff(BuffBase bb, int turn)
         {
             Buffs.Add(new Buff(bb, turn));
+
+            NotifyObservers();
         }
 
         public void ReduceBuffTurn(int turn)
@@ -96,12 +167,14 @@ namespace KWY
                     Debug.LogFormat("The buff {0} of {1} is removed", b.bb.name, Cb.name);
                 }
             }
+
+            NotifyObservers();
         }
 
         public void ClearBuff()
         {
             Buffs.Clear();
-            Debug.LogFormat("All buffs of {0} is removed", Cb.name);
+            NotifyObservers();
         }
 
         public void SetTilePos(Vector3Int pos)
@@ -109,10 +182,10 @@ namespace KWY
             TempTilePos = pos;
         }
 
-        public void ResetTempPos()
+        public void ResetTempPosAndMp()
         {
-            map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
-            TempTilePos = TilePos;
+            TempTilePos = map.WorldToCell(transform.position);
+            TempMp = Mp;
         }
 
         public override string ToString()
@@ -123,7 +196,14 @@ namespace KWY
                 t += b.ToString() + ", ";
             }
             t += "]";
-            return string.Format("CID: {0}, HP: {1}, MP: {2}, Down?: {3}, Buffs: {4}", Cb.cid, Hp, Mp, BreakDown, t);
+
+            string tt = "[";
+            foreach(IObserver<Character> o in observers)
+            {
+                tt += o.GetType().ToString();
+            }
+            tt += "]";
+            return string.Format("CID: {0}, HP: {1}, MP: {2}, Down?: {3}, Buffs: {4}, Observers: {5}", Cb.cid, Hp, Mp, BreakDown, t, tt);
         }
 
         #region IPunObservable implementation
@@ -161,11 +241,12 @@ namespace KWY
             Vector2Int realDir = TransFromY(dir);
             Vector3Int nowPos = TilePos;
             Vector3 des = map.CellToWorld(new Vector3Int(nowPos.x + realDir.x, nowPos.y + realDir.y, nowPos.z));
-            TilePos = map.WorldToCell(des);
-            des.y += 0.1f;
 
             if (map.HasTile(map.WorldToCell(des)))
             {
+                TilePos = map.WorldToCell(des);
+                des.y += 0.1f;
+
                 TCtrl.updateCharNum(map.WorldToCell(des), 1, gameObject);
                 TCtrl.updateCharNum(nowPos, -1, gameObject);
 
@@ -174,14 +255,16 @@ namespace KWY
 
                 worldPos = des;
                 destination = des;
-                //nowMove = true;
-                Debug.Log("nowpos = " + nowPos + ", despos = " + map.WorldToCell(des));
-                Debug.Log(gameObject.name + ": desNum->" + charsOnDes + ", curNum->" + charsOnCur);
 
-                if (map.CellToWorld(nowPos).x < des.x)
+
+                //nowMove = true;
+                //Debug.Log("nowpos = " + nowPos + ", despos = " + map.WorldToCell(des));
+                //Debug.Log(gameObject.name + ": desNum->" + charsOnDes + ", curNum->" + charsOnCur);
+
+                /*if (map.CellToWorld(nowPos).x < des.x)
                     gameObject.GetComponent<SpriteRenderer>().flipX = false;
                 else if(map.CellToWorld(nowPos).x > des.x)
-                    gameObject.GetComponent<SpriteRenderer>().flipX = true;
+                    gameObject.GetComponent<SpriteRenderer>().flipX = true;*/
 
                 if (charsOnDes > 1)
                 {
@@ -218,7 +301,7 @@ namespace KWY
                     nowMove = true;
                     gameObject.GetComponent<BoxCollider2D>().offset = Vector2.zero;
 
-                    Debug.Log("noone on tile");
+                    //Debug.Log("noone on tile");
                 }
 
                 if (charsOnCur > 1)
@@ -282,20 +365,145 @@ namespace KWY
             }
         }
 
-        public void SpellSkill(SID sid, SkillDicection direction)
+        [PunRPC]
+        public void Teleport(int x, int y)
+        {
+            Vector3Int vec = new Vector3Int(x, y, 0);
+
+            if (map.HasTile(vec))
+            {
+                Vector3Int nowPos = TilePos;
+                TilePos = vec;
+                Vector3 newPos = map.CellToWorld(vec);
+                newPos.y += 0.1f;
+                transform.position = newPos;
+
+                TCtrl.updateCharNum(vec, 1, gameObject);
+                TCtrl.updateCharNum(nowPos, -1, gameObject);
+
+                int charsOnDes = TCtrl.getCharList(vec).Count;
+                int charsOnCur = TCtrl.getCharList(nowPos).Count;
+
+                worldPos = newPos;
+
+
+
+                //if (map.CellToWorld(nowPos).x < des.x)
+                //    gameObject.GetComponent<SpriteRenderer>().flipX = false;
+                //else if (map.CellToWorld(nowPos).x > des.x)
+                //    gameObject.GetComponent<SpriteRenderer>().flipX = true;
+
+                if (charsOnDes > 1)
+                {
+                    map.SetTileFlags(vec, TileFlags.None);
+                    map.SetColor(vec, new Color(1, 1, 1, 0));
+
+                    Sprite sprite = map.GetTile<CustomTile>(vec).sprite;
+                    TCtrl.activateAltTile(worldPos, charsOnDes, sprite);
+
+                    List<GameObject> characters = TCtrl.getCharList(vec);
+
+                    int count = 0;
+
+                    foreach (GameObject chara in characters)
+                    {
+                        Vector2 offset = TCtrl.nList[charsOnDes - 1].coordList[count];
+                        chara.GetComponent<Character>().destination = (Vector2)chara.GetComponent<Character>().worldPos + offset;
+                        chara.GetComponent<Character>().nowMove = true;
+                        //chara.GetComponent<BoxCollider2D>().offset = -offset;
+                        count++;
+                    }
+                }
+                else
+                {
+                    //nowMove = true;
+                    gameObject.GetComponent<BoxCollider2D>().offset = Vector2.zero;
+
+                    Debug.Log("noone on tile");
+                }
+
+                if (charsOnCur > 1)
+                {
+                    Sprite sprite = map.GetTile<CustomTile>(nowPos).sprite;
+                    Vector3 v = map.CellToWorld(nowPos);
+                    v.y += 0.1f;
+                    TCtrl.activateAltTile(vec, charsOnCur, sprite);
+
+                    List<GameObject> characters = TCtrl.getCharList(nowPos);
+
+                    int count = 0;
+                    //destination = worldPos;
+                    foreach (GameObject chara in characters)
+                    {
+                        Vector3 charpos = chara.transform.position;
+                        Vector2 offset = TCtrl.nList[charsOnCur - 1].coordList[count];
+                        chara.GetComponent<Character>().destination = (Vector2)chara.GetComponent<Character>().worldPos + offset;
+                        chara.GetComponent<Character>().nowMove = true;
+                        //chara.GetComponent<BoxCollider2D>().offset = -offset;
+
+                        count++;
+                    }
+                }
+
+                else if (charsOnCur == 1)
+                {
+                    map.SetTileFlags(nowPos, TileFlags.None);
+                    map.SetColor(nowPos, new Color(1, 1, 1, 1));
+
+                    TCtrl.deactivateAltTile(map.CellToWorld(nowPos));
+
+                    List<GameObject> characters = TCtrl.getCharList(nowPos);
+                    characters[0].GetComponent<Character>().destination = map.CellToWorld(nowPos);
+                    characters[0].GetComponent<Character>().nowMove = true;
+                    characters[0].GetComponent<BoxCollider2D>().offset = Vector2.zero;
+                    GetComponent<BoxCollider2D>().offset = Vector2.zero;
+
+                }
+
+                Debug.LogFormat("{0} / {1} teleported to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, vec);
+            }
+            else
+            {
+                Debug.LogFormat("{0} / {1} can not go to {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, vec);
+            }
+        }
+
+        public void SetMoveIdx(int value)
+        {
+            if (value != 0)
+            {
+                moveIdx += value;
+            }
+            else
+            {
+                moveIdx = 0;
+            }
+        }
+
+        public void SpellSkill(SID sid, SkillDicection direction, int x, int y)
         {
             nowMove = false;
             SkillBase SelSkill = SkillManager.GetData(sid);
+
+            DataController.Instance.ModifyCharacterMp(Pc.Id, -SelSkill.cost);
+
             if (SelSkill.areaAttack)
             {
+                Vector3 v = map.CellToWorld(new Vector3Int(x, y, 0));
                 skillSpawner = SelSkill.area;
-                Vector3Int v = new Vector3Int(SelTilePos.x, SelTilePos.y, 0);
-                skillSpawner.Activate(map.CellToWorld(v));
+                skillSpawner.Activate(new Vector2(v.x, v.y));
                 skillSpawner.Destroy(SkillManager.GetData(sid).triggerTime);   // triggerTime만큼 스킬 지속후 삭제
             }
             else
             {
-                ray.CurvedMultipleRay(map.CellToWorld(TempTilePos), SelSkill, SelSkill.directions, true, SelSkill.directions.Count);
+                if (direction == SkillDicection.Right)
+                {
+                    ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, true, SelSkill.directions.Count);
+                }
+                else
+                {
+                    ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, false, SelSkill.directions.Count);
+                }
             }
             Debug.LogFormat("{0} / {1} spells {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, sid);
         }
@@ -306,31 +514,44 @@ namespace KWY
         #region MonoBehaviour CallBacks
         private void Awake()
         {
-            Cb = _characterBase;
-            Buffs = new List<Buff>();
+            Init();
+
 
             map = GameObject.FindGameObjectWithTag("Map").GetComponent<Tilemap>();
-            //Debug.Log(map.name + " found.");
-            hlMap = GameObject.Find("HighlightTilemap").GetComponent<Tilemap>();
-            //Debug.Log(hlMap.name + " found.");
             TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
 
             TilePos = map.WorldToCell(transform.position);
-            //map.GetTile<CustomTile>(map.WorldToCell(transform.position)).updateCharNum(1, gameObject);
-            //map.GetTile<CustomTile>(map.WorldToCell(transform.position)).getTilePos();
-
-            Hp = Cb.hp;
-            Mp = 0;
-            BreakDown = false;
-
-            Debug.Log(this+"'s pos = "+map.WorldToCell(transform.position));
+            SetMoveIdx(0);
         }
+
+        private void Start()
+        {
+            GameObject o = GameObject.Find("RayTest");
+
+            if (!o)
+            {
+                Debug.LogError("Can not find GameObject named RayTest");
+            }
+
+            ray = o.GetComponent<RayTest>();
+
+            if (!ray)
+            {
+                Debug.LogError("Can not find component, RayTest at RayTest");
+            }
+        }
+
 
         void Update()
         {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                return;
+            }
+
             if (nowMove)
             {
-                transform.position = Vector3.Lerp(gameObject.transform.position, destination, 0.7f);
+                transform.position = Vector3.Lerp(gameObject.transform.position, destination, movementSpeed);
                 if (transform.position == new Vector3(destination.x, destination.y, 0))
                     nowMove = false;
             }
@@ -339,8 +560,55 @@ namespace KWY
                 
             }
         }
+
+
+
         #endregion
 
+        #region IObserver Methods
 
+        public void AddObserver(IObserver<Character> o)
+        {
+            if (observers.IndexOf(o) < 0)
+            {
+                observers.Add(o);
+            }
+            else
+            {
+                Debug.LogWarning($"The observer already exists in list: {o}");
+            }
+        }
+
+        public void RemoveObserver(IObserver<Character> o)
+        {
+            int idx = observers.IndexOf(o);
+            if (idx >= 0)
+            {
+                observers.RemoveAt(idx); // O(n)
+            }
+            else
+            {
+                Debug.LogError($"Can not remove the observer; It does not exist in list: {o}");
+            }
+        }
+
+        public void NotifyObservers()
+        {
+            foreach (IObserver<Character> o in observers)
+            {
+                o.OnNotify(this);
+            }
+        }
+
+        public void RemoveAllObservers()
+        {
+            observers.Clear();
+        }
+
+        #endregion
+
+        public void OnPhotonInstantiate(PhotonMessageInfo info)
+        {
+        }
     }
 }

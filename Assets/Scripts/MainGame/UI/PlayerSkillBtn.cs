@@ -4,6 +4,8 @@ using UnityEngine.UI;
 using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
 
+using UI;
+
 namespace KWY
 {
     [RequireComponent(typeof(CanvasRenderer))]
@@ -18,9 +20,8 @@ namespace KWY
         PlayerSkillBase psb;
 
         Character SelChara;
-        Tilemap map;
         MouseInput mouseInput;
-        CharacterControl chCtrl;
+
 
         [Tooltip("Info 띄우는데 필요한 최소 클릭 시간; move 일 경우 없음")]
         public float minClickTime = 1;
@@ -55,48 +56,32 @@ namespace KWY
 
         public void OnClickUseSkill()
         {
-            MainGameData data = GameObject.Find("GameData").GetComponent<MainGameData>();
-
-            if (data.PlayerMp >= psb.cost)
+            if (MainGameData.Instance.MyPlayer.Mp >= psb.cost)
             {
                 mouseInput.Mouse.MouseClick.performed += OnClick;
-                GameManager gm = GameObject.Find("GameManager").GetComponent<GameManager>();
-                gm.UpdatePlayerMP(-psb.cost);
-
                 Debug.Log("스킬 발동");
             }
-            else 
+            else
             {
                 Debug.Log("마나 부족");
+                GameObject canvas = GameObject.Find("UICanvas");
+                PanelBuilder.ShowFadeOutText(canvas.transform, "Not enough Mp to use this skill!");
             }
         }
 
         public void Skill1(InputAction.CallbackContext context)
         {
-            map = GameObject.Find("Tilemap").GetComponent<Tilemap>();
-            chCtrl = GameObject.Find("CharacterControl").GetComponent<CharacterControl>();
-            mouseInput.Mouse.MouseClick.performed += chCtrl.OnClick;
-
-            if (chCtrl.SelChara == null) return;
-
             Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
 
-            // 바로 WorldToCell 함수에 집어넣지 말것! (???)
-            mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
-
-            // 사용 x
-            // Vector3Int clickV = map.WorldToCell(mouseInput.Mouse.MouseClick.performed += OnClickMoveDirection;);
-
-            // 클릭 된 좌표 맵 좌표로 변환
-            Vector3Int clickV = map.WorldToCell(mousePosition);
-
-            if (map.HasTile(clickV))
+            if (MainGameData.Instance.MyPlayer.Skill1(SelChara, mousePosition))
             {
-                SelChara.TilePos = clickV;
-                Vector3 newPos = map.CellToWorld(clickV);
-                newPos.y += 0.1f;
-                SelChara.transform.position = newPos;
                 mouseInput.Mouse.MouseClick.performed -= Skill1;
+                MainGameData.Instance.MyPlayer.SubMp(psb.cost);
+                Debug.Log($"마나 소모: {psb.cost}");
+            }
+            else
+            {
+                Debug.Log("??");
             }
         }
 
@@ -108,12 +93,20 @@ namespace KWY
 
             if (hit.collider != null)
             {
-                //CID cid = hit.collider.gameObject.GetComponent<Character>().Cb.cid;
-                //chCtrl.SetSelChara(cid);
                 SelChara = hit.collider.gameObject.GetComponent<Character>();
+
+                // 자신의 캐릭터만 선택 되도록
+                if (!MainGameData.Instance.IsMyCharacter[SelChara.Pc.Id])
+                {
+                    Debug.Log("Selected Chara is not mine");
+                    return;
+                }
+
                 mouseInput.Mouse.MouseClick.performed -= OnClick;
                 mouseInput.Mouse.MouseClick.performed += Skill1;
             }
+            else
+                Debug.Log("no char");
         }
 
 
@@ -138,6 +131,7 @@ namespace KWY
         }
 
         #region MonoBehaviour CallBacks
+
         private void Update()
         {
             if (isClick)

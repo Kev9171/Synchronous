@@ -10,7 +10,12 @@ using TMPro;
 using Photon.Pun;
 using Photon.Realtime;
 
-namespace KWY
+using PhotonPlayer = Photon.Realtime.Player;
+
+using DebugUtil;
+using KWY;
+
+namespace Lobby
 {
     public class GameLobby : MonoBehaviour
     {
@@ -53,10 +58,13 @@ namespace KWY
         [SerializeField]
         Timer TimerObject;
 
-        readonly private string nextLevel = "PickScene"; // MainGameScene
+        readonly private string nextLevel = "PickScene";
+        //readonly private string nextLevel = "MainGameScene";
         readonly private string previousLevel = "StartScene";
 
         float timeLimit;
+
+        SLobbyData lobbyData;
 
         public bool myReady { get; set; } = false;
         public bool otherReady { get; set; } = false;
@@ -96,7 +104,7 @@ namespace KWY
         // 플레이어에 custom property로 icon 가져올 수 있도록? -> 로그인 서버에서 처리?
         // 일단 null 값
 
-        public void SetEnteredPlayer(Player player)
+        public void SetEnteredPlayer(PhotonPlayer player)
         {
             RightUserPanel.GetComponent<UserProfilePanel>().SetData(null, player.NickName);
             RightUserPanel.SetActive(true);
@@ -130,6 +138,7 @@ namespace KWY
 
         private void TimeOut()
         {
+            // Debug.Log(PhotonNetwork.AutomaticallySyncScene); // true
             // 게임 시작
             if (PhotonNetwork.IsMasterClient)
             {
@@ -143,6 +152,12 @@ namespace KWY
 
         public void OnReadyBtnClicked()
         {
+            // 상대 플레이어 입장 안했을 경우 레디 x
+            if (PhotonNetwork.CurrentRoom.PlayerCount != 2)
+            {
+                return;
+            }
+
             lobbyEvent.RaiseEventReady(true);
         }
 
@@ -181,12 +196,19 @@ namespace KWY
 
         private void Start()
         {
+            lobbyData = Resources.Load<SLobbyData>("Lobby/OLobbyData");
+
+            if (!lobbyData)
+            {
+                Debug.LogError("Can not find lobbyData");
+            }
+
             LeftUserPanel.GetComponent<UserProfilePanel>().LoadNowUser();
 
             // join 한 경우 이미 들어와있는 플레이어 정보 로드
             if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
             {
-                foreach (Player p in PhotonNetwork.CurrentRoom.Players.Values)
+                foreach (PhotonPlayer p in PhotonNetwork.CurrentRoom.Players.Values)
                 {
                     if (p.UserId != PhotonNetwork.AuthValues.UserId)
                     {
@@ -195,7 +217,8 @@ namespace KWY
                 }
             }
 
-            this.timeLimit = MasterManager.GameSettings.GameLobbyTimerTime;
+            //this.timeLimit = MasterManager.GameSettings.GameLobbyTimerTime;
+            timeLimit = lobbyData.startCountDownSeconds;
 
             TimerObject.InitTimer(timeLimit, TimeOut, CountDownText);
 
