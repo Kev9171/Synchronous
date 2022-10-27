@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Photon.Pun;
 using Unity.Mathematics;
 
 namespace KWY
@@ -13,7 +14,7 @@ namespace KWY
         [SerializeField]
         Tilemap map;
 
-        public LayerMask layerMask;
+        private int layerMask;
         RaycastHit2D[] hits;
         private List<Vector2> correction = new List<Vector2>();
         private List<Vector2> direction = new List<Vector2>();
@@ -83,7 +84,7 @@ namespace KWY
             }
         }
 
-        public void CurvedRay(Vector2 basePos, SkillBase sb, List<Direction> dir, int num, bool reversed)
+        public void CurvedRay(Vector2 basePos, SkillBase sb, List<Direction> dir, int num, bool reversed, bool team)
         {
             Vector2 bp;
             Vector2 dp;
@@ -127,6 +128,16 @@ namespace KWY
             //}
 
 
+            if (!team)
+            {
+                layerMask = 1 << 7 | 1 << 8;
+            }
+            else
+            {
+                layerMask = 1 << 6 | 1 << 8;
+            }
+
+
             hits = Physics2D.RaycastAll(bp, dp, d, layerMask);
             Debug.Log("hits : " + hits.Length);
             for (int i = 0; i < hits.Length; i++)
@@ -140,6 +151,7 @@ namespace KWY
                     {
                         DataController.Instance.ModifyCharacterHp(
                             hit.transform.GetComponent<Character>().Pc.Id, -sb.value);
+                        Debug.Log("hit!");
                         //hit.transform.GetComponent<Character>().DamageHP(sb.value);
                     }
                 }
@@ -165,7 +177,7 @@ namespace KWY
             lastPos = lastPos + dp * d;
         }
 
-        public void CurvedMultipleRay(Vector2 basePos, SkillBase sb, List<Direction> dir, bool reversed, int rays)
+        public void CurvedMultipleRay(Vector2 basePos, SkillBase sb, List<Direction> dir, bool reversed, bool team, int rays)
         {
             //if (reversed)
             //{
@@ -183,9 +195,19 @@ namespace KWY
             //    }
             //}
 
-            for (int i = 0; i < rays; i++)
+            if(!team)
             {
-                CurvedRay(basePos, sb, dir, i, reversed);
+                for (int i = 0; i < rays; i++)
+                {
+                    CurvedRay(basePos, sb, dir, i, false, reversed);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < rays; i++)
+                {
+                    CurvedRay(basePos, sb, dir, i, true, reversed);
+                }
             }
         }
 
