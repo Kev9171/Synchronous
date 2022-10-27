@@ -13,7 +13,7 @@ namespace KWY
         [SerializeField]
         Tilemap map;
 
-        private int layerMask = (1 << 6) | (1 << 8);
+        public LayerMask layerMask;
         RaycastHit2D[] hits;
         private List<Vector2> correction = new List<Vector2>();
         private List<Vector2> direction = new List<Vector2>();
@@ -128,6 +128,7 @@ namespace KWY
 
 
             hits = Physics2D.RaycastAll(bp, dp, d, layerMask);
+            Debug.Log("hits : " + hits.Length);
             for (int i = 0; i < hits.Length; i++)
             {
                 RaycastHit2D hit = hits[i];

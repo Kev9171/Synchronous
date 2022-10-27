@@ -7212,6 +7212,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tilemapcontrol: {fileID: 391674104}
   map: {fileID: 461010248}
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 320
 --- !u!224 &1695663022
 RectTransform:
   m_ObjectHideFlags: 0

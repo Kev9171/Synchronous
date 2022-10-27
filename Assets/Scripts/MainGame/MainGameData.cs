@@ -254,6 +254,7 @@ namespace KWY
                     _notBreakDownTeamA++;
 
                     chara.tag = "Friendly";
+                    chara.layer = 7;
                 }
                 else
                 {
@@ -262,6 +263,7 @@ namespace KWY
                     _notBreakDownTeamB++;
 
                     chara.tag = "Enemy";
+                    chara.layer = 6;
                 }
 
                 photonView.RPC(
@@ -439,6 +441,7 @@ namespace KWY
                 _isMyCharacter.Add(id, false);
 
                 chara.tag = "Enemy";
+                chara.layer = 6;
             }
             // other client
             else
@@ -449,6 +452,7 @@ namespace KWY
                 _isMyCharacter.Add(id, true);
 
                 chara.tag = "Friendly";
+                chara.layer = 7;
 
                 if (NullCheck.HasItComponent(pc.CharaObject, "SpriteRenderer", out SpriteRenderer component))
                 {
