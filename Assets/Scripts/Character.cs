@@ -201,6 +201,14 @@ namespace KWY
         {
             TempTilePos = pos;
         }
+        [PunRPC]
+        private void SetTilePosRPC(int x, int y)
+        {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                TilePos = new Vector3Int(x, y, 0);
+            }
+        }
 
         public void ResetTempPosAndMp()
         {
@@ -428,6 +436,7 @@ namespace KWY
             {
                 Vector3Int nowPos = TilePos;
                 TilePos = vec;
+                photonView.RPC("SetTilePosRPC", RpcTarget.Others, vec.x, vec.y);
                 Vector3 newPos = map.CellToWorld(vec);
                 newPos.y += 0.1f;
                 transform.position = newPos;
