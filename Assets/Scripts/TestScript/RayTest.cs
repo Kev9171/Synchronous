@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Photon.Pun;
+using DebugUtil;
+
 using Unity.Mathematics;
 
 namespace KWY
@@ -13,7 +16,7 @@ namespace KWY
         [SerializeField]
         Tilemap map;
 
-        private int layerMask = (1 << 6) | (1 << 8);
+        private int layerMask;
         RaycastHit2D[] hits;
         private List<Vector2> correction = new List<Vector2>();
         private List<Vector2> direction = new List<Vector2>();
@@ -83,7 +86,7 @@ namespace KWY
             }
         }
 
-        public void CurvedRay(Vector2 basePos, SkillBase sb, List<Direction> dir, int num, bool reversed)
+        public void CurvedRay(Vector2 basePos, SkillBase sb, List<Direction> dir, int num, bool reversed, bool team)
         {
             Vector2 bp;
             Vector2 dp;
@@ -126,19 +129,46 @@ namespace KWY
             //    Debug.Log(hit.transform.name);
             //}
 
+            int l;
+
+            if (!team)
+            {
+                layerMask = 1 << 6 | 1 << 8;
+                l = 6;
+
+            }
+            else
+            {
+                layerMask = 1 << 7 | 1 << 8;
+                l = 7;
+            }
+
 
             hits = Physics2D.RaycastAll(bp, dp, d, layerMask);
+            Debug.Log("hits : " + hits.Length);
             for (int i = 0; i < hits.Length; i++)
             {
                 RaycastHit2D hit = hits[i];
-                hit.transform.GetComponent<SpriteRenderer>().color = Color.red;
 
-                if (hit.transform.gameObject.layer == 6)
+                
+                if (hit.transform.gameObject.layer == l)
                 {
                     if (sb.isDamage)
                     {
                         DataController.Instance.ModifyCharacterHp(
                             hit.transform.GetComponent<Character>().Pc.Id, -sb.value);
+                        Debug.Log("hit!");
+
+                        GameObject o = PhotonNetwork.Instantiate(
+                    SpawnableSkillResources.GetPath(sb.sid),
+                    new Vector3(hit.transform.position.x, hit.transform.position.y + 0.1f, 0),
+                    Quaternion.identity);
+
+                        if (!NullCheck.HasItComponent<SkillSpawner>(o, "SkillSpawner"))
+                        {
+                            // error
+                            return;
+                        }
                         //hit.transform.GetComponent<Character>().DamageHP(sb.value);
                     }
                 }
@@ -155,6 +185,17 @@ namespace KWY
                                 DataController.Instance.ModifyCharacterHp(
                                     hit.transform.GetComponent<Character>().Pc.Id,
                                     -sb.value);
+
+                                GameObject o = PhotonNetwork.Instantiate(
+                    SpawnableSkillResources.GetPath(sb.sid),
+                    new Vector3(hit.transform.position.x, hit.transform.position.y + 0.1f, 0),
+                    Quaternion.identity);
+
+                                if (!NullCheck.HasItComponent<SkillSpawner>(o, "SkillSpawner"))
+                                {
+                                    // error
+                                    return;
+                                }
                                 //hit.transform.GetComponent<Character>().DamageHP(sb.value);
                             }
                         }
@@ -162,9 +203,11 @@ namespace KWY
                 }
             }
             lastPos = lastPos + dp * d;
+
+            
         }
 
-        public void CurvedMultipleRay(Vector2 basePos, SkillBase sb, List<Direction> dir, bool reversed, int rays)
+        public void CurvedMultipleRay(Vector2 basePos, SkillBase sb, List<Direction> dir, bool reversed, bool team, int rays)
         {
             //if (reversed)
             //{
@@ -182,9 +225,19 @@ namespace KWY
             //    }
             //}
 
-            for (int i = 0; i < rays; i++)
+            if(!team)
             {
-                CurvedRay(basePos, sb, dir, i, reversed);
+                for (int i = 0; i < rays; i++)
+                {
+                    CurvedRay(basePos, sb, dir, i, reversed, team);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < rays; i++)
+                {
+                    CurvedRay(basePos, sb, dir, i, reversed, team);
+                }
             }
         }
 

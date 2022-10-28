@@ -34,6 +34,6 @@ MonoBehaviour:
   directions: 
   areaAttack: 1
   area: {fileID: 2418642603031395723, guid: 45561ae525c97fe46be6fd8d1230a562, type: 3}
-  isDamage: 0
+  isDamage: 1
   value: 0
   dmgMultiplicand: 1.5

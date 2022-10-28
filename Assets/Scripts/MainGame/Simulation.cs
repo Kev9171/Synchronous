@@ -192,10 +192,10 @@ namespace KWY
             yield return null;
         }
 
-        IEnumerator DoCharaSkill(int cid, SID sid, SkillDicection dir, Vector2Int v)
+        IEnumerator DoCharaSkill(int id, SID sid, SkillDicection dir, Vector2Int v)
         {
-            data.PCharacters[cid].Chara.SpellSkill(sid, dir, v.x, v.y);
-            showActions.ShowSkillLog(cid, sid);
+            data.PCharacters[id].Chara.SpellSkill(sid, dir, v.x, v.y);
+            showActions.ShowSkillLog(id, sid);
             yield return null;
         }
 

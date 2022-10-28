@@ -306,10 +306,10 @@ namespace KWY
             Ray ray = Camera.main.ScreenPointToRay(mousePosition);
             RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
 
-            if (hit.collider != null)
+            if (hit.collider != null && hit.collider.gameObject.TryGetComponent<Character>(out var ch))
             {
-                Character c = hit.collider.gameObject.GetComponent<Character>();
-                SetSelChara(c);
+                //Character c = hit.collider.gameObject.GetComponent<Character>();
+                SetSelChara(ch);
             }
         }
 

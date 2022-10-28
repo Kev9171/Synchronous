@@ -90,7 +90,7 @@ namespace KWY
                 {
                     if (PhotonNetwork.IsMasterClient)
                     {
-                        GameManager.Instance.Simulation.ChangeAction((int)selChara.Cb.cid, clickV.y);
+                        GameManager.Instance.Simulation.ChangeAction(selChara.Pc.Id, clickV.y);
                     }
                 }
                 //selChara.Teleport(clickV);

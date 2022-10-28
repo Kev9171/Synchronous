@@ -53,6 +53,9 @@ namespace KWY
             }
         }
 
+        [SerializeField]
+        GameObject characterEmptyObject;
+
         [Tooltip("Pre-set Possible-to-use Playerskills")]
         [SerializeField]
         private List<PSID> _playerSkillList;
@@ -192,18 +195,6 @@ namespace KWY
             {
                 return;
             }
-
-            /*List<CharaDataForPick> tList = new List<CharaDataForPick>
-            {
-                new CharaDataForPick(CID.Flappy, -3, 0, Team.A),
-                new CharaDataForPick(CID.Flappy2, -3, 1, Team.A),
-                new CharaDataForPick(CID.Knight, -3, 2, Team.A),
-
-                new CharaDataForPick(CID.Flappy, 5, 0, Team.B),
-                new CharaDataForPick(CID.Flappy2, 5, 1, Team.B),
-                new CharaDataForPick(CID.Knight, 5, 2, Team.B),
-            };*/
-
             // get data from pickdata
 
             Debug.Log(PickData.Instance);
@@ -243,6 +234,8 @@ namespace KWY
                 _pCharacters.Add(id, pc);
                 chara.GetComponent<Character>().SetData(pc);
 
+                chara.transform.SetParent(characterEmptyObject.transform);
+
                 // 팀에 맞게 리스트에 추가
                 if (d.team == Team.A)
                 {
@@ -261,6 +254,7 @@ namespace KWY
                     _notBreakDownTeamA++;
 
                     chara.tag = "Friendly";
+                    chara.layer = 7;
                 }
                 else
                 {
@@ -269,6 +263,7 @@ namespace KWY
                     _notBreakDownTeamB++;
 
                     chara.tag = "Enemy";
+                    chara.layer = 6;
                 }
 
                 photonView.RPC(
@@ -437,6 +432,8 @@ namespace KWY
             _pCharacters.Add(id, pc);
             chara.GetComponent<Character>().SetData(pc);
 
+            chara.transform.SetParent(characterEmptyObject.transform);
+
             // Master Client
             if (_team == Team.A)
             {
@@ -444,6 +441,7 @@ namespace KWY
                 _isMyCharacter.Add(id, false);
 
                 chara.tag = "Enemy";
+                chara.layer = 6;
             }
             // other client
             else
@@ -454,6 +452,7 @@ namespace KWY
                 _isMyCharacter.Add(id, true);
 
                 chara.tag = "Friendly";
+                chara.layer = 7;
 
                 if (NullCheck.HasItComponent(pc.CharaObject, "SpriteRenderer", out SpriteRenderer component))
                 {
