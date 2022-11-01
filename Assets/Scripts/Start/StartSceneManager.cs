@@ -1,3 +1,5 @@
+#define TEST
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -144,6 +146,9 @@ namespace KWY
         {
             if (!PhotonNetwork.IsConnected)
             {
+#if TEST
+                ;
+#endif
                 // connect photon and 로비 진입
                 connectPhoton.ConnectPhotonServer();
             }
@@ -162,12 +167,12 @@ namespace KWY
 
         public void OnBtnPointerEnter(Button btn)
         {
-            btn.GetComponent<RectTransform>().localScale = new Vector3(1.05f, 1.05f, 1.05f);
+            //btn.GetComponent<RectTransform>().localScale = new Vector3(1.05f, 1.05f, 1.05f);
         }
 
         public void OnBtnPointerExit(Button btn)
         {
-            btn.GetComponent<RectTransform>().localScale = new Vector3(1.0f, 1.0f, 1.0f);
+            //btn.GetComponent<RectTransform>().localScale = new Vector3(1.0f, 1.0f, 1.0f);
         }
 
         #endregion
@@ -177,13 +182,13 @@ namespace KWY
     {
         public override void OnPointerEnter(PointerEventData eventData)
         {
-            gameObject.GetComponent<RectTransform>().localScale = new Vector3(1.05f, 1.05f, 1.05f);
-            base.OnPointerEnter(eventData);
+            //gameObject.GetComponent<RectTransform>().localScale = new Vector3(1.05f, 1.05f, 1.05f);
+            //base.OnPointerEnter(eventData);
         }
         public override void OnPointerExit(PointerEventData eventData)
         {
-            gameObject.GetComponent<RectTransform>().localScale = new Vector3(1.0f, 1.0f, 1.0f);
-            base.OnPointerExit(eventData);
+            //gameObject.GetComponent<RectTransform>().localScale = new Vector3(1.0f, 1.0f, 1.0f);
+            //base.OnPointerExit(eventData);
         }
     }
 }
