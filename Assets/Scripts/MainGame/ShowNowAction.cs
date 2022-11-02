@@ -36,7 +36,7 @@ namespace KWY
 
             if (PhotonNetwork.IsMasterClient)
             {
-                StartCoroutine(ShowActionLog(icon, name, data.IsMyCharacter[id], duration));
+                StartCoroutine(ShowActionLog(icon, name, data.IsMyCharacter[id], duration, ActionType.Move));
             }
             else
             {
@@ -54,7 +54,7 @@ namespace KWY
 
             if (PhotonNetwork.IsMasterClient)
             {
-                StartCoroutine(ShowActionLog(icon, name, data.IsMyCharacter[id], duration));
+                StartCoroutine(ShowActionLog(icon, name, data.IsMyCharacter[id], duration, ActionType.Skill));
             }
             else
             {
@@ -71,7 +71,7 @@ namespace KWY
 
             if (!PhotonNetwork.IsMasterClient)
             {
-                StartCoroutine(ShowActionLog(icon, name, !data.IsMyCharacter[id], duration));
+                StartCoroutine(ShowActionLog(icon, name, !data.IsMyCharacter[id], duration, ActionType.Move));
             }
             else
             {
@@ -88,7 +88,7 @@ namespace KWY
 
             if (!PhotonNetwork.IsMasterClient)
             {
-                StartCoroutine(ShowActionLog(icon, name, !data.IsMyCharacter[id], duration));
+                StartCoroutine(ShowActionLog(icon, name, !data.IsMyCharacter[id], duration, ActionType.Skill));
             }
             else
             {
@@ -96,19 +96,19 @@ namespace KWY
             }
         }
 
-        IEnumerator ShowActionLog(Sprite icon, string name, bool left, float duration)
+        IEnumerator ShowActionLog(Sprite icon, string name, bool left, float duration, ActionType type)
         {
             if (left)
             {
                 Instantiate(leftActionPiecePrefab, leftSkillLinePanel.transform)
                     .GetComponent<ActionPiece>()
-                    .SetDataAndStart(icon, name, duration);
+                    .SetDataAndStart(icon, name, duration, type);
             }
             else
             {
                 Instantiate(rightActionPiecePrefab, rightSkillLinePanel.transform)
                     .GetComponent<ActionPiece>()
-                    .SetDataAndStart(icon, name, duration);
+                    .SetDataAndStart(icon, name, duration, type);
             }
 
             yield return null;
