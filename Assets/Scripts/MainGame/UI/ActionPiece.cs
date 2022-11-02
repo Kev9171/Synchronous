@@ -10,16 +10,31 @@ namespace KWY
     public class ActionPiece : MonoBehaviour
     {
         [SerializeField]
+        Image blockImage;
+        [SerializeField]
         Image charaIcon;
         [SerializeField]
         TMP_Text skillNameLabel;
+
         [SerializeField]
-        SLogicData logicData;
+        Sprite moveSprite;
+
+        [SerializeField]
+        Sprite skillSprite;
 
         private float activeDuration;
 
-        public void SetDataAndStart(Sprite icon, string skillName, float duration)
+        public void SetDataAndStart(Sprite icon, string skillName, float duration, ActionType type)
         {
+            if (type == ActionType.Move)
+            {
+                blockImage.sprite = moveSprite;
+            }
+            else
+            {
+                blockImage.sprite = skillSprite;
+            }
+
             charaIcon.sprite = icon;
             skillNameLabel.text = skillName;
             activeDuration = duration;

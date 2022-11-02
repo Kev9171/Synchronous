@@ -30,9 +30,9 @@ namespace KWY
         #region Private Fields
         [Tooltip("Game data about player and characters")]
         [SerializeField]
-        private MainGameData data;
+        public MainGameData data;
 
-        private ActionData actionData = null;
+        public ActionData actionData = null;
         private int maxTimeLine;
         private int finActions;
         private float simulationIntervalSeconds;
@@ -58,12 +58,22 @@ namespace KWY
         {
             characterPanel.anchoredPosition = new Vector2(250, 0);
 
+            foreach (PlayableCharacter p in data.PCharacters.Values)
+            {
+                p.Chara.ResetTempPosAndMp();
+            }
+
             simulCanvas.SetActive(true);
         }
 
 
         public void StartSimulationState(ActionData actionData)
         {
+            foreach (PlayableCharacter p in data.PCharacters.Values)
+            {
+                p.Chara.ResetTempPosAndMp();
+            }
+
             this.actionData = actionData;
 
             characterPanel.anchoredPosition = new Vector2(250, 0);
@@ -104,10 +114,6 @@ namespace KWY
             foreach (int t in actionData.Data.Keys)
             {
                 maxTimeLine = (t > maxTimeLine) ? t : maxTimeLine;
-            }
-            foreach(PlayableCharacter p in data.PCharacters.Values)
-            {
-                p.Chara.ResetTempPosAndMp();
             }
 
             //StartCoroutine(StartAction(-1));
@@ -192,10 +198,10 @@ namespace KWY
             yield return null;
         }
 
-        IEnumerator DoCharaSkill(int cid, SID sid, SkillDicection dir, Vector2Int v)
+        IEnumerator DoCharaSkill(int id, SID sid, SkillDicection dir, Vector2Int v)
         {
-            data.PCharacters[cid].Chara.SpellSkill(sid, dir, v.x, v.y);
-            showActions.ShowSkillLog(cid, sid);
+            data.PCharacters[id].Chara.SpellSkill(sid, dir, v.x, v.y);
+            showActions.ShowSkillLog(id, sid);
             yield return null;
         }
 
@@ -203,21 +209,6 @@ namespace KWY
         {
             if (actionData.Data.TryGetValue(id, out var value))
             {
-                //foreach (object[] d in value)
-                //{
-                //    int time = (int)d[0];
-
-                //    ActionType t = (ActionType)d[1];
-
-                //    if (t == ActionType.Move)
-                //    {
-                //        Vector2Int vec = new Vector2Int((int)d[2], (int)d[3]);
-                //        List<Vector2Int> des = y % 2 == 0 ? action.areaEvenY : action.areaOddY;
-                //        List<Vector2Int> cur = y % 2 != 0 ? action.areaEvenY : action.areaOddY;
-                //        int idx = cur.IndexOf(vec);
-
-                //    }
-                //}
                 int y2 = y;
                 for (int i = data.PCharacters[id].Chara.moveIdx; i < value.Length; i++)
                 {

@@ -86,15 +86,17 @@ namespace KWY
 
             if (map.HasTile(clickV))
             {
+                bool yDiff = false;
                 if (clickV.y % 2 != selChara.TilePos.y % 2)
                 {
                     if (PhotonNetwork.IsMasterClient)
                     {
-                        GameManager.Instance.Simulation.ChangeAction((int)selChara.Cb.cid, clickV.y);
+                        //GameManager.Instance.Simulation.ChangeAction(selChara.Pc.Id, clickV.y);
                     }
+                    yDiff = true;
                 }
                 //selChara.Teleport(clickV);
-                selChara.photonView.RPC("Teleport", RpcTarget.MasterClient, clickV.x, clickV.y);
+                selChara.photonView.RPC("Teleport", RpcTarget.MasterClient, clickV.x, clickV.y, selChara.Pc.Id, yDiff);
                 //GameManager.Instance.Simulation.ShowAction(selChara.Pc.Id);
 
                 SkillCount++;

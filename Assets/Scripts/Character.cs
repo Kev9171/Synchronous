@@ -201,10 +201,19 @@ namespace KWY
         {
             TempTilePos = pos;
         }
+        [PunRPC]
+        private void SetTilePosRPC(int x, int y)
+        {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                TilePos = new Vector3Int(x, y, 0);
+            }
+        }
 
         public void ResetTempPosAndMp()
         {
-            TempTilePos = map.WorldToCell(transform.position);
+            //TempTilePos = map.WorldToCell(transform.position);
+            TempTilePos = TilePos;
             TempMp = Mp;
         }
 
@@ -269,10 +278,10 @@ namespace KWY
                 TilePos = map.WorldToCell(des);
                 des.y += 0.1f;
 
-                TCtrl.updateCharNum(map.WorldToCell(des), 1, gameObject);
+                TCtrl.updateCharNum(TilePos, 1, gameObject);
                 TCtrl.updateCharNum(nowPos, -1, gameObject);
 
-                int charsOnDes = TCtrl.getCharList(map.WorldToCell(des)).Count;
+                int charsOnDes = TCtrl.getCharList(TilePos).Count;
                 int charsOnCur = TCtrl.getCharList(nowPos).Count;
 
                 worldPos = des;
@@ -292,13 +301,13 @@ namespace KWY
                 {
                     //map.SetTransformMatrix(map.WorldToCell(des), elevatedTile);
                     //hlMap.SetTransformMatrix(map.WorldToCell(des), elevatedTile);
-                    map.SetTileFlags(map.WorldToCell(des), TileFlags.None);
-                    map.SetColor(map.WorldToCell(des), new Color(1, 1, 1, 0));
+                    map.SetTileFlags(TilePos, TileFlags.None);
+                    map.SetColor(TilePos, new Color(1, 1, 1, 0));
 
-                    Sprite sprite = map.GetTile<CustomTile>(map.WorldToCell(des)).sprite;
+                    Sprite sprite = map.GetTile<CustomTile>(TilePos).sprite;
                     TCtrl.activateAltTile(des, charsOnDes, sprite);
 
-                    List<GameObject> characters = TCtrl.getCharList(map.WorldToCell(des));
+                    List<GameObject> characters = TCtrl.getCharList(TilePos);
 
                     int count = 0;
 
@@ -309,8 +318,7 @@ namespace KWY
                         Vector2 offset = TCtrl.nList[charsOnDes - 1].coordList[count];
                         chara.GetComponent<Character>().destination = (Vector2)chara.GetComponent<Character>().worldPos + offset;
                         chara.GetComponent<Character>().nowMove = true;
-                        //chara.transform.position += new Vector3(-0.1f, 0.5f, 0);
-                        chara.GetComponent<BoxCollider2D>().offset = -offset;
+                        //chara.GetComponent<BoxCollider2D>().offset = -offset;
 
                         //Debug.Log(chara.GetComponent<Character>().destination);
                         //Debug.Log((Vector2)fTiles.nList[charsOnDes - 1].coordList[count] + ", " + (Vector2)fTiles.nList[charsOnDes - 2].coordList[count]);
@@ -388,9 +396,39 @@ namespace KWY
         }
 
         [PunRPC]
-        public void Teleport(int x, int y)
+        public void Teleport(int x, int y, int id, bool yDiff)
         {
             if (BreakDown) return;
+
+            if (yDiff)
+            {
+                if (GameManager.Instance.Simulation.actionData.Data.TryGetValue(id, out var value))
+                {
+                    int y2 = y;
+                    for (int i = GameManager.Instance.Simulation.data.PCharacters[id].Chara.moveIdx; i < value.Length; i++)
+                    {
+                        object[] d = (object[])value[i];
+                        if ((ActionType)d[1] == ActionType.Move)
+                        {
+                            Vector2Int vec2 = new Vector2Int((int)d[2], (int)d[3]);
+                            List<Vector2Int> v = y2 % 2 != 0 ? MoveManager.MoveData.areaEvenY : MoveManager.MoveData.areaOddY;
+                            //List<Vector2Int> cur = y % 2 != 0 ? action.areaEvenY : action.areaOddY;
+                            int idx = v.IndexOf(vec2);
+                            Vector2Int newVec = v[5 - idx] * (-1);
+                            Debug.Log("vec = " + vec2 + ", newvec = " + newVec + "index = " + idx);
+                            Debug.Log("ActionType = " + d[1] + ", vec = " + d[2] + ", " + d[3]);
+                            d[2] = newVec.x;
+                            d[3] = newVec.y;
+                            value[i] = d;
+                            y2 += (int)d[3];
+                            Debug.Log("index: " + i + ", value[i] " + value[i] + ", moveIdx: " + GameManager.Instance.Simulation.data.PCharacters[id].Chara.moveIdx);
+                        }
+                    }
+                    GameManager.Instance.Simulation.actionData.Data[id] = value;
+                }
+                else
+                    Debug.Log("no char matching cid");
+            }
 
             Vector3Int vec = new Vector3Int(x, y, 0);
 
@@ -398,6 +436,7 @@ namespace KWY
             {
                 Vector3Int nowPos = TilePos;
                 TilePos = vec;
+                photonView.RPC("SetTilePosRPC", RpcTarget.Others, vec.x, vec.y);
                 Vector3 newPos = map.CellToWorld(vec);
                 newPos.y += 0.1f;
                 transform.position = newPos;
@@ -534,13 +573,27 @@ namespace KWY
             }
             else
             {
-                if (direction == SkillDicection.Right)
+                if (Pc.Team == 0)
                 {
-                    ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, true, SelSkill.directions.Count);
+                    if (direction == SkillDicection.Right)
+                    {
+                        ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, true, false, SelSkill.directions.Count);
+                    }
+                    else
+                    {
+                        ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, false, false, SelSkill.directions.Count);
+                    }
                 }
                 else
                 {
-                    ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, false, SelSkill.directions.Count);
+                    if (direction == SkillDicection.Right)
+                    {
+                        ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, true, true, SelSkill.directions.Count);
+                    }
+                    else
+                    {
+                        ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, false, true, SelSkill.directions.Count);
+                    }
                 }
             }
             Debug.LogFormat("{0} / {1} spells {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, sid);
