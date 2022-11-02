@@ -149,8 +149,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4294902272
+  m_fontColor: {r: 0, g: 0.008504391, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -296,7 +296,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d11081e1186f0174c988875c9035cb5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manaBar: {fileID: 0}
   playerImg: {fileID: 5568541471688148133}
   mpLabel: {fileID: 5568541473315734834}
   mpBar: {fileID: 2057977708728148399}
