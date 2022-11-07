@@ -1107,6 +1107,7 @@ MonoBehaviour:
   SelectPanel: {fileID: 7934122411135105697}
   ClickToStart: {fileID: 3955760847690643906}
   CanvasTransform: {fileID: 7934122410494185891}
+  MainPanel: {fileID: 3955760847125990926}
 --- !u!4 &1478994391
 Transform:
   m_ObjectHideFlags: 0
@@ -6514,7 +6515,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Padding: {x: 0, y: -5, z: -8, w: -5}
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
   m_Softness: {x: 0, y: 0}
 --- !u!1 &7934122411067085810
 GameObject:

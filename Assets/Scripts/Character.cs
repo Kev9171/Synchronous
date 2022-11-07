@@ -400,40 +400,40 @@ namespace KWY
         {
             if (BreakDown) return;
 
-            if (yDiff)
-            {
-                if (GameManager.Instance.Simulation.actionData.Data.TryGetValue(id, out var value))
-                {
-                    int y2 = y;
-                    for (int i = GameManager.Instance.Simulation.data.PCharacters[id].Chara.moveIdx; i < value.Length; i++)
-                    {
-                        object[] d = (object[])value[i];
-                        if ((ActionType)d[1] == ActionType.Move)
-                        {
-                            Vector2Int vec2 = new Vector2Int((int)d[2], (int)d[3]);
-                            List<Vector2Int> v = y2 % 2 != 0 ? MoveManager.MoveData.areaEvenY : MoveManager.MoveData.areaOddY;
-                            //List<Vector2Int> cur = y % 2 != 0 ? action.areaEvenY : action.areaOddY;
-                            int idx = v.IndexOf(vec2);
-                            Vector2Int newVec = v[5 - idx] * (-1);
-                            Debug.Log("vec = " + vec2 + ", newvec = " + newVec + "index = " + idx);
-                            Debug.Log("ActionType = " + d[1] + ", vec = " + d[2] + ", " + d[3]);
-                            d[2] = newVec.x;
-                            d[3] = newVec.y;
-                            value[i] = d;
-                            y2 += (int)d[3];
-                            Debug.Log("index: " + i + ", value[i] " + value[i] + ", moveIdx: " + GameManager.Instance.Simulation.data.PCharacters[id].Chara.moveIdx);
-                        }
-                    }
-                    GameManager.Instance.Simulation.actionData.Data[id] = value;
-                }
-                else
-                    Debug.Log("no char matching cid");
-            }
-
             Vector3Int vec = new Vector3Int(x, y, 0);
 
             if (map.HasTile(vec))
             {
+                if (yDiff)
+                {
+                    if (GameManager.Instance.Simulation.actionData.Data.TryGetValue(id, out var value))
+                    {
+                        int y2 = y;
+                        for (int i = GameManager.Instance.Simulation.data.PCharacters[id].Chara.moveIdx; i < value.Length; i++)
+                        {
+                            object[] d = (object[])value[i];
+                            if ((ActionType)d[1] == ActionType.Move)
+                            {
+                                Vector2Int vec2 = new Vector2Int((int)d[2], (int)d[3]);
+                                List<Vector2Int> v = y2 % 2 != 0 ? MoveManager.MoveData.areaEvenY : MoveManager.MoveData.areaOddY;
+                                //List<Vector2Int> cur = y % 2 != 0 ? action.areaEvenY : action.areaOddY;
+                                int idx = v.IndexOf(vec2);
+                                Vector2Int newVec = v[5 - idx] * (-1);
+                                Debug.Log("vec = " + vec2 + ", newvec = " + newVec + "index = " + idx);
+                                Debug.Log("ActionType = " + d[1] + ", vec = " + d[2] + ", " + d[3]);
+                                d[2] = newVec.x;
+                                d[3] = newVec.y;
+                                value[i] = d;
+                                y2 += (int)d[3];
+                                Debug.Log("index: " + i + ", value[i] " + value[i] + ", moveIdx: " + GameManager.Instance.Simulation.data.PCharacters[id].Chara.moveIdx);
+                            }
+                        }
+                        GameManager.Instance.Simulation.actionData.Data[id] = value;
+                    }
+                    else
+                        Debug.Log("no char matching cid");
+                }
+
                 Vector3Int nowPos = TilePos;
                 TilePos = vec;
                 photonView.RPC("SetTilePosRPC", RpcTarget.Others, vec.x, vec.y);
@@ -449,8 +449,8 @@ namespace KWY
 
                 worldPos = newPos;
 
-
-
+                //GetComponentInParent<SpawnEffect>().PlayEffect();
+                photonView.RPC("PlayEffect", RpcTarget.All);
                 //if (map.CellToWorld(nowPos).x < des.x)
                 //    gameObject.GetComponent<SpriteRenderer>().flipX = false;
                 //else if (map.CellToWorld(nowPos).x > des.x)

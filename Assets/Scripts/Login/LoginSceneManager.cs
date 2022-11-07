@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 namespace KWY
 {
@@ -25,12 +26,17 @@ namespace KWY
         [SerializeField]
         Transform CanvasTransform;
 
+        [SerializeField]
+        GameObject MainPanel;
+
         const string nextLevel = "StartScene";
 
         public void AfterLogin()
         {
             InitialPanel.SetActive(false);
-            ClickToStart.SetActive(true);
+            StartCoroutine(TextFlicker());
+
+            MainPanel.GetComponent<EventTrigger>().enabled = true;
         }
 
         #region Button Elements Callbacks
@@ -63,10 +69,24 @@ namespace KWY
 
         private void Start()
         {
+            ClickToStart.SetActive(false);
             LoginPanel.SetActive(false);
             JoinPanel.SetActive(false);
 
             SelectPanel.SetActive(true);
+
+            MainPanel.GetComponent<EventTrigger>().enabled = false;
+        }
+
+        private IEnumerator TextFlicker()
+        {
+            while (true)
+            {
+                ClickToStart.SetActive(true);
+                yield return new WaitForSeconds(0.5f);
+                ClickToStart.SetActive(false);
+                yield return new WaitForSeconds(0.5f);
+            }
         }
     }
 }

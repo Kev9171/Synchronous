@@ -101,15 +101,6 @@ namespace KWY
                 DataController.Instance.AddAllCharactersMp(LogicData.Instance.CharacterMpIncrement);
             }
 
-            /*// 플레이어 mp 추가
-            data.MyPlayer.AddMp(LogicData.Instance.PlayerMPIncrement);
-
-            // 캐릭터 mp 추가
-            foreach(PlayableCharacter pc in data.MyTeamCharacter)
-            {
-                pc.Chara.AddMP(LogicData.Instance.CharacterMpIncrement);
-            }*/
-
             // show UI
             TurnReadyUI.SetActive(true);
 
