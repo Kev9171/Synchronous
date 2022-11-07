@@ -118,7 +118,10 @@ namespace KWY
 
         public void UpdateCharacterActionIcon(int id)
         {
-            CharacterActionData data = MainGameData.Instance.GetActionData(id);
+            if (!MainGameData.Instance.TryGetActionData(id, out CharacterActionData data))
+            {
+                return;
+            }
 
             charaUIs[id].ResetSelActionImg();
 
@@ -140,7 +143,12 @@ namespace KWY
 
         public void ClearCharacterActionIcon(int id)
         {
-            MainGameData.Instance.GetActionData(id).ClearActionData();
+            if (!MainGameData.Instance.TryGetActionData(id, out var data))
+            {
+                return;
+            }
+            data.ClearActionData();
+            
             charaUIs[id].ResetSelActionImg();
         }
 
@@ -148,7 +156,7 @@ namespace KWY
         {
             foreach(PlayableCharacter pc in MainGameData.Instance.MyTeamCharacter)
             {
-                if (pc.Chara.BreakDown) continue;
+                //if (pc.Chara.BreakDown) continue;
                 ClearCharacterActionIcon(pc.Id);
             }
         }
@@ -160,7 +168,5 @@ namespace KWY
                 s.gameObject.SetActive(false);
             }
         }
-
-        
     }
 }
