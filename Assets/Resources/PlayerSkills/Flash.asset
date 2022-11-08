@@ -15,5 +15,5 @@ MonoBehaviour:
   psid: 1
   name: Flash
   skillExplanation: move 2 at once
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: df2d3bb1b6e641a4d809131293f84dea, type: 3}
   cost: 3

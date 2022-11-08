@@ -17,12 +17,20 @@ namespace KWY
                 if (team == Team.A)
                 {
                     MainGameData.Instance.NotBreakDownTeamA--;
+                    if (MainGameData.Instance.TryGetActionData(chara.Pc.Id, out var data))
+                    {
+                        data.ClearActionData();
+                    }
                     MainGameData.Instance.CharaActionData.Remove(chara.Pc.Id);
                     chara.BreakDownNotice = true;
                 }
                 else if (team == Team.B)
                 {
                     MainGameData.Instance.NotBreakDownTeamB--;
+                    if (MainGameData.Instance.TryGetActionData(chara.Pc.Id, out var data))
+                    {
+                        data.ClearActionData();
+                    }
                     MainGameData.Instance.CharaActionData.Remove(chara.Pc.Id);
                     chara.BreakDownNotice = true;
                 }

@@ -160,15 +160,17 @@ namespace KWY
             return null;
         }
 
-        public CharacterActionData GetActionData(int id)
+        public bool TryGetActionData(int id, out CharacterActionData data)
         {
             if (_charaActionData.TryGetValue(id, out var value))
             {
-                return value;
+                data = value;
+                return true;
             }
 
             Debug.Log("There is no data: " + id);
-            return null;
+            data = null;
+            return false;
         }
 
         public void LoadData()
