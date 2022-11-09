@@ -518,7 +518,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8a6e8b43d1ae48408d72b7140836d2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeLimit: 5
+  timeLimit: 20
   timeSecondsToStart: 5
   timer: {fileID: 894895603}
   timerPanel: {fileID: 1807078887}

@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 085bd84b746f6d94499fa8a3e6ebaf71, type: 3}
   m_Name: OLobbyData
   m_EditorClassIdentifier: 
-  startCountDownSeconds: 5
+  startCountDownSeconds: 10

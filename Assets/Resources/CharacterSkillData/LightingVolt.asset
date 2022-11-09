@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89ce9026c72516941a8617dd5cfe0160, type: 3}
   m_Name: LightingVolt
   m_EditorClassIdentifier: 
-  cost: 7
-  icon: {fileID: 21300000, guid: 274ed5dc8e0ecc6409ba34ce72bf7fbe, type: 3}
+  cost: 5
+  icon: {fileID: 21300000, guid: aae72addb621fc144bc09579ad0442d0, type: 3}
   name: LightingVolt
   castingTime: 1
   triggerTime: 2
@@ -27,8 +27,8 @@ MonoBehaviour:
   - {x: 0, y: 0}
   sid: 2
   casters: 02000000
-  skillExplanation: Lighting Volt!!!!!!
-  skillExImg: {fileID: 21300000, guid: 6baebaaa74a5b92469b0df54ffb02161, type: 3}
+  skillExplanation: Lightning Volt!!!!!!
+  skillExImg: {fileID: 0}
   distance:
   - 1
   directions: 
@@ -36,4 +36,4 @@ MonoBehaviour:
   area: {fileID: 2418642603031395723, guid: 45561ae525c97fe46be6fd8d1230a562, type: 3}
   isDamage: 1
   value: 0
-  dmgMultiplicand: 1.5
+  dmgMultiplicand: 1.2
