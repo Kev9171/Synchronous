@@ -37,7 +37,7 @@ namespace KWY
             casterNameLabel.text = t;
             costLabel.text = "cost: " + sb.cost.ToString();
             skillExLabel.text = sb.skillExplanation;
-            skillIcon.sprite = sb.skillExImg;
+            skillImg.sprite = sb.skillExImg;
         }
 
         public void OnClickClose()
