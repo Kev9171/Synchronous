@@ -106,6 +106,7 @@ namespace UI
                 ClearBuffs();
             }
 
+            UpdateDamage(c.Hp);
             UpdateHP(c.Hp);
             UpdateMP(c.Mp);
         }
@@ -115,8 +116,17 @@ namespace UI
             float now = chara.Hp;
             float v = hpBar.value * chara.MaxHp;
             StartCoroutine(IEUpdateHp(now - v));
-            GameObject DamageTextInstance = PhotonNetwork.Instantiate("TextHolder", chara.transform.position, Quaternion.identity);
-            DamageTextInstance.transform.GetChild(0).GetComponent<TextMeshPro>().SetText(((int)v).ToString());
+        }
+
+        public void UpdateDamage(float hp)
+        {
+            float now = chara.Hp;
+            float v = hpBar.value * chara.MaxHp;
+            if (now != v)
+            {
+                GameObject DamageTextInstance = PhotonNetwork.Instantiate("TextHolder", chara.transform.position, Quaternion.identity, 0);
+                DamageTextInstance.transform.GetChild(0).GetComponent<TextMeshPro>().SetText(((int)(now - v)).ToString());
+            }
         }
 
         public void UpdateMP(float mp)
