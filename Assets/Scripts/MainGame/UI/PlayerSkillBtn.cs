@@ -54,11 +54,18 @@ namespace KWY
             this.psb = psb;
         }
 
-        public void OnClickUseSkill()
+        public void OnClickUseSkill(PSID pSID)
         {
             if (MainGameData.Instance.MyPlayer.Mp >= psb.cost)
             {
-                mouseInput.Mouse.MouseClick.performed += OnClick;
+                switch (pSID)
+                {
+                    case (PSID)1: mouseInput.Mouse.MouseClick.performed += OnClick; 
+                        break;
+                    case (PSID)2: mouseInput.Mouse.MouseClick.performed += Skill2;
+                        break;
+                }
+                
                 Debug.Log("스킬 발동");
             }
             else
@@ -76,6 +83,22 @@ namespace KWY
             if (MainGameData.Instance.MyPlayer.Skill1(SelChara, mousePosition))
             {
                 mouseInput.Mouse.MouseClick.performed -= Skill1;
+                MainGameData.Instance.MyPlayer.SubMp(psb.cost);
+                Debug.Log($"마나 소모: {psb.cost}");
+            }
+            else
+            {
+                Debug.Log("??");
+            }
+        }
+
+        public void Skill2(InputAction.CallbackContext context)
+        {
+            Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
+
+            if (MainGameData.Instance.MyPlayer.Skill2(mousePosition))
+            {
+                mouseInput.Mouse.MouseClick.performed -= Skill2;
                 MainGameData.Instance.MyPlayer.SubMp(psb.cost);
                 Debug.Log($"마나 소모: {psb.cost}");
             }
@@ -121,7 +144,7 @@ namespace KWY
             }
             else
             {
-                OnClickUseSkill();
+                OnClickUseSkill(psb.psid);
             }
         }
 

@@ -2520,52 +2520,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 357068677}
   m_CullTransparentMesh: 1
---- !u!1 &357723235
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 357723237}
-  - component: {fileID: 357723236}
-  m_Layer: 0
-  m_Name: DamageTextManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &357723236
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 357723235}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6dc82997e54a76e41b480cc88f0258ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  damageTextPrefab: {fileID: 3257263199610640513, guid: 4a1243452364b3f438766172345a0111, type: 3}
-  characterInstance: {fileID: 0}
-  textToDisplay: 100
---- !u!4 &357723237
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 357723235}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 86.770836, y: 97.61719, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 14
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &391674102
 GameObject:
   m_ObjectHideFlags: 0
@@ -5788,10 +5742,6 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 140848647252565480, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
-      propertyPath: damageTextPrefab
-      value: 
-      objectReference: {fileID: 3257263199610640513, guid: 4a1243452364b3f438766172345a0111, type: 3}
-    - target: {fileID: 140848647252565480, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
       propertyPath: showingSkillManager
       value: 
       objectReference: {fileID: 624665549}
@@ -6762,10 +6712,6 @@ PrefabInstance:
       propertyPath: nthCharacter
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 140848647252565480, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
-      propertyPath: damageTextPrefab
-      value: 
-      objectReference: {fileID: 3257263199610640513, guid: 4a1243452364b3f438766172345a0111, type: 3}
     - target: {fileID: 140848647252565480, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
       propertyPath: showingSkillManager
       value: 
@@ -8606,10 +8552,6 @@ PrefabInstance:
       propertyPath: charaControl
       value: 
       objectReference: {fileID: 627332755}
-    - target: {fileID: 140848647252565480, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
-      propertyPath: damageTextPrefab
-      value: 
-      objectReference: {fileID: 3257263199610640513, guid: 4a1243452364b3f438766172345a0111, type: 3}
     - target: {fileID: 140848647252565480, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
       propertyPath: characterInfoPanelPrefab
       value: 
