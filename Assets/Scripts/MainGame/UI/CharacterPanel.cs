@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections;
 
 using KWY;
+using Photon.Pun;
 
 namespace UI
 {
@@ -57,6 +58,9 @@ namespace UI
         [Tooltip("0 ~ 2 (위에서 부터)")]
         [SerializeField]
         int nthCharacter;
+
+        public GameObject damageTextPrefab;
+        //private string textToDisplay; // Skill damage
 
         #region Private Fields
 
@@ -111,6 +115,8 @@ namespace UI
             float now = chara.Hp;
             float v = hpBar.value * chara.MaxHp;
             StartCoroutine(IEUpdateHp(now - v));
+            GameObject DamageTextInstance = PhotonNetwork.Instantiate("TextHolder", chara.transform.position, Quaternion.identity);
+            DamageTextInstance.transform.GetChild(0).GetComponent<TextMeshPro>().SetText(((int)v).ToString());
         }
 
         public void UpdateMP(float mp)

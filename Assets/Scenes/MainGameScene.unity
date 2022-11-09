@@ -5788,6 +5788,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 140848647252565480, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
+      propertyPath: damageTextPrefab
+      value: 
+      objectReference: {fileID: 3257263199610640513, guid: 4a1243452364b3f438766172345a0111, type: 3}
+    - target: {fileID: 140848647252565480, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
       propertyPath: showingSkillManager
       value: 
       objectReference: {fileID: 624665549}
@@ -6758,6 +6762,10 @@ PrefabInstance:
       propertyPath: nthCharacter
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 140848647252565480, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
+      propertyPath: damageTextPrefab
+      value: 
+      objectReference: {fileID: 3257263199610640513, guid: 4a1243452364b3f438766172345a0111, type: 3}
     - target: {fileID: 140848647252565480, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
       propertyPath: showingSkillManager
       value: 
@@ -8598,6 +8606,10 @@ PrefabInstance:
       propertyPath: charaControl
       value: 
       objectReference: {fileID: 627332755}
+    - target: {fileID: 140848647252565480, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
+      propertyPath: damageTextPrefab
+      value: 
+      objectReference: {fileID: 3257263199610640513, guid: 4a1243452364b3f438766172345a0111, type: 3}
     - target: {fileID: 140848647252565480, guid: 8eb6951e70c13914ab145a5057abded7, type: 3}
       propertyPath: characterInfoPanelPrefab
       value: 
