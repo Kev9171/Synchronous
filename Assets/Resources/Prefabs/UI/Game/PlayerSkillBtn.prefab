@@ -172,7 +172,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 250, y: 110}
+  m_SizeDelta: {x: 110, y: 110}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2816787751648910931
 CanvasRenderer:
@@ -203,7 +203,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -226,7 +226,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   costLabel: {fileID: 2816787750996143841}
   icon: {fileID: 2816787751648910930}
-  psp: {fileID: 3023831340802591439, guid: 7c51e4e5137bd5c4b8213ee9a2dbeeb8, type: 3}
   minClickTime: 1
 --- !u!114 &2014451614452840489
 MonoBehaviour:
