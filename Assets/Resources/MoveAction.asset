@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: MoveAction
   m_EditorClassIdentifier: 
   cost: 1
-  icon: {fileID: 21300000, guid: 0915a9637eee19846b7384eb1529d940, type: 3}
+  icon: {fileID: 21300000, guid: 77173487e0b176949af0eaa17dc8d809, type: 3}
   name: Move
   castingTime: 0
   triggerTime: 1

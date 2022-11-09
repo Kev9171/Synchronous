@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: KnightSpecial
   m_EditorClassIdentifier: 
   cost: 2
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 2a8941a0027dc154eb7afb15f79304ae, type: 3}
   name: Knight Special
   castingTime: 3
   triggerTime: 3
@@ -40,7 +40,7 @@ MonoBehaviour:
   sid: 4
   casters: 03000000
   skillExplanation: Knight Special!
-  skillExImg: {fileID: 21300000, guid: 6baebaaa74a5b92469b0df54ffb02161, type: 3}
+  skillExImg: {fileID: 0}
   distance:
   - 2
   directions: 

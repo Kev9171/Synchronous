@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: FireBall
   m_EditorClassIdentifier: 
   cost: 1
-  icon: {fileID: 21300000, guid: d542c7c9aff724b49b4e147eba39a697, type: 3}
+  icon: {fileID: 21300000, guid: 333041afb7ceebb4389cfa3459812933, type: 3}
   name: FireBall
   castingTime: 2
   triggerTime: 1
