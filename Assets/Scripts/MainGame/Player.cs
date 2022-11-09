@@ -106,6 +106,54 @@ namespace KWY
             return false;
         }
 
+        public bool Skill2(Vector2 mousePosition)
+        {
+            mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
+
+            Vector3Int clickV = map.WorldToCell(mousePosition);
+
+            if (map.HasTile(clickV))
+            {
+                TilemapControl TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
+                List<Vector2Int> v = clickV.y % 2 == 0 ? MoveManager.MoveData.areaEvenY : MoveManager.MoveData.areaOddY;
+                foreach(Vector2Int vec in v)
+                {
+                    Vector2Int newVec = (Vector2Int)clickV + vec;
+                    if (map.HasTile((Vector3Int)newVec))
+                    {
+                        List<GameObject> ch = TCtrl.getCharList((Vector3Int)newVec);
+                        if(ch.Count != 0)
+                        {
+                            foreach(GameObject c in ch)
+                            {
+                                DataController.Instance.ModifyCharacterHp(c.GetComponent<Character>().Pc.Id, -100);
+                                Debug.Log(c.name + "hit by meteor");
+                            }
+                        }
+                    }
+                }
+                List<GameObject> ch2 = TCtrl.getCharList(clickV);
+                foreach (GameObject c in ch2)
+                {
+                    DataController.Instance.ModifyCharacterHp(c.GetComponent<Character>().Pc.Id, -100);
+                    Debug.Log(c.name + "hit by meteor");
+                }
+                GameObject obj = PhotonNetwork.Instantiate(
+                    "EffectExamples/Fire & Explosion Effects/Prefabs/BigExplosion",
+                    map.CellToWorld(clickV),
+                    Quaternion.identity);
+                StartCoroutine(DestoryAfterTime(obj, 1));
+                return true;
+            }
+            return false;
+        }
+        IEnumerator DestoryAfterTime(GameObject obj, float time)
+        {
+            yield return new WaitForSeconds(time);
+            PhotonNetwork.Destroy(obj);
+            //clone.RemoveAt(clone.Count - 1);
+        }
+
         #region ISubject Methods
         public void AddObserver(IObserver<Player> o)
         {

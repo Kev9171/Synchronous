@@ -249,7 +249,7 @@ MonoBehaviour:
   spawnEffectTime: 3
   pause: 1
   material: {fileID: 2100000, guid: a683b955b3d06e6429565831caff80f8, type: 2}
-  prefab: {fileID: 1912731163003908, guid: c5febdd93ab44d640b3eb37b768360bb, type: 3}
+  prefab: {fileID: 0}
   fadeIn:
     serializedVersion: 2
     m_Curve:

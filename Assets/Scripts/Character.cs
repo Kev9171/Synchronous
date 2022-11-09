@@ -112,7 +112,7 @@ namespace KWY
                 Hp -= damage;
                 Debug.LogFormat($"[id={Pc.Id}]{Cb.name} is damaged {damage}; Now hp: {Hp}");
             }
-            else if (Hp - damage < 0)
+            else if (Hp - damage <= 0)
             {
                 Hp = 0;
                 BreakDown = true;
