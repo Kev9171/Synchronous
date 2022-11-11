@@ -59,3 +59,9 @@ TagManager:
   - name: Character
     uniqueID: 1807390041
     locked: 0
+  - name: SpawnableSkills
+    uniqueID: 1501340805
+    locked: 0
+  - name: DamageText
+    uniqueID: 62428819
+    locked: 0
