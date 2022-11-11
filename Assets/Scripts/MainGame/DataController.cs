@@ -61,7 +61,8 @@ namespace KWY
                 else
                 {
                     GameObject damageTextInstance = PhotonNetwork.Instantiate("TextHolder", pc.Chara.transform.position, Quaternion.identity, 0);
-                    damageTextInstance.transform.GetChild(0).GetComponent<TextMeshPro>().SetText(amount.ToString());
+                    //damageTextInstance.transform.GetChild(0).GetComponent<TextMeshPro>().SetText(amount.ToString());
+                    damageTextInstance.GetPhotonView().GetComponentInChildren<TextMeshPro>().SetText(amount.ToString());
                     pc.Chara.DamageHP(-amount);
                 }
             }
