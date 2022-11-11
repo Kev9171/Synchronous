@@ -28,17 +28,10 @@ MonoBehaviour:
   skillExplanation: Throw a fireball.
   skillExImg: {fileID: 0}
   distance:
-  - 3
-  - 2
-  - 2
-  - 1
+  - 6
   - 0
-  - 4
-  - 2
-  - 2
-  - 0
-  - 2
-  directions: 00000000010000000500000000000000060000000400000003000000050000000600000001000000
+  - 6
+  directions: 010000000600000004000000
   areaAttack: 0
   area: {fileID: 0}
   isDamage: 1

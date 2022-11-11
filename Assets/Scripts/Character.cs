@@ -554,9 +554,10 @@ namespace KWY
 
             if (SelSkill.areaAttack)
             {
+                Vector3 v = map.CellToWorld(new Vector3Int(x, y, 0));
                 GameObject o = PhotonNetwork.Instantiate(
                     SpawnableSkillResources.GetPath(SelSkill.sid),
-                    new Vector3(x, y + 0.1f, 0),
+                    new Vector3(v.x, v.y + 0.1f, 0),
                     Quaternion.identity);
 
                 if (!NullCheck.HasItComponent<SkillSpawner>(o, "SkillSpawner")) {

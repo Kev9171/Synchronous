@@ -28,7 +28,7 @@ MonoBehaviour:
   skillExplanation: lalalalalalalalalal
   skillExImg: {fileID: 0}
   distance:
-  - 1
+  - 2
   directions: 01000000
   areaAttack: 0
   area: {fileID: 0}
