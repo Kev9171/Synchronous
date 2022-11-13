@@ -138,19 +138,20 @@ namespace KWY
                     DataController.Instance.ModifyCharacterHp(c.GetComponent<Character>().Pc.Id, -100);
                     Debug.Log(c.name + "hit by meteor");
                 }
+                StartCoroutine(DelayTime(0.75f));
                 GameObject obj = PhotonNetwork.Instantiate(
                     "EffectExamples/Fire & Explosion Effects/Prefabs/BigExplosion",
                     map.CellToWorld(clickV),
                     Quaternion.identity);
-                StartCoroutine(DestoryAfterTime(obj, 1));
+                StartCoroutine(DelayTime(1));
+                PhotonNetwork.Destroy(obj);
                 return true;
             }
             return false;
         }
-        IEnumerator DestoryAfterTime(GameObject obj, float time)
+        IEnumerator DelayTime(float time)
         {
             yield return new WaitForSeconds(time);
-            PhotonNetwork.Destroy(obj);
             //clone.RemoveAt(clone.Count - 1);
         }
 
