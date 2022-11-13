@@ -5720,7 +5720,7 @@ GameObject:
   - component: {fileID: 1668773733}
   - component: {fileID: 1668773732}
   - component: {fileID: 1668773734}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Hexagon Pointed-Top (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6606,7 +6606,7 @@ GameObject:
   - component: {fileID: 1869849876}
   - component: {fileID: 1869849875}
   - component: {fileID: 1869849877}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Hexagon Pointed-Top
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6756,7 +6756,7 @@ GameObject:
   - component: {fileID: 1878264120}
   - component: {fileID: 1878264119}
   - component: {fileID: 1878264121}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Hexagon Pointed-Top (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
