@@ -114,17 +114,18 @@ namespace KWY
 
             if (map.HasTile(clickV))
             {
+                //Meteor(clickV, 1);
                 TilemapControl TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
                 List<Vector2Int> v = clickV.y % 2 == 0 ? MoveManager.MoveData.areaEvenY : MoveManager.MoveData.areaOddY;
-                foreach(Vector2Int vec in v)
+                foreach (Vector2Int vec in v)
                 {
                     Vector2Int newVec = (Vector2Int)clickV + vec;
                     if (map.HasTile((Vector3Int)newVec))
                     {
                         List<GameObject> ch = TCtrl.getCharList((Vector3Int)newVec);
-                        if(ch.Count != 0)
+                        if (ch.Count != 0)
                         {
-                            foreach(GameObject c in ch)
+                            foreach (GameObject c in ch)
                             {
                                 DataController.Instance.ModifyCharacterHp(c.GetComponent<Character>().Pc.Id, -100);
                                 Debug.Log(c.name + "hit by meteor");
@@ -138,22 +139,56 @@ namespace KWY
                     DataController.Instance.ModifyCharacterHp(c.GetComponent<Character>().Pc.Id, -100);
                     Debug.Log(c.name + "hit by meteor");
                 }
-                StartCoroutine(DelayTime(0.75f));
                 GameObject obj = PhotonNetwork.Instantiate(
-                    "EffectExamples/Fire & Explosion Effects/Prefabs/BigExplosion",
-                    map.CellToWorld(clickV),
-                    Quaternion.identity);
-                StartCoroutine(DelayTime(1));
-                PhotonNetwork.Destroy(obj);
+                        "EffectExamples/Fire & Explosion Effects/Prefabs/BigExplosion",
+                        map.CellToWorld(clickV),
+                        Quaternion.identity);
+                StartCoroutine(DestoryAfterTime(obj, 1));
                 return true;
             }
             return false;
         }
-        IEnumerator DelayTime(float time)
+
+        IEnumerator DestoryAfterTime(GameObject obj, float time)
         {
             yield return new WaitForSeconds(time);
-            //clone.RemoveAt(clone.Count - 1);
+            PhotonNetwork.Destroy(obj);
         }
+        //IEnumerator Meteor(Vector3Int clickV, float time)
+        //{
+        //    yield return new WaitForSeconds(0.75f);
+        //    TilemapControl TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
+        //    List<Vector2Int> v = clickV.y % 2 == 0 ? MoveManager.MoveData.areaEvenY : MoveManager.MoveData.areaOddY;
+        //    foreach (Vector2Int vec in v)
+        //    {
+        //        Vector2Int newVec = (Vector2Int)clickV + vec;
+        //        if (map.HasTile((Vector3Int)newVec))
+        //        {
+        //            List<GameObject> ch = TCtrl.getCharList((Vector3Int)newVec);
+        //            if (ch.Count != 0)
+        //            {
+        //                foreach (GameObject c in ch)
+        //                {
+        //                    DataController.Instance.ModifyCharacterHp(c.GetComponent<Character>().Pc.Id, -100);
+        //                    Debug.Log(c.name + "hit by meteor");
+        //                }
+        //            }
+        //        }
+        //    }
+        //    List<GameObject> ch2 = TCtrl.getCharList(clickV);
+        //    foreach (GameObject c in ch2)
+        //    {
+        //        DataController.Instance.ModifyCharacterHp(c.GetComponent<Character>().Pc.Id, -100);
+        //        Debug.Log(c.name + "hit by meteor");
+        //    }
+        //    GameObject obj = PhotonNetwork.Instantiate(
+        //            "EffectExamples/Fire & Explosion Effects/Prefabs/BigExplosion",
+        //            map.CellToWorld(clickV),
+        //            Quaternion.identity);
+        //    yield return new WaitForSeconds(time);
+        //    PhotonNetwork.Destroy(obj);
+        //    //clone.RemoveAt(clone.Count - 1);
+        //}
 
         #region ISubject Methods
         public void AddObserver(IObserver<Player> o)
