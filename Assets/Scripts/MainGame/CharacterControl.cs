@@ -82,11 +82,10 @@ namespace KWY
 
                 // 이동 넣었을 경우 하이라이트를 위한 임시 좌표 변경
                 SelChara.SetTilePos(clickV);
-
-                SetSelClear();
-
-                mouseInput.Mouse.MouseClick.performed += OnClick;
             }
+            SetSelClear();
+
+            mouseInput.Mouse.MouseClick.performed += OnClick;
         }
 
 
@@ -104,10 +103,19 @@ namespace KWY
             }
 
             Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
+            mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
+            Vector3Int clickV = map.WorldToCell(mousePosition);
+            if (!map.HasTile(clickV)){
+                SetSelClear();
+                
+                mouseInput.Mouse.MouseClick.performed += OnClick;
+                Debug.Log("no tile");
+                return;
+            }
 
             // 클릭 된 좌표 맵 좌표로 변환
-            int clickX = map.WorldToCell(Camera.main.ScreenToWorldPoint(mousePosition)).x;
-            int clickY = map.WorldToCell(Camera.main.ScreenToWorldPoint(mousePosition)).y;
+            int clickX = clickV.x;
+            int clickY = clickV.y;
             float charaX = SelChara.TempTilePos.x;
             skillSpawner = ((SkillBase)SelAction).area;
 
