@@ -150,8 +150,34 @@ namespace KWY
             {
                 RaycastHit2D hit = hits[i];
 
-                
-                if (hit.transform.gameObject.layer == l)
+                if (hit.transform.gameObject.layer == 8)
+                {
+                    Debug.Log("this is E.T.");
+                    Vector3Int v = map.WorldToCell(hit.transform.position);
+                    List<GameObject> list = tilemapcontrol.getCharList(v);
+                    if (list[0].transform.gameObject.layer == l)
+                    {
+                        if (sb.isDamage)
+                        {
+                            DataController.Instance.ModifyCharacterHp(
+                                list[0].transform.gameObject.GetComponent<Character>().Pc.Id,
+                                -sb.value);
+
+                            GameObject o = PhotonNetwork.Instantiate(
+                SpawnableSkillResources.GetPath(sb.sid),
+                new Vector3(hit.transform.position.x, hit.transform.position.y + 0.1f, 0),
+                Quaternion.identity);
+
+                            if (!NullCheck.HasItComponent<SkillSpawner>(o, "SkillSpawner"))
+                            {
+                                // error
+                                return;
+                            }
+                            //hit.transform.GetComponent<Character>().DamageHP(sb.value);
+                        }
+                    }
+                }
+                else if (hit.transform.gameObject.layer == l)
                 {
                     if (sb.isDamage)
                     {
@@ -170,35 +196,6 @@ namespace KWY
                             return;
                         }
                         //hit.transform.GetComponent<Character>().DamageHP(sb.value);
-                    }
-                }
-                else if (hit.transform.gameObject.layer == 8)
-                {
-                    Vector3Int v = map.WorldToCell(hit.transform.position);
-                    List<GameObject> list = tilemapcontrol.getCharList(v);
-                    for (int j = 0; j < list.Count; j++)
-                    {
-                        if (list[j].transform.gameObject.layer == 6)
-                        {
-                            if (sb.isDamage)
-                            {
-                                DataController.Instance.ModifyCharacterHp(
-                                    hit.transform.GetComponent<Character>().Pc.Id,
-                                    -sb.value);
-
-                                GameObject o = PhotonNetwork.Instantiate(
-                    SpawnableSkillResources.GetPath(sb.sid),
-                    new Vector3(hit.transform.position.x, hit.transform.position.y + 0.1f, 0),
-                    Quaternion.identity);
-
-                                if (!NullCheck.HasItComponent<SkillSpawner>(o, "SkillSpawner"))
-                                {
-                                    // error
-                                    return;
-                                }
-                                //hit.transform.GetComponent<Character>().DamageHP(sb.value);
-                            }
-                        }
                     }
                 }
             }

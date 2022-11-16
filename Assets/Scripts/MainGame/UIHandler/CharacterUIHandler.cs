@@ -95,7 +95,8 @@ namespace KWY
             }
             else
             {
-                Debug.LogError($"There is no entrolled character id={id} or this character is not mine");
+                //Debug.LogError($"There is no entrolled character id={id} or this character is not mine");
+                Debug.Log($"There is no entrolled character id={id} or this character is not mine");
             }
         }
 
