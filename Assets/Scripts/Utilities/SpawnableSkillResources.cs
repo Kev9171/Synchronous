@@ -18,7 +18,6 @@ namespace KWY
             {
                 SID.FireBall => FireBall,
                 SID.LightingVolt => LighteningVolt,
-                SID.KnightNormal => throw new System.NotImplementedException(),
                 SID.KnightSpecial => KnightSpecial,
                 _ => throw new System.NotImplementedException(),
             };
