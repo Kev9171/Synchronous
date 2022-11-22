@@ -95,7 +95,8 @@ namespace KWY
             }
             else
             {
-                Debug.LogError($"There is no entrolled character id={id} or this character is not mine");
+                //Debug.LogError($"There is no entrolled character id={id} or this character is not mine");
+                Debug.Log($"There is no entrolled character id={id} or this character is not mine");
             }
         }
 
@@ -112,7 +113,8 @@ namespace KWY
             }
             else
             {
-                Debug.LogError($"Can not find character: {chara.Pc.Id}");
+                // panel은 자신의 캐릭터만 업데이트
+                //Debug.LogError($"Can not find character: {chara.Pc.Id}");
             }
         }
 

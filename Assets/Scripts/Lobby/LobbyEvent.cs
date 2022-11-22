@@ -36,7 +36,7 @@ namespace Lobby
         /// </summary>
         public void RaiseEventReady(bool isReady)
         {
-            byte evCode = (byte)EvCode.LobbyReady;
+            byte evCode = (byte)EvCode.LobbyGameReady;
             object[] content = new object[]
             {
                 isReady
@@ -62,6 +62,36 @@ namespace Lobby
             }
         }
 
+        public void RaiseEventGameReady()
+        {
+            byte evCode = (byte)EvCode.LobbyGameReady;
+            object[] content = new object[]
+            {
+                gameLobby.myId,
+                gameLobby.otherId,
+                (gameLobby.myId != null && gameLobby.otherId != null)
+            };
+
+            RaiseEventOptions raiseEventOptions = new RaiseEventOptions
+            {
+                Receivers = ReceiverGroup.All
+            };
+
+            SendOptions sendOptions = new SendOptions
+            {
+                Reliability = true
+            };
+
+            if (PhotonNetwork.RaiseEvent(evCode, content, raiseEventOptions, sendOptions))
+            {
+                Debug.Log($"EvCode: {evCode}, content:[{content[0]}, {content[1]}, {content[2]}]");
+            }
+            else
+            {
+                DebugLog.FailedToRaiseEvent(evCode);
+            }
+        }
+
         #endregion
 
         #region Private Methods
@@ -74,8 +104,8 @@ namespace Lobby
         {
             switch (eventData.Code)
             {
-                case (byte)EvCode.ResLobbyReady:
-                    OnEventLobbyReady(eventData);
+                case (byte)EvCode.ResLobbyGameReady:
+                    OnEventLobbyGameReady(eventData);
                     break;
                 default:
                     //Debug.LogError("There is not matching event code: " + eventData.Code);
@@ -84,11 +114,39 @@ namespace Lobby
 
         }
 
-        /// <summary>
+        private void OnEventLobbyGameReady(EventData eventData)
+        {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                return;
+            }
+
+            object[] data = (object[])eventData.CustomData;
+            bool flag = (bool)data[0];
+            string masterId = (string)data[1];
+
+            if (!flag)
+            {
+                Debug.Log($"Error: {masterId}");
+                return;
+            }
+
+            string clientId = (string)data[2];
+            int roomId = (int)data[3];
+
+            Debug.Log($"flag={flag}, masterId={masterId}, clientId={clientId}, roomId={roomId}");
+
+            if (flag)
+            {
+                gameLobby.LoadNextLevel();
+            }
+        }
+
+        /*/// <summary>
         /// Method when the server responses at client's LobbyReady event; data: [userId: string, resOk: bool, startgame: bool]
         /// </summary>
         /// <param name="eventData">Received data from the server</param>
-        private void OnEventLobbyReady(EventData eventData)
+        private void OnEventLobbyGameReady(EventData eventData)
         {
             UserId = PhotonNetwork.AuthValues.UserId; // temp
             object[] data = (object[])eventData.CustomData;
@@ -126,7 +184,7 @@ namespace Lobby
             {
                 gameLobby.StartTimer();
             }
-        }
+        }*/
 
         #endregion
 
@@ -170,7 +228,7 @@ namespace Lobby
 
         public override void OnPlayerLeftRoom(PhotonPlayer otherPlayer)
         {
-            Debug.Log("New player left the room: " + otherPlayer.NickName); ;
+            Debug.Log("A player left the room: " + otherPlayer.NickName); ;
 
             gameLobby.ClearEnteredPlayer();
             base.OnPlayerLeftRoom(otherPlayer);

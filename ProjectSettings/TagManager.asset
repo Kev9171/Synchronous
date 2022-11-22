@@ -44,6 +44,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 2607206587
+    locked: 0
   - name: Map
     uniqueID: 3272561927
     locked: 0
@@ -55,4 +58,10 @@ TagManager:
     locked: 0
   - name: Character
     uniqueID: 1807390041
+    locked: 0
+  - name: SpawnableSkills
+    uniqueID: 1501340805
+    locked: 0
+  - name: DamageText
+    uniqueID: 62428819
     locked: 0

@@ -27,6 +27,7 @@ namespace KWY
 
         public void UpdateData(Character t)
         {
+            CharacterHpBarController.Instance.UpdateHp(t); // 먼저 호출... 필요
             CharacterUIHandler.UpdateCharacterStatusUI(t);
         }
 

@@ -92,6 +92,9 @@ namespace UI
 
             hpLabel.text = chara.Hp.ToString();
             mpLabel.text = chara.Mp.ToString();
+
+            hpBar.maxValue = chara.MaxHp;
+            mpBar.maxValue = chara.MaxMp;
         }
 
         public void UpdateUI(Character c)
@@ -106,18 +109,20 @@ namespace UI
             UpdateMP(c.Mp);
         }
 
-        public void UpdateHP(float hp)
+        /// <summary>
+        /// Update Hp
+        /// </summary>
+        /// <param name="hp">now(updated) hp</param>
+        public void UpdateHP(int hp)
         {
-            float now = chara.Hp;
-            float v = hpBar.value * chara.MaxHp;
-            StartCoroutine(IEUpdateHp(now - v));
+            int now = (int)hpBar.value;
+            StartCoroutine(IEUpdateHp(hp - now));
         }
 
-        public void UpdateMP(float mp)
+        public void UpdateMP(int mp)
         {
-            float now = chara.Mp;
-            float v = mpBar.value * chara.MaxMp;
-            StartCoroutine(IEUpdateMp(now - v));
+            int now = (int)mpBar.value;
+            StartCoroutine(IEUpdateMp(mp - now));
         }
 
         public void UpdateBuffs()
@@ -206,32 +211,34 @@ namespace UI
 
         #region IEnumerator
 
-        IEnumerator IEUpdateHp(float dv)
+        IEnumerator IEUpdateHp(int dv)
         {
-            // TODO
-            // 보안 필요
-            // 10 tick (2000ms동안 업데이트)
+            // 10 tick
 
             // tick 당 업데이트할 값
-            float v = (dv / chara.MaxHp) / 10f;
+            float v = dv / 10f;
             for (float ft = 1f; ft >= 0; ft -= 0.1f)
             {
                 hpBar.value += v;
-                hpLabel.text = Mathf.Floor(hpBar.value * chara.MaxHp + 0.5f).ToString();
+                hpLabel.text = hpBar.value.ToString();
                 yield return new WaitForSeconds(0.1f);
             }
+            hpBar.value = chara.Hp;
+            hpLabel.text = chara.Hp.ToString();
         }
 
-        IEnumerator IEUpdateMp(float dv)
+        IEnumerator IEUpdateMp(int dv)
         {
             // TODO
-            float v = (dv / chara.MaxMp) / 10f;
+            float v = dv / 10f;
             for (float ft = 1f; ft >= 0; ft -= 0.1f)
             {
                 mpBar.value += v;
-                mpLabel.text = Mathf.Floor(mpBar.value * chara.MaxMp).ToString();
+                mpLabel.text = mpBar.value.ToString();
                 yield return new WaitForSeconds(0.1f);
             }
+            mpBar.value = chara.Mp;
+            mpLabel.text = chara.Mp.ToString();
         }
 
         #endregion
