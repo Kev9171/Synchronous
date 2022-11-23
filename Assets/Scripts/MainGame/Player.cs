@@ -144,6 +144,7 @@ namespace KWY
                         map.CellToWorld(clickV),
                         Quaternion.identity);
                 StartCoroutine(DestoryAfterTime(obj, 1));
+                SkillCount++;
                 return true;
             }
             return false;
