@@ -14,6 +14,7 @@ using PhotonPlayer = Photon.Realtime.Player;
 
 using DebugUtil;
 using KWY;
+using UI;
 
 namespace Lobby
 {
@@ -58,9 +59,14 @@ namespace Lobby
         [SerializeField]
         Timer TimerObject;
 
+        PhotonView photonView;
+
         readonly private string nextLevel = "PickScene";
         //readonly private string nextLevel = "MainGameScene";
         readonly private string previousLevel = "StartScene";
+
+        internal string myId;
+        internal string otherId;
 
         float timeLimit;
 
@@ -106,6 +112,8 @@ namespace Lobby
 
         public void SetEnteredPlayer(PhotonPlayer player)
         {
+            Debug.Log($"{PhotonNetwork.AuthValues.UserId}");
+
             RightUserPanel.GetComponent<UserProfilePanel>().SetData(null, player.NickName);
             RightUserPanel.SetActive(true);
         }
@@ -114,14 +122,19 @@ namespace Lobby
         {
             StopTimer();
 
+            otherId = null;
+            Debug.Log(otherId);
+
             // 상대방 정보 없애기
             RightUserPanel.SetActive(false);
 
             // 상대 ready 취소 한 것처럼 보이기
-            SetReadyStatus(false, isMe: false);
+            //SetReadyStatus(false, isMe: false);
+            photonView.RPC("SetReadyStateRPC", RpcTarget.All, !PhotonNetwork.IsMasterClient, false);
 
             // 자신의 ready 상태 해제
-            lobbyEvent.RaiseEventReady(false);
+            //lobbyEvent.RaiseEventReady(false);
+            photonView.RPC("SetReadyStateRPC", RpcTarget.All, PhotonNetwork.IsMasterClient, false);
         }
 
         public void StartTimer()
@@ -142,10 +155,17 @@ namespace Lobby
             // 게임 시작
             if (PhotonNetwork.IsMasterClient)
             {
-                PhotonNetwork.LoadLevel(nextLevel);
+                //PhotonNetwork.LoadLevel(nextLevel);
+                // game ready 서버로 전송
+                lobbyEvent.RaiseEventGameReady();
             }
 
             Debug.Log("Game Start!");
+        }
+
+        public void LoadNextLevel()
+        {
+            PhotonNetwork.LoadLevel(nextLevel);
         }
 
         #region Button OnClick Callbacks
@@ -155,15 +175,61 @@ namespace Lobby
             // 상대 플레이어 입장 안했을 경우 레디 x
             if (PhotonNetwork.CurrentRoom.PlayerCount != 2)
             {
+                PanelBuilder.ShowFadeOutText(CanvasTransform, "Other player is not exist yet.");
                 return;
             }
 
-            lobbyEvent.RaiseEventReady(true);
+            photonView.RPC("SetReadyStateRPC", RpcTarget.All, PhotonNetwork.IsMasterClient, true);
+
+            //lobbyEvent.RaiseEventReady(true);
+        }
+
+        [PunRPC]
+        private void SetReadyStateRPC(bool isMaster, bool status)
+        {
+            if ((isMaster && PhotonNetwork.IsMasterClient) || (!isMaster && !PhotonNetwork.IsMasterClient))
+            {
+                myReady = status;
+                LeftReadyText.SetActive(status);
+
+                // ready 버튼 숨기기
+                ReadyBtn.gameObject.SetActive(!status);
+
+                // 취소 버튼 보이기
+                ReadyCancelBtn.gameObject.SetActive(status);
+            }
+            else
+            {
+                otherReady = status;
+                RightReadyText.SetActive(status);
+            }
+
+            if (myReady && otherReady)
+            {
+                StartTimer();
+            }
+            else
+            {
+                StopTimer();
+            }
+        }
+
+        [PunRPC]
+        private void GetOtherPlayerIdRPC(string id)
+        {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                return;
+            }
+
+            otherId = id;
+            Debug.Log(otherId);
         }
 
         public void OnReadyCancelBtnClicked()
-        {            
-            lobbyEvent.RaiseEventReady(false);
+        {
+            //lobbyEvent.RaiseEventReady(false);
+            photonView.RPC("SetReadyStateRPC", RpcTarget.All, PhotonNetwork.IsMasterClient, false);
         }
 
         public void OnLeaveRoomBtnClicked()
@@ -196,6 +262,8 @@ namespace Lobby
 
         private void Start()
         {
+            photonView = PhotonView.Get(this);
+
             lobbyData = Resources.Load<SLobbyData>("Lobby/OLobbyData");
 
             if (!lobbyData)
@@ -224,6 +292,13 @@ namespace Lobby
 
             LeaveRoomBtn.gameObject.AddComponent<GameLobbyBtnEventTrigeer>();
             ReadyBtn.gameObject.AddComponent<GameLobbyBtnEventTrigeer>();
+
+            myId = PhotonNetwork.AuthValues.UserId;
+
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                photonView.RPC("GetOtherPlayerIdRPC", RpcTarget.MasterClient, PhotonNetwork.AuthValues.UserId);
+            }
         }
 
         private void OnEnable()

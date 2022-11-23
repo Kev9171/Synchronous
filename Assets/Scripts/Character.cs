@@ -15,6 +15,9 @@ namespace KWY
         [SerializeField]
         CharacterBase _characterBase;
 
+        
+        
+
         private readonly List<IObserver<Character>> observers = new List<IObserver<Character>>();
         private readonly Dictionary<string, IObserver<Character>> obDict = new Dictionary<string, IObserver<Character>>();
 
@@ -637,6 +640,11 @@ namespace KWY
 
         void Update()
         {
+            if (!PhotonNetwork.InRoom)
+            {
+                return;
+            }
+
             if (BreakDown) return;
 
             if (!PhotonNetwork.IsMasterClient)

@@ -7,6 +7,7 @@ using TMPro;
 using UnityEngine.UI;
 
 using Photon.Pun;
+using UI;
 
 namespace KWY
 {
@@ -42,7 +43,8 @@ namespace KWY
 
         private float time;
         private float timeLimit;
-
+        private bool sentData = false;
+        private bool timerRunning = false;
 
         #region Public Methods
 
@@ -93,7 +95,7 @@ namespace KWY
             }
 
             // 버튼 기능 초기화
-            readyBtn.GetComponent<TurnReadyBtn>().ResetReady();
+            GameManager.Instance.TurnReady.ResetReady();
 
             if (PhotonNetwork.IsMasterClient)
             {
@@ -103,6 +105,9 @@ namespace KWY
 
             // show UI
             TurnReadyUI.SetActive(true);
+
+            // clear setnData flag
+            sentData = false;
 
             // start timer
             StartTimer();
@@ -116,6 +121,8 @@ namespace KWY
             // 타이머 리셋
             ResetTimer();
 
+            StopTimer();
+
             // 캐릭터 선택 못하도록
             characterUIHandler.CharaPanelSelectable = false;
 
@@ -125,18 +132,7 @@ namespace KWY
 
         public void OnClickTurnReady()
         {
-            StopTimer();
-
-            // 캐릭터 선택 막고
-            characterUIHandler.CharaPanelSelectable = false;
-
-            // 캐릭터 패널 숨기기
-            characterUIHandler.HideAllSkillSelPanel();
-
-            FillRandomMoveAtEmpty();
-
-            // event 전송
-            gameEvent.RaiseEventTurnReady(ActionData.CreateActionData(data.CharaActionData));
+            TimeOut();
         }
 
         #endregion
@@ -180,14 +176,12 @@ namespace KWY
 
         private void StopTimer()
         {
+            timerRunning = false;
             StopCoroutine(Timer());
         }
 
         private void TimeOut()
         {
-            //PanelBuilder.ShowResultPanel(UICanvasTransform, WINLOSE.WIN, data.CreateResultData());
-
-
             // 캐릭터 선택 못하게 + 스킬 선택 패널 안보이게
             characterUIHandler.CharaPanelSelectable = false;
 
@@ -196,25 +190,26 @@ namespace KWY
             ActionData d = ActionData.CreateActionData(data.CharaActionData);
             Debug.Log(d);
 
-#if TEST
-            if (!PhotonNetwork.IsMasterClient) return;
-            DataController.Instance.ModifyCharacterHp(2, -50);
-            DataController.Instance.ModifyCharacterHp(5, -50);
-            return;
-#endif
             gameEvent.RaiseEventTurnReady(d);
+
+            sentData = true;
         }
 
         IEnumerator Timer()
         {
+            timerRunning = true;
             while(true)
             {
+                if (timerRunning == false) break;
                 float t = Mathf.Ceil(timeLimit - time);
 
                 if (t < 0)
                 {
                     timerText.text = "0";
-                    TimeOut();
+                    if (!sentData)
+                    {
+                        TimeOut();
+                    }
                     break;
                 }
                 else
@@ -224,6 +219,34 @@ namespace KWY
                     yield return new WaitForSeconds(0.5f);
                 }
             }
+        }
+
+        #endregion
+
+        #region TurnReadyBtn
+
+        public void SetReady(bool state)
+        {
+            // 서버로 부터 ok 사인 왔을 떄 호출 
+            if (state)
+            {
+                // 버튼 더 이상 누르지 못하도록
+                readyBtn.interactable = false;
+            }
+            else
+            {
+                // 오류 보여주기
+                PanelBuilder.ShowFadeOutText(UICanvasTransform, "Can not read value from the server...");
+
+                // 다시 원래대로
+                readyBtn.interactable = true;
+            }
+        }
+
+        public void ResetReady()
+        {
+            // 다시 원래대로
+            readyBtn.interactable = true;
         }
 
         #endregion
