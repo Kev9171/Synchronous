@@ -54,7 +54,8 @@ namespace KWY
 
         public Vector3 worldPos { get; private set; }
 
-        private readonly float movementSpeed = 0.5f;
+        private readonly float movementSpeed = 1f;
+        public float currentTime = 0;
         private Vector2 destination;
         public Vector3Int TilePos;
         public int moveIdx { get; private set; }
@@ -645,7 +646,10 @@ namespace KWY
 
             if (nowMove)
             {
-                transform.position = Vector3.Lerp(gameObject.transform.position, destination, movementSpeed);
+                currentTime += Time.deltaTime;
+                if (currentTime >= movementSpeed)
+                    currentTime = movementSpeed;
+                transform.position = Vector3.Lerp(gameObject.transform.position, destination, currentTime/movementSpeed);
                 if (transform.position == new Vector3(destination.x, destination.y, 0))
                     nowMove = false;
             }
