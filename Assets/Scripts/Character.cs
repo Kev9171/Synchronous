@@ -639,6 +639,11 @@ namespace KWY
 
         void Update()
         {
+            if (!PhotonNetwork.InRoom)
+            {
+                return;
+            }
+
             if (BreakDown) return;
 
             if (!PhotonNetwork.IsMasterClient)

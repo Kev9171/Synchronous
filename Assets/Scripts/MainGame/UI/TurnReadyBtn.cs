@@ -3,15 +3,15 @@ using UnityEngine;
 
 using TMPro;
 
+using UI;
+
 namespace KWY
 {
     [RequireComponent(typeof(Button))]
     public class TurnReadyBtn : MonoBehaviour
     {
         [SerializeField]
-        TMP_Text ReadyText;
-
-        Color IsReadyColor = new Color(210, 210, 210);
+        Transform UITransform;
 
         public void SetReady(bool state)
         {
@@ -20,14 +20,14 @@ namespace KWY
             {
                 // 버튼 더 이상 누르지 못하도록
                 this.GetComponent<Button>().interactable = false;
-
-                // cancel 로 텍스트 바꾸기
-                ReadyText.text = "Cancel";
             }
             else
             {
+                // 오류 보여주기
+                PanelBuilder.ShowFadeOutText(UITransform, "Can not read value from the server...");
+
                 // 다시 원래대로
-                this.GetComponent<Image>().color = Color.white;
+                this.GetComponent<Button>().interactable = true;
             }
         }
 
