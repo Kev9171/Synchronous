@@ -43,6 +43,7 @@ MonoBehaviour:
   skillExImg: {fileID: 0}
   distance:
   - 2
+  - 2
   directions: 
   areaAttack: 1
   area: {fileID: 6941316062329348292, guid: 683939de26b66f745999e25866b13f7b, type: 3}

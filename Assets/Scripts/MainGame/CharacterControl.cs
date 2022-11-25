@@ -261,9 +261,14 @@ namespace KWY
             Vector3 overVec2 = map.CellToWorld(overVec);
             Vector2 deltaXY = (Vector2)overVec2 - (Vector2)charaV2;
 
+            if (!map.HasTile(overVec))
+            {
+                return;
+            }
+
             if (((SkillBase)SelAction).areaAttack)
             {
-                if (Math.Sqrt(deltaXY.x * deltaXY.x + deltaXY.y * deltaXY.y) < ((SkillBase)SelAction).distance[0])
+                if (Math.Sqrt(deltaXY.x * deltaXY.x + deltaXY.y * deltaXY.y) < ((SkillBase)SelAction).distance[1])
                 {
                     dir = Direction.Right;
                 }
@@ -322,7 +327,6 @@ namespace KWY
 
                 if(dir != Direction.None)
                 {
-                    //highLighter.HighlightMap(SelChara.TempTilePos, SelChara.TempTilePos.y % 2 == 0 ? SelAction.areaEvenY : SelAction.areaOddY);
                     highLighter.HighlightMap(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), (int)dir);
                 }
             }
