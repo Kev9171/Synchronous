@@ -193,7 +193,11 @@ namespace KWY
             if (UserId == (string)data[0] && (bool) data[1])
             {
                 // 서버로 부터 ready에 대한 ok 사인이 왔을 때 변경함
-                readyBtn.GetComponent<TurnReadyBtn>().SetReady((bool)data[1]);
+                GameManager.Instance.TurnReady.SetReady((bool)data[1]);
+            }
+            else if (UserId == (string)data[0] && !(bool)data[1])
+            {
+                GameManager.Instance.TurnReady.SetReady(false);
             }
 
             // check ' start simulation' through data[2]

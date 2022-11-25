@@ -272,8 +272,6 @@ namespace KWY
                     "InitCharacterRPC", RpcTarget.Others,
                     chara.GetPhotonView().ViewID, id, ((int)d.team));
             }
-
-            InitBaseObservers();
         }
 
 
@@ -286,7 +284,7 @@ namespace KWY
 
             // character
             // 일단 자신의 캐릭터만 (현재 UI 업데이트는 자신의 캐릭터만 됨)
-            foreach (PlayableCharacter p in MyTeamCharacter)
+            foreach (PlayableCharacter p in _pCharacters.Values)
             {
                 p.Chara.AddObserver(new CharacterObserver());
             }
@@ -307,9 +305,18 @@ namespace KWY
 
             AddObserver(new GameProgressObserver());
         }
+
+        private void InitCharacterHpBars()
+        {
+            foreach(PlayableCharacter pc in _pCharacters.Values)
+            {
+                CharacterHpBarController.Instance.AddBar(pc.Chara);
+            }
+        }
+
         #endregion
 
-        
+
         public ResultData CreateResultData()
         {
             return new ResultData(MyTeamCharacter, MyPlayer);
@@ -351,7 +358,13 @@ namespace KWY
         }
         #endregion
 
-
+        private void Loading()
+        {
+            // 순서 바꾸지 말것
+            InitCharacters();
+            InitBaseObservers();
+            InitCharacterHpBars();
+        }
         
 
         #region PunRPC
@@ -366,7 +379,7 @@ namespace KWY
                 return;
             }
 
-            InitCharacters();
+            Loading();
         }
 
         /// <summary>
@@ -486,7 +499,11 @@ namespace KWY
 
             if (_pCharacters.Count == 6)
             {
+                // loading()
                 InitBaseObservers();
+
+                InitCharacterHpBars();
+
                 photonView.RPC("OnGameReadyRPC", RpcTarget.All);
             }
         }

@@ -7,8 +7,8 @@ namespace KWY
     public enum EvCode : byte
     {
         // for lobby
-        LobbyReady = 10, // 로비에서 준비 완료 상태 전송 content: bool (only true) - null값으로 바꿔도 될지 확인 필요
-        ResLobbyReady = 110, // LobbyReady에 대한 res 값 data: [ userId: string, ok: bool, startgame: bool ]
+        LobbyGameReady = 10, // 로비에서 준비 완료 상태 전송 content: bool (only true) - null값으로 바꿔도 될지 확인 필요
+        ResLobbyGameReady = 110, // LobbyReady에 대한 res 값 data: [ userId: string, ok: bool, startgame: bool ]
 
         // for main
         TurnReady = 11, // 턴 시작 준비 완료 상태 전송 content: actionData: Dictionary<int, int>

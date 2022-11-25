@@ -113,7 +113,8 @@ namespace KWY
             }
             else
             {
-                Debug.LogError($"Can not find character: {chara.Pc.Id}");
+                // panel은 자신의 캐릭터만 업데이트
+                //Debug.LogError($"Can not find character: {chara.Pc.Id}");
             }
         }
 

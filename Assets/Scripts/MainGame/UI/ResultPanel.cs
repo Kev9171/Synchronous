@@ -9,7 +9,7 @@ using TMPro;
 namespace KWY
 {
     [RequireComponent(typeof(CanvasRenderer))]
-    public class ResultPanel : MonoBehaviour, IInstantiatableUI
+    public class ResultPanel : MonoBehaviourPunCallbacks, IInstantiatableUI
     {
         [SerializeField]
         TMP_Text resultText;
@@ -75,7 +75,7 @@ namespace KWY
         public void OnClickClose()
         {
             // Leave the room 
-            if (PhotonNetwork.LeaveRoom(true))
+            if (PhotonNetwork.LeaveRoom())
             {
                 Debug.Log("Leave the room...");
             }
@@ -84,14 +84,8 @@ namespace KWY
                 Debug.Log("Can not leave the room");
             }
 
-            // load the start scene
-            SceneManager.LoadScene("StartScene");
         }
 
-        public void OnOkBtnClick()
-        {
-            OnClickClose();
-        }
 
         private int GetCharacterScore(float hp, float maxHp)
         {
@@ -108,6 +102,17 @@ namespace KWY
         {
             Init();
             okBtn.onClick.AddListener(OnClickClose);
+        }
+
+        public override void OnLeftRoom()
+        {
+            if (SceneManager.GetActiveScene().name == "MainGameScene")
+            {
+                // load the start scene
+                SceneManager.LoadScene("StartScene");
+            }
+
+            base.OnLeftRoom();
         }
     }
 }

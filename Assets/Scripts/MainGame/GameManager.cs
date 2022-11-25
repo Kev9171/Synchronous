@@ -116,8 +116,6 @@ namespace KWY
 
             nowState = STATE.Simul;
 
-            nowState = STATE.Simul;
-
             // end turnready state
             turnReady.EndTurnReadyState();
 
@@ -151,7 +149,10 @@ namespace KWY
         private void GameOverState(TICK_RESULT result)
         {
             nowState = STATE.GameOver;
+
             // TODO
+            // 씬 연동 해제
+            PhotonNetwork.AutomaticallySyncScene = false;
 
             // 마스터 클라이언트가 이겻을 경우
             if (result == TICK_RESULT.MASTER_WIN)

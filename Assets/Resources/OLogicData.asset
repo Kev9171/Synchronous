@@ -19,4 +19,4 @@ MonoBehaviour:
   actionLogShowingTime: 2.5
   simulationIntervalSeconds: 1
   characterScoreMultiplier: 1000
-  playerSkillCountScoreMultiplier: 0
+  playerSkillCountScoreMultiplier: 500

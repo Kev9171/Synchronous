@@ -7,7 +7,7 @@ using Photon.Pun;
 
 namespace KWY
 {
-    public class MapHighLighter : MonoBehaviour
+    public class MapHighLighter : MonoBehaviourPunCallbacks
     {
 
         [SerializeField]
@@ -58,7 +58,6 @@ namespace KWY
         public void HighlightMap(Vector3Int baseTilePos, List<Vector2Int> posList)
         {
             ClearHighlight();
-
             foreach (Vector2Int pos in posList)
             {
                 Vector3Int v = new Vector3Int(baseTilePos.x + pos.x, baseTilePos.y + pos.y, 0);
@@ -66,6 +65,24 @@ namespace KWY
                 {
                     hlMap.SetTileFlags(v, TileFlags.None);
                     hlMap.SetColor(v, highlightColor);
+                }
+            }
+        }
+
+        [PunRPC]
+        public void PhotonHighlightMap(Vector3Int baseTilePos, List<Vector2Int> posList, Color? color = null)
+        {
+            ClearHighlight();
+
+            if (color == null) color = highlightColor;
+
+            foreach (Vector2Int pos in posList)
+            {
+                Vector3Int v = new Vector3Int(baseTilePos.x + pos.x, baseTilePos.y + pos.y, 0);
+                if (hlMap.HasTile(v))
+                {
+                    hlMap.SetTileFlags(v, TileFlags.None);
+                    hlMap.SetColor(v, (Color)color);
                 }
             }
         }
@@ -225,6 +242,20 @@ namespace KWY
         }
 
         public void ClearHighlight()
+        {
+            foreach (var pos in hlMap.cellBounds.allPositionsWithin)
+            {
+                Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
+                Vector3 place = hlMap.CellToWorld(localPlace);
+                if (hlMap.HasTile(localPlace))
+                {
+                    hlMap.SetTileFlags(localPlace, TileFlags.None);
+                    hlMap.SetColor(localPlace, transparent);
+                }
+            }
+        }
+        [PunRPC]
+        public void PhotonClearHighlight()
         {
             foreach (var pos in hlMap.cellBounds.allPositionsWithin)
             {
