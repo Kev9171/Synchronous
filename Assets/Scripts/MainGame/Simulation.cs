@@ -182,7 +182,7 @@ namespace KWY
                     else if (type == ActionType.Skill)
                     {
                         yield return new WaitForSeconds(SkillManager.GetData((SID)d[2]).castingTime);
-                        StartCoroutine(DoCharaSkill(id, (SID)d[2], (SkillDicection)d[3], new Vector2Int((int)d[4], (int)d[5])));
+                        StartCoroutine(DoCharaSkill(id, (SID)d[2], (Direction)d[3], new Vector2Int((int)d[4], (int)d[5])));
                         data.PCharacters[id].Chara.SetMoveIdx(1);
                         yield return new WaitForSeconds(SkillManager.GetData((SID)d[2]).triggerTime);
                     }
@@ -198,7 +198,7 @@ namespace KWY
             yield return null;
         }
 
-        IEnumerator DoCharaSkill(int id, SID sid, SkillDicection dir, Vector2Int v)
+        IEnumerator DoCharaSkill(int id, SID sid, Direction dir, Vector2Int v)
         {
             data.PCharacters[id].Chara.SpellSkill(sid, dir, v.x, v.y);
             showActions.ShowSkillLog(id, sid);

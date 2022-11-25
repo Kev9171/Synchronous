@@ -61,6 +61,7 @@ namespace KWY
     // 육각형 방향
     public enum Direction : int
     {
+        None = -1,
         TopLeft = 0,
         Left = 1,
         BottomLeft = 2,

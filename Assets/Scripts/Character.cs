@@ -547,7 +547,7 @@ namespace KWY
             }
         }
 
-        public void SpellSkill(SID sid, SkillDicection direction, int x, int y)
+        public void SpellSkill(SID sid, Direction direction, int x, int y)
         {
             if (BreakDown) return;
 
@@ -578,28 +578,7 @@ namespace KWY
             }
             else
             {
-                if (Pc.Team == 0)
-                {
-                    if (direction == SkillDicection.Right)
-                    {
-                        ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, true, false, SelSkill.directions.Count);
-                    }
-                    else
-                    {
-                        ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, false, false, SelSkill.directions.Count);
-                    }
-                }
-                else
-                {
-                    if (direction == SkillDicection.Right)
-                    {
-                        ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, true, true, SelSkill.directions.Count);
-                    }
-                    else
-                    {
-                        ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, false, true, SelSkill.directions.Count);
-                    }
-                }
+                ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, (int)direction, false, SelSkill.directions.Count);
             }
             Debug.LogFormat("{0} / {1} spells {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, sid);
         }
