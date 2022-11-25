@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 833a9b8c053c0d34aa5c7cc2a3ce87a4, type: 3}
   m_Name: OLogicData
   m_EditorClassIdentifier: 
-  playerInitialMp: 3
+  playerInitialMp: 7
   playerMPIncrement: 2
   characterMPIncrement: 3
-  timeLimit: 45
+  timeLimit: 15
   actionLogShowingTime: 2.5
   simulationIntervalSeconds: 1
   characterScoreMultiplier: 1000

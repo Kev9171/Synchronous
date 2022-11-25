@@ -90,6 +90,7 @@ namespace KWY
         private void BreakDownStatus()
         {
             ClearBuff();
+            GetComponent<Animator>().SetBool("IsDead", true);
             GetComponent<SpriteRenderer>().color = Color.red;
 
             if (gameObject.TryGetComponent(out BoxCollider2D c1))
@@ -287,7 +288,6 @@ namespace KWY
                 worldPos = des;
                 destination = des;
 
-
                 //nowMove = true;
                 //Debug.Log("nowpos = " + nowPos + ", despos = " + map.WorldToCell(des));
                 //Debug.Log(gameObject.name + ": desNum->" + charsOnDes + ", curNum->" + charsOnCur);
@@ -319,7 +319,6 @@ namespace KWY
                         chara.GetComponent<Character>().destination = (Vector2)chara.GetComponent<Character>().worldPos + offset;
                         chara.GetComponent<Character>().nowMove = true;
                         //chara.GetComponent<BoxCollider2D>().offset = -offset;
-
                         //Debug.Log(chara.GetComponent<Character>().destination);
                         //Debug.Log((Vector2)fTiles.nList[charsOnDes - 1].coordList[count] + ", " + (Vector2)fTiles.nList[charsOnDes - 2].coordList[count]);
 
@@ -353,7 +352,6 @@ namespace KWY
                         chara.GetComponent<Character>().nowMove = true;
                         //chara.transform.position += new Vector3(-0.1f, 0.5f, 0);
                         chara.GetComponent<BoxCollider2D>().offset = -offset;
-
                         count++;
                     }
                 }
@@ -371,6 +369,7 @@ namespace KWY
                     List<GameObject> characters = TCtrl.getCharList(nowPos);
                     characters[0].GetComponent<Character>().destination = map.CellToWorld(nowPos);
                     characters[0].GetComponent<Character>().nowMove = true;
+
                     characters[0].GetComponent<BoxCollider2D>().offset = Vector2.zero;
                     GetComponent<BoxCollider2D>().offset = Vector2.zero;
 
@@ -547,6 +546,8 @@ namespace KWY
         {
             if (BreakDown) return;
 
+            GetComponent<Animator>().SetTrigger("IsAttacking"); // Activates animation.
+
             nowMove = false;
             SkillBase SelSkill = SkillManager.GetData(sid);
 
@@ -579,10 +580,12 @@ namespace KWY
                     if (direction == SkillDicection.Right)
                     {
                         ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, true, false, SelSkill.directions.Count);
+                        SkillSwitcher(SelSkill);
                     }
                     else
                     {
                         ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, false, false, SelSkill.directions.Count);
+                        SkillSwitcher(SelSkill);
                     }
                 }
                 else
@@ -590,18 +593,40 @@ namespace KWY
                     if (direction == SkillDicection.Right)
                     {
                         ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, true, true, SelSkill.directions.Count);
+                        SkillSwitcher(SelSkill);
                     }
                     else
                     {
                         ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, false, true, SelSkill.directions.Count);
+                        SkillSwitcher(SelSkill);
                     }
                 }
             }
             Debug.LogFormat("{0} / {1} spells {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, sid);
         }
 
+        public void SkillSwitcher(SkillBase SelSkill)
+        {
+            switch (SelSkill.sid)
+            {
+                case SID.FireBall:
+                    break;
+                case SID.LightingVolt:
+                    break;
+                case SID.KnightNormal:
+                    //GameObject Arrow = PhotonNetwork.Instantiate("Arrow", transform.position, Quaternion.identity, 0);
+                    //Arrow arrow = GetComponent<Arrow>();
+                    //arrow.targetPosition.x = transform.position.x - 6f;
+                    Debug.Log("Spawn an arrow.");
+                    break;
+                case SID.KnightSpecial:
+                    break;
+                default:
+                    break;
+            }
+        }
         #endregion
-        
+
 
         #region MonoBehaviour CallBacks
         private void Awake()
@@ -638,16 +663,20 @@ namespace KWY
         {
             if (BreakDown) return;
 
-            if (!PhotonNetwork.IsMasterClient)
-            {
-                return;
-            }
+            //if (!PhotonNetwork.IsMasterClient)
+            //{
+            //    return;
+            //}
 
             if (nowMove)
             {
-                transform.position = Vector3.Lerp(gameObject.transform.position, destination, movementSpeed);
+                GetComponent<Animator>().SetBool("IsMoving", true); // Enables animation of movement.
+                transform.position = Vector3.MoveTowards(gameObject.transform.position, destination, movementSpeed);
                 if (transform.position == new Vector3(destination.x, destination.y, 0))
+                {
                     nowMove = false;
+                    GetComponent<Animator>().SetBool("IsMoving", false); // Stops movement animation.
+                }
             }
             else
             {
