@@ -1,7 +1,10 @@
 fileFormatVersion: 2
 guid: 4bd3b3d5cfe928a4b88ffdcfe94894dc
 TextureImporter:
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      213: 8751830209157537110
+    second: Knight_03__JUMP_000_0
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -101,7 +104,28 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: Knight_03__JUMP_000_0
+      rect:
+        serializedVersion: 2
+        x: 755
+        y: 318
+        width: 567
+        height: 481
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 65d1e5fb43fb47970800000000000000
+      internalID: 8751830209157537110
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []

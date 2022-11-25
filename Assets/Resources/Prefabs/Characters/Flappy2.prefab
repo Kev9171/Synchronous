@@ -186,6 +186,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _characterBase: {fileID: 11400000, guid: 9cc1e36a50a670d4289b912bc85d48df, type: 2}
   BreakDownNotice: 0
+  currentTime: 0
   TilePos: {x: 0, y: 0, z: 0}
 --- !u!61 &3782679816142068562
 BoxCollider2D:
