@@ -9,9 +9,6 @@ namespace KWY
     public class CharacterHpBarController : MonoBehaviour
     {
         [SerializeField]
-        Vector3 hpBarRelativePosition;
-
-        [SerializeField]
         GameObject hpBarPrefab;
 
         [SerializeField]
@@ -96,7 +93,7 @@ namespace KWY
             {
                 if (hpBars[c].activeSelf)
                 {
-                    hpBars[c].transform.position = camera.WorldToScreenPoint(c.gameObject.transform.position + hpBarRelativePosition);
+                    hpBars[c].transform.position = camera.WorldToScreenPoint(c.gameObject.transform.position + new Vector3(0, c.HpBarRelativePosY, 0));
                 }
             }
         }

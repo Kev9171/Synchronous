@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace KWY
 {
-    public class PlayerObserver : IObserver<Player>
+    public class PlayerObserver : IObserver
     {
         PlayerUIHandler _playerUIHandler;
 
@@ -20,14 +20,14 @@ namespace KWY
             }
         }
 
-        public void OnNotify(Player t)
+        public void OnNotify()
         {
-            UpdateData(t);
+            UpdateData();
         }
 
-        public void UpdateData(Player t)
+        public void UpdateData()
         {
-            PlayerUIHandler.UpdatePlayerMpPanel(t);
+            PlayerUIHandler.UpdatePlayerMpPanel();
         }
 
         private void FindPlayerUIHandler()

@@ -10,13 +10,13 @@ using UI;
 
 namespace KWY
 {
-    public class Player : MonoBehaviour, ISubject<Player>
+    public class Player : MonoBehaviour, ISubject
     {
-        public List<IObserver<Player>> Observers
+        public List<IObserver> Observers
         {
             get;
             private set;
-        } = new List<IObserver<Player>>();
+        } = new List<IObserver>();
 
         public int Mp
         {
@@ -144,6 +144,8 @@ namespace KWY
                 //        map.CellToWorld(clickV),
                 //        Quaternion.identity);
                 //StartCoroutine(DestoryAfterTime(obj, 1));
+
+                SkillCount++;
                 return true;
             }
             return false;
@@ -195,7 +197,7 @@ namespace KWY
         }
 
         #region ISubject Methods
-        public void AddObserver(IObserver<Player> o)
+        public void AddObserver(IObserver o)
         {
             if (Observers.IndexOf(o) < 0)
             {
@@ -209,9 +211,9 @@ namespace KWY
 
         public void NotifyObservers()
         {
-            foreach (IObserver<Player> o in Observers)
+            foreach (IObserver o in Observers)
             {
-                o.OnNotify(this);
+                o.OnNotify();
             }
         }
 
@@ -220,7 +222,7 @@ namespace KWY
             Observers.Clear();
         }
 
-        public void RemoveObserver(IObserver<Player> o)
+        public void RemoveObserver(IObserver o)
         {
             int idx = Observers.IndexOf(o);
             if (idx >= 0)

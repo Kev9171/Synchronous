@@ -107,6 +107,9 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 1
     Name: idle
+  - Type: 9
+    SynchronizeType: 0
+    Name: IsAttacking
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0
@@ -166,7 +169,6 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 1445382690674112794}
   - {fileID: 1445382690674112793}
-  - {fileID: 4233863068189232577}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -230,6 +232,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _characterBase: {fileID: 11400000, guid: da6c8684341450244928e0a87054b797, type: 2}
-  movementSpeed: 0
-  TilePos: {x: 0, y: 0, z: 0}
-  ray: {fileID: 0}
