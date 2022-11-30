@@ -160,9 +160,11 @@ namespace KWY
             TilemapControl TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
             List<Vector2Int> v = clickV.y % 2 == 0 ? MoveManager.MoveData.areaEvenY : MoveManager.MoveData.areaOddY;
             v.Add(Vector2Int.zero);
-            mapHighLighter.PhotonHighlightMap(clickV, v, Color.red);//photonView.RPC("PhotonHighlightMap", RpcTarget.All, clickV, v, Color.red); // PhotonHighlightMap(clickV, v, Color.red);
-            yield return new WaitForSeconds(0.75f);
-            mapHighLighter.ClearHighlight();//photonView.RPC("PhotonClearHighlight", RpcTarget.All);
+            mapHighLighter.PhotonHighlightMap(clickV, v, Color.red);
+            //mapHighLighter.photonView.RPC("PhotonHighlightMap", RpcTarget.All, (Vector3)clickV, v, Color.red);
+            yield return new WaitForSeconds(time);
+            mapHighLighter.ClearHighlight();
+            //mapHighLighter.photonView.RPC("PhotonClearHighlight", RpcTarget.All);
             foreach (Vector2Int vec in v)
             {
                 Vector2Int newVec = (Vector2Int)clickV + vec;

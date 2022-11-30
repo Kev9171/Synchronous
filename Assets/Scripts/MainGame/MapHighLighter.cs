@@ -70,15 +70,15 @@ namespace KWY
         }
 
         [PunRPC]
-        public void PhotonHighlightMap(Vector3Int baseTilePos, List<Vector2Int> posList, Color? color = null)
+        public void PhotonHighlightMap(Vector3 baseTilePos, List<Vector2Int> posList, Color? color = null)
         {
             ClearHighlight();
 
             if (color == null) color = highlightColor;
 
-            foreach (Vector2Int pos in posList)
+            foreach (Vector2 pos in posList)
             {
-                Vector3Int v = new Vector3Int(baseTilePos.x + pos.x, baseTilePos.y + pos.y, 0);
+                Vector3Int v = new Vector3Int((int)baseTilePos.x + (int)pos.x, (int)baseTilePos.y + (int)pos.y, 0);
                 if (hlMap.HasTile(v))
                 {
                     hlMap.SetTileFlags(v, TileFlags.None);

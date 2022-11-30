@@ -45,7 +45,7 @@ namespace KWY
 
         [Tooltip("이 값은 시뮬레이션 종료 후 다음 진행까지 얼마나 대기 하고 있을 것인가에 대한 int 값으로 logic data에서 지정하고 있는 interval 단위")]
         [SerializeField]
-        private int timeAfterSimul = 3;
+        private int timeAfterSimul = 2;
         #endregion
 
         #region Public Methods
