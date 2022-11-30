@@ -14579,6 +14579,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _characterBase: {fileID: 11400000, guid: f30847bdd2f685e47aed92d6b0c1b32d, type: 2}
+  HpBarRelativePosY: 1.4
   BreakDownNotice: 0
   currentTime: 0
   TilePos: {x: 0, y: 0, z: 0}

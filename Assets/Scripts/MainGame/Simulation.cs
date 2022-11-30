@@ -16,9 +16,6 @@ namespace KWY
         private PlayerSkillPanel playerSkillPanel;
 
         [SerializeField]
-        private PlayerMPPanel playerMpPanel;
-
-        [SerializeField]
         private ShowNowAction showActions;
 
         [SerializeField]

@@ -15,8 +15,7 @@ namespace KWY
         [SerializeField]
         CharacterBase _characterBase;
 
-        
-        
+        public float HpBarRelativePosY;
 
         private readonly List<IObserver<Character>> observers = new List<IObserver<Character>>();
         private readonly Dictionary<string, IObserver<Character>> obDict = new Dictionary<string, IObserver<Character>>();
@@ -46,6 +45,7 @@ namespace KWY
         public bool BreakDown { get; private set; }
         public int Atk { get; private set; }
         public int Def { get; private set; }
+
 
         public int TempMp { get; set; }
 
