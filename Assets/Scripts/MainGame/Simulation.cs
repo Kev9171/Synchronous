@@ -16,9 +16,6 @@ namespace KWY
         private PlayerSkillPanel playerSkillPanel;
 
         [SerializeField]
-        private PlayerMPPanel playerMpPanel;
-
-        [SerializeField]
         private ShowNowAction showActions;
 
         [SerializeField]
@@ -45,7 +42,7 @@ namespace KWY
 
         [Tooltip("이 값은 시뮬레이션 종료 후 다음 진행까지 얼마나 대기 하고 있을 것인가에 대한 int 값으로 logic data에서 지정하고 있는 interval 단위")]
         [SerializeField]
-        private int timeAfterSimul = 3;
+        private int timeAfterSimul = 2;
         #endregion
 
         #region Public Methods
@@ -182,7 +179,7 @@ namespace KWY
                     else if (type == ActionType.Skill)
                     {
                         yield return new WaitForSeconds(SkillManager.GetData((SID)d[2]).castingTime);
-                        StartCoroutine(DoCharaSkill(id, (SID)d[2], (SkillDicection)d[3], new Vector2Int((int)d[4], (int)d[5])));
+                        StartCoroutine(DoCharaSkill(id, (SID)d[2], (Direction)d[3], new Vector2Int((int)d[4], (int)d[5])));
                         data.PCharacters[id].Chara.SetMoveIdx(1);
                         yield return new WaitForSeconds(SkillManager.GetData((SID)d[2]).triggerTime);
                     }
@@ -198,7 +195,7 @@ namespace KWY
             yield return null;
         }
 
-        IEnumerator DoCharaSkill(int id, SID sid, SkillDicection dir, Vector2Int v)
+        IEnumerator DoCharaSkill(int id, SID sid, Direction dir, Vector2Int v)
         {
             data.PCharacters[id].Chara.SpellSkill(sid, dir, v.x, v.y);
             showActions.ShowSkillLog(id, sid);

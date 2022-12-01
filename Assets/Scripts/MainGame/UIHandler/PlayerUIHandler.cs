@@ -13,9 +13,9 @@ namespace KWY
 
         }
 
-        public void UpdatePlayerMpPanel(Player player)
+        public void UpdatePlayerMpPanel()
         {
-            playerMpPanel.UpdateUI(player);
+            playerMpPanel.UpdateUI();
         }
     }
 }

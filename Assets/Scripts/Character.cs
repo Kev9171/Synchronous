@@ -15,8 +15,7 @@ namespace KWY
         [SerializeField]
         CharacterBase _characterBase;
 
-        
-        
+        public float HpBarRelativePosY;
 
         private readonly List<IObserver<Character>> observers = new List<IObserver<Character>>();
         private readonly Dictionary<string, IObserver<Character>> obDict = new Dictionary<string, IObserver<Character>>();
@@ -46,6 +45,7 @@ namespace KWY
         public bool BreakDown { get; private set; }
         public int Atk { get; private set; }
         public int Def { get; private set; }
+
 
         public int TempMp { get; set; }
 
@@ -288,6 +288,7 @@ namespace KWY
 
             Vector2Int realDir = TransFromY(dir);
             Vector3Int nowPos = TilePos;
+            worldPos = map.CellToWorld(nowPos);
             Vector3 des = map.CellToWorld(new Vector3Int(nowPos.x + realDir.x, nowPos.y + realDir.y, nowPos.z));
 
             if (map.HasTile(map.WorldToCell(des)))
@@ -301,9 +302,8 @@ namespace KWY
                 int charsOnDes = TCtrl.getCharList(TilePos).Count;
                 int charsOnCur = TCtrl.getCharList(nowPos).Count;
 
-                worldPos = des;
                 destination = des;
-
+                //worldPos = des;
 
                 //nowMove = true;
                 //Debug.Log("nowpos = " + nowPos + ", despos = " + map.WorldToCell(des));
@@ -331,9 +331,8 @@ namespace KWY
                     //nowMove = true;
                     foreach (GameObject chara in characters)
                     {
-                        //chara.GetComponent<Character>().worldPos = des;
                         Vector2 offset = TCtrl.nList[charsOnDes - 1].coordList[count];
-                        chara.GetComponent<Character>().destination = (Vector2)chara.GetComponent<Character>().worldPos + offset;
+                        chara.GetComponent<Character>().destination += offset; //(Vector2)chara.GetComponent<Character>().worldPos + offset;
                         chara.GetComponent<Character>().nowMove = true;
                         //chara.GetComponent<BoxCollider2D>().offset = -offset;
 
@@ -366,7 +365,7 @@ namespace KWY
                     {
                         Vector3 charpos = chara.transform.position;
                         Vector2 offset = TCtrl.nList[charsOnCur - 1].coordList[count];
-                        chara.GetComponent<Character>().destination = (Vector2)chara.GetComponent<Character>().worldPos + offset;
+                        chara.GetComponent<Character>().destination += offset; //(Vector2)chara.GetComponent<Character>().worldPos + offset;
                         chara.GetComponent<Character>().nowMove = true;
                         //chara.transform.position += new Vector3(-0.1f, 0.5f, 0);
                         chara.GetComponent<BoxCollider2D>().offset = -offset;
@@ -464,7 +463,7 @@ namespace KWY
                 int charsOnDes = TCtrl.getCharList(vec).Count;
                 int charsOnCur = TCtrl.getCharList(nowPos).Count;
 
-                worldPos = newPos;
+                worldPos = map.CellToWorld(nowPos); //newPos
 
                 //GetComponentInParent<SpawnEffect>().PlayEffect();
                 photonView.RPC("PlayEffect", RpcTarget.All);
@@ -479,7 +478,7 @@ namespace KWY
                     map.SetColor(vec, new Color(1, 1, 1, 0));
 
                     Sprite sprite = map.GetTile<CustomTile>(vec).sprite;
-                    TCtrl.activateAltTile(worldPos, charsOnDes, sprite);
+                    TCtrl.activateAltTile(newPos, charsOnDes, sprite);
 
                     List<GameObject> characters = TCtrl.getCharList(vec);
 
@@ -488,7 +487,7 @@ namespace KWY
                     foreach (GameObject chara in characters)
                     {
                         Vector2 offset = TCtrl.nList[charsOnDes - 1].coordList[count];
-                        chara.GetComponent<Character>().destination = (Vector2)chara.GetComponent<Character>().worldPos + offset;
+                        chara.GetComponent<Character>().destination += offset; //(Vector2)chara.GetComponent<Character>().worldPos + offset;
                         chara.GetComponent<Character>().nowMove = true;
                         //chara.GetComponent<BoxCollider2D>().offset = -offset;
                         count++;
@@ -512,12 +511,11 @@ namespace KWY
                     List<GameObject> characters = TCtrl.getCharList(nowPos);
 
                     int count = 0;
-                    //destination = worldPos;
                     foreach (GameObject chara in characters)
                     {
                         Vector3 charpos = chara.transform.position;
                         Vector2 offset = TCtrl.nList[charsOnCur - 1].coordList[count];
-                        chara.GetComponent<Character>().destination = (Vector2)chara.GetComponent<Character>().worldPos + offset;
+                        chara.GetComponent<Character>().destination += offset; //(Vector2)chara.GetComponent<Character>().worldPos + offset;
                         chara.GetComponent<Character>().nowMove = true;
                         //chara.GetComponent<BoxCollider2D>().offset = -offset;
 
@@ -560,7 +558,7 @@ namespace KWY
             }
         }
 
-        public void SpellSkill(SID sid, SkillDicection direction, int x, int y)
+        public void SpellSkill(SID sid, Direction direction, int x, int y)
         {
             if (BreakDown) return;
 
@@ -592,28 +590,7 @@ namespace KWY
             }
             else
             {
-                if (Pc.Team == 0)
-                {
-                    if (direction == SkillDicection.Right)
-                    {
-                        ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, true, false, SelSkill.directions.Count);
-                    }
-                    else
-                    {
-                        ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, false, false, SelSkill.directions.Count);
-                    }
-                }
-                else
-                {
-                    if (direction == SkillDicection.Right)
-                    {
-                        ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, true, true, SelSkill.directions.Count);
-                    }
-                    else
-                    {
-                        ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, false, true, SelSkill.directions.Count);
-                    }
-                }
+                ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, (int)direction, false, SelSkill.directions.Count);
             }
             Debug.LogFormat("{0} / {1} spells {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, sid);
         }
@@ -694,11 +671,12 @@ namespace KWY
                 currentTime += Time.deltaTime;
                 if (currentTime >= movementSpeed)
                     currentTime = movementSpeed;
-                transform.position = Vector3.Lerp(gameObject.transform.position, destination, currentTime/movementSpeed);
+                transform.position = Vector3.Lerp(worldPos/*transform.position*/, destination, currentTime/movementSpeed);
                 if (transform.position == new Vector3(destination.x, destination.y, 0))
                 {
                     GetComponent<Animator>().SetBool("IsMoving", false); // Stops movement animation.
                     nowMove = false;
+                    currentTime = 0;
                 }
             }
             else

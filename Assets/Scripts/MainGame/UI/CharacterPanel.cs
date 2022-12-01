@@ -220,7 +220,7 @@ namespace UI
             for (float ft = 1f; ft >= 0; ft -= 0.1f)
             {
                 hpBar.value += v;
-                hpLabel.text = hpBar.value.ToString();
+                hpLabel.text = ((int)(hpBar.value)).ToString();
                 yield return new WaitForSeconds(0.1f);
             }
             hpBar.value = chara.Hp;
@@ -234,7 +234,7 @@ namespace UI
             for (float ft = 1f; ft >= 0; ft -= 0.1f)
             {
                 mpBar.value += v;
-                mpLabel.text = mpBar.value.ToString();
+                mpLabel.text = ((int)(mpBar.value)).ToString();
                 yield return new WaitForSeconds(0.1f);
             }
             mpBar.value = chara.Mp;

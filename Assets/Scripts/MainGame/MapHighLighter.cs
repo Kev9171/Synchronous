@@ -70,15 +70,15 @@ namespace KWY
         }
 
         [PunRPC]
-        public void PhotonHighlightMap(Vector3Int baseTilePos, List<Vector2Int> posList, Color? color = null)
+        public void PhotonHighlightMap(Vector3 baseTilePos, List<Vector2Int> posList, Color? color = null)
         {
             ClearHighlight();
 
             if (color == null) color = highlightColor;
 
-            foreach (Vector2Int pos in posList)
+            foreach (Vector2 pos in posList)
             {
-                Vector3Int v = new Vector3Int(baseTilePos.x + pos.x, baseTilePos.y + pos.y, 0);
+                Vector3Int v = new Vector3Int((int)baseTilePos.x + (int)pos.x, (int)baseTilePos.y + (int)pos.y, 0);
                 if (hlMap.HasTile(v))
                 {
                     hlMap.SetTileFlags(v, TileFlags.None);
@@ -88,7 +88,7 @@ namespace KWY
         }
 
         // raycast highlight
-        public void HighlightMap(Vector3 basePos, SkillBase sb, bool reversed)
+        public void HighlightMap(Vector3 basePos, SkillBase sb, int overdir)
         {
             ClearHighlight();
             int dp;
@@ -105,13 +105,38 @@ namespace KWY
                     lastPos = basePos;
                     continue;
                 }
-                else if (reversed)
+                //else if (reversed)
+                //{
+                //    dp = (int)allDirection[5 - (int)dir[i]];
+                //}
+                //else
+                //{
+                //    dp = (int)dir[i];
+                //}
+
+                if (overdir == 0)
                 {
-                    dp = (int)allDirection[5 - (int)dir[i]];
+                    dp = (int)allDirection[((int)dir[i] + 5) % 6];
+                }
+                else if (overdir == 1)
+                {
+                    dp = (int)dir[i];
+                }
+                else if (overdir == 2)
+                {
+                    dp = (int)allDirection[((int)dir[i] + 1) % 6];
+                }
+                else if (overdir == 3)
+                {
+                    dp = (int)allDirection[((int)dir[i] + 2) % 6];
+                }
+                else if (overdir == 4)
+                {
+                    dp = (int)allDirection[((int)dir[i] + 3) % 6];
                 }
                 else
                 {
-                    dp = (int)dir[i];
+                    dp = (int)allDirection[((int)dir[i] + 4) % 6];
                 }
 
                 for (int j = 1; j <= d; j++)

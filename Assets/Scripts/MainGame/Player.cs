@@ -10,13 +10,13 @@ using UI;
 
 namespace KWY
 {
-    public class Player : MonoBehaviour, ISubject<Player>
+    public class Player : MonoBehaviour, ISubject
     {
-        public List<IObserver<Player>> Observers
+        public List<IObserver> Observers
         {
             get;
             private set;
-        } = new List<IObserver<Player>>();
+        } = new List<IObserver>();
 
         public int Mp
         {
@@ -144,6 +144,8 @@ namespace KWY
                 //        map.CellToWorld(clickV),
                 //        Quaternion.identity);
                 //StartCoroutine(DestoryAfterTime(obj, 1));
+
+                SkillCount++;
                 return true;
             }
             return false;
@@ -160,9 +162,11 @@ namespace KWY
             TilemapControl TCtrl = GameObject.Find("TilemapControl").GetComponent<TilemapControl>();
             List<Vector2Int> v = clickV.y % 2 == 0 ? MoveManager.MoveData.areaEvenY : MoveManager.MoveData.areaOddY;
             v.Add(Vector2Int.zero);
-            mapHighLighter.PhotonHighlightMap(clickV, v, Color.red);//photonView.RPC("PhotonHighlightMap", RpcTarget.All, clickV, v, Color.red); // PhotonHighlightMap(clickV, v, Color.red);
-            yield return new WaitForSeconds(0.75f);
-            mapHighLighter.ClearHighlight();//photonView.RPC("PhotonClearHighlight", RpcTarget.All);
+            mapHighLighter.PhotonHighlightMap(clickV, v, Color.red);
+            //mapHighLighter.photonView.RPC("PhotonHighlightMap", RpcTarget.All, (Vector3)clickV, v, Color.red);
+            yield return new WaitForSeconds(time);
+            mapHighLighter.ClearHighlight();
+            //mapHighLighter.photonView.RPC("PhotonClearHighlight", RpcTarget.All);
             foreach (Vector2Int vec in v)
             {
                 Vector2Int newVec = (Vector2Int)clickV + vec;
@@ -195,7 +199,7 @@ namespace KWY
         }
 
         #region ISubject Methods
-        public void AddObserver(IObserver<Player> o)
+        public void AddObserver(IObserver o)
         {
             if (Observers.IndexOf(o) < 0)
             {
@@ -209,9 +213,9 @@ namespace KWY
 
         public void NotifyObservers()
         {
-            foreach (IObserver<Player> o in Observers)
+            foreach (IObserver o in Observers)
             {
-                o.OnNotify(this);
+                o.OnNotify();
             }
         }
 
@@ -220,7 +224,7 @@ namespace KWY
             Observers.Clear();
         }
 
-        public void RemoveObserver(IObserver<Player> o)
+        public void RemoveObserver(IObserver o)
         {
             int idx = Observers.IndexOf(o);
             if (idx >= 0)

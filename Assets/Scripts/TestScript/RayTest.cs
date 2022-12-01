@@ -86,7 +86,7 @@ namespace KWY
             }
         }
 
-        public void CurvedRay(Vector2 basePos, SkillBase sb, List<Direction> dir, int num, bool reversed, bool team)
+        public void CurvedRay(Vector2 basePos, SkillBase sb, List<Direction> dir, int num, int overdir, bool team)
         {
             Vector2 bp;
             Vector2 dp;
@@ -103,17 +103,48 @@ namespace KWY
                 return;
             }
 
-            // 반전일 경우
-            if (reversed)
+            //// 반전일 경우
+            //if (reversed)
+            //{
+            //    bp = lastPos + correction[5 - (int)dir[num]];
+            //    dp = direction[5 - (int)dir[num]];
+            //}
+            //// 아닐 경우
+            //else
+            //{
+            //    bp = lastPos + correction[(int)dir[num]];
+            //    dp = direction[(int)dir[num]];
+            //}
+
+            if(overdir == 0)
             {
-                bp = lastPos + correction[5 - (int)dir[num]];
-                dp = direction[5 - (int)dir[num]];
+                bp = lastPos + correction[((int)dir[num] + 5) % 6];
+                dp = direction[((int)dir[num] + 5) % 6];
             }
-            // 아닐 경우
-            else
+            else if (overdir == 1)
             {
                 bp = lastPos + correction[(int)dir[num]];
                 dp = direction[(int)dir[num]];
+            }
+            else if (overdir == 2)
+            {
+                bp = lastPos + correction[((int)dir[num] + 1) % 6];
+                dp = direction[((int)dir[num] + 1) % 6];
+            }
+            else if (overdir == 3)
+            {
+                bp = lastPos + correction[((int)dir[num] + 2) % 6];
+                dp = direction[((int)dir[num] + 2) % 6];
+            }
+            else if (overdir == 4)
+            {
+                bp = lastPos + correction[((int)dir[num] + 3) % 6];
+                dp = direction[((int)dir[num] + 3) % 6];
+            }
+            else
+            {
+                bp = lastPos + correction[((int)dir[num] + 4) % 6];
+                dp = direction[((int)dir[num] + 4) % 6];
             }
 
             // 사거리
@@ -204,7 +235,7 @@ namespace KWY
             
         }
 
-        public void CurvedMultipleRay(Vector2 basePos, SkillBase sb, List<Direction> dir, bool reversed, bool team, int rays)
+        public void CurvedMultipleRay(Vector2 basePos, SkillBase sb, List<Direction> dir, int overdir, bool team, int rays)
         {
             //if (reversed)
             //{
@@ -226,14 +257,14 @@ namespace KWY
             {
                 for (int i = 0; i < rays; i++)
                 {
-                    CurvedRay(basePos, sb, dir, i, reversed, team);
+                    CurvedRay(basePos, sb, dir, i, overdir, team);
                 }
             }
             else
             {
                 for (int i = 0; i < rays; i++)
                 {
-                    CurvedRay(basePos, sb, dir, i, reversed, team);
+                    CurvedRay(basePos, sb, dir, i, overdir, team);
                 }
             }
         }

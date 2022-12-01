@@ -9,6 +9,7 @@ namespace KWY
     class SpawnableSkillResources
     {
         public static string FireBall = "Prefabs/SpawnableSkills/FireBall";
+        public static string KnightNormal = "Prefabs/SpawnableSkills/KnightNormal";
         public static string KnightSpecial = "Prefabs/SpawnableSkills/KnightSpecial";
         public static string LighteningVolt = "Prefabs/SpawnableSkills/LightningVolt";
 
@@ -18,6 +19,7 @@ namespace KWY
             {
                 SID.FireBall => FireBall,
                 SID.LightingVolt => LighteningVolt,
+                SID.KnightNormal => KnightNormal,
                 SID.KnightSpecial => KnightSpecial,
                 _ => throw new System.NotImplementedException(),
             };

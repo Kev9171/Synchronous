@@ -36,7 +36,7 @@ namespace KWY
             idx = 0;
         }
 
-        public void AddSkillAction(ActionType type, SID sid, SkillDicection dir, params object[] skillOps)
+        public void AddSkillAction(ActionType type, SID sid, Direction dir, params object[] skillOps)
         {
             Debug.LogFormat("Type: {0}, SID: {1}, Direction: {2}, ops: {3}", type, sid, dir, skillOps);
             if (type != ActionType.Skill)

@@ -17,6 +17,6 @@ MonoBehaviour:
   characterMPIncrement: 3
   timeLimit: 15
   actionLogShowingTime: 2.5
-  simulationIntervalSeconds: 1
+  simulationIntervalSeconds: 2
   characterScoreMultiplier: 1000
   playerSkillCountScoreMultiplier: 500
