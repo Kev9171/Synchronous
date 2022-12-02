@@ -27,10 +27,10 @@ public class BackgroundMusic : MonoBehaviour
             BackgroundMusic.instance.GetComponent<AudioSource>().Pause();
         }
 
-        if (SceneManager.GetActiveScene().name == "StartScene")
-        {
-            BackgroundMusic.instance.GetComponent<AudioSource>().Play();
+        //if (SceneManager.GetActiveScene().name == "StartScene")
+        //{
+        //    BackgroundMusic.instance.GetComponent<AudioSource>().Play();
 
-        }
+        //}
     }
 }
