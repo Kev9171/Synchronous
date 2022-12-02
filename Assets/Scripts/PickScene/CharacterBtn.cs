@@ -17,21 +17,6 @@ namespace PickScene
             GetComponent<Image>().sprite = icon;
             this.cid = cid;
         }
-
-        private void Start()
-        {
-            gameObject.GetComponent<Button>().onClick.AddListener(OnClicked);
-        }
-
-        public void OnClicked()
-        {
-            GameObject pick = GameObject.Find("PickControl");
-            if (NullCheck.IsGameObjectNull(pick)) { return; }
-
-            if (!NullCheck.HasItComponent<PickControl>(pick, "PickControl")) { return; }
-
-            pick.GetComponent<PickControl>().OnCharaSelected(cid);
-        }
     }
 }
 
