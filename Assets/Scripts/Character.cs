@@ -590,7 +590,14 @@ namespace KWY
             }
             else
             {
-                ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, (int)direction, false, SelSkill.directions.Count);
+                if(Pc.Team == 0)
+                {
+                    ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, (int)direction, false, SelSkill.directions.Count);
+                }
+                else
+                {
+                    ray.CurvedMultipleRay(map.CellToWorld(TilePos), SelSkill, SelSkill.directions, (int)direction, true, SelSkill.directions.Count);
+                }
             }
             Debug.LogFormat("{0} / {1} spells {2}", PhotonNetwork.IsMasterClient ? 'M' : 'C', Cb.cid, sid);
         }
