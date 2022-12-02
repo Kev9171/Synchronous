@@ -1,11 +1,12 @@
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using Photon.Pun;
 using System;
-
+using TMPro;
 using Random = UnityEngine.Random;
 
 using KWY;
@@ -26,42 +27,58 @@ namespace PickScene
 
         [SerializeField] Tilemap map;
         [SerializeField] Tilemap hlMap;
-        /*[SerializeField] GameObject ClientCharacters, MasterClientCharacters;
-        [SerializeField] private List<GameObject> deployableList = new List<GameObject>(); // Storing deployable character information
-
-        private List<GameObject> unDeployableList = new List<GameObject>(); // List to temporarily save deployabled characters
-        private GameObject[] charArray = new GameObject[10]; // Initial storage of instantiated characters
-        private List<Vector3Int> deployPositionList = new List<Vector3Int>(); // Initial storage of deployable tiles
-        private int deployCounter; // Deployable character number
-        private List<PickCharacter> pCharacters = new List<PickCharacter>(); // A list with character information during the game
-        //private Dictionary<CID, GameObject> pCharacterObjects = new Dictionary<CID, GameObject>();
-        private Dictionary<CID, Vector3Int> deployDontDestroy = new Dictionary<CID, Vector3Int>();*/
-
-
-        
+        [SerializeField] Button removeCharacterBtn;
+        [SerializeField] GameObject characterBtnsParentObject;
+        [SerializeField] TMP_Text removeCharacterLabel;
+        [SerializeField] TMP_Text setCharacterLabel;
 
         [SerializeField]
-        public List<CharacterBase> CharaList = new List<CharacterBase>();
+        GameObject btnPrefab;
 
-        public readonly List<Vector2Int> SelectableCoords = new List<Vector2Int>(); // load from other file
+        [Tooltip("배치 가능한 캐릭터 리스트")]
+        [SerializeField]
+        List<CharacterBase> CharaList = new List<CharacterBase>();
 
+        /// <summary>
+        /// 배치 가능한 타일들의 좌표 리스트 (하드 코딩되어있음)
+        /// </summary>
+        private readonly List<Vector2Int> SelectableCoords = new List<Vector2Int>(); // load from other file
+
+        /// <summary>
+        /// 현재 배치 되지 않아서 배치 될 수 있는 캐릭터들의 cid 리스트
+        /// </summary>
         private readonly List<CID> cidList = new List<CID>();
+
+        /// <summary>
+        /// 현재 배치 가능한 타일들의 좌표 리스트
+        /// </summary>
         private readonly List<Vector2Int> nowSetableList = new List<Vector2Int>();
 
+        /// <summary>
+        /// 배치하거나 취소할 수 있는 상태
+        /// </summary>
         private bool nowSelectable = true;
 
+        /// <summary>
+        /// 현재 선택되어 있는 캐릭터의 cid (선택되어 있는 캐릭터가 없으면 -1)
+        /// </summary>
         private int selectedCid;
+
         private readonly string spawnableTileName = "tileWater_full";
+
+        /// <summary>
+        /// 현재 배치되어 있는 캐릭터(key)와 그 캐릭터가 배치되어있는 파일 맵의 좌표(value)
+        /// </summary>
         readonly Dictionary<CID, Vector3Int> setLocList = new Dictionary<CID, Vector3Int>();
+
+        /// <summary>
+        /// 현재 배치되어 있는 캐릭터(key)와 그 캐릭터의 실제 GameObject(value)
+        /// </summary>
         readonly Dictionary<CID, GameObject> setCidList = new Dictionary<CID, GameObject>();
 
-        Color transparent = new Color(1, 1, 1, 0);
-
-        #region Private Fields
+        readonly Color transparent = new Color(1, 1, 1, 0);
 
         MouseInput mouseInput;
-
-        #endregion
 
 
         private void SetSelectableCoords()
@@ -99,92 +116,63 @@ namespace PickScene
             }
         }
 
-        private void SetCidList()
-        {
-            foreach(CharacterBase cb in CharaList)
-            {
-                cidList.Add(cb.cid);
-            }
-        }
-
         #region Public Methods
 
-        public void StartControl()
+        public void StartControlSet()
         {
-            mouseInput.Mouse.MouseClick.performed += OnClick;
+            setCharacterLabel.gameObject.SetActive(true);
+            mouseInput.Mouse.MouseClick.performed += OnClickSetCharacter;
             HighlightSelectableTile();
         }
 
-        public void StopControl()
+        public void StopControlSet()
         {
-            mouseInput.Mouse.MouseClick.performed -= OnClick;
+            setCharacterLabel.gameObject.SetActive(false);
+            mouseInput.Mouse.MouseClick.performed -= OnClickSetCharacter;
             ClearHighlightedTile();
         }
 
-        public void SetSelChara(CID cid)
+        public void StartControlRemove()
         {
-            /*PickCharacter c = GetCertainCharacter(cid);
-            if (c == null)
+            removeCharacterLabel.gameObject.SetActive(true);
+
+            // 캐릭터 하이라이트 되도록
+            foreach(GameObject o in setCidList.Values)
             {
-                Debug.LogErrorFormat("Can not select - cid: {0}", cid);
-                return;
+                o.GetComponent<PickCharacter>().Highlightable = true;
             }
-            mouseInput.Mouse.MouseClick.performed += OnClick;
-            foreach (GameObject g in unDeployableList)
-            {
-                if (g.name == cid.ToString())
-                {
-                    deployableList.Add(g);
-                    unDeployableList.Remove(g);
-                    break; // InvalidOperationException: Collection was modified; enumeration operation may not execute.
-                }
-            }
-            Destroy(GameObject.Find(cid.ToString() + "(Clone)")); // Destroy clicked gameObject
-            Debug.Log("Character destroyed: " + cid);
-            deployPositionList.Add(deployDontDestroy[cid]); // Recover deployable tile
-            deployDontDestroy.Remove(cid);
-            foreach (PickCharacter ch in pCharacters)
-            {
-                if (ch.Cb.cid == cid)
-                {
-                    pCharacters.Remove(ch);
-                    break;
-                }
-            }
-            // GameObject gameObject = undeployList.Find(x => x.name.Equals(cid));
-            deployCounter++;*/
+
+            mouseInput.Mouse.MouseClick.performed += OnClickRemoveCharacter;
+            ClearHighlightedTile();
         }
 
-        public void GetDeployPosition()
+        public void StopControlRemove()
         {
-            /*foreach (Vector3Int position in map.cellBounds.allPositionsWithin)
+            removeCharacterLabel.gameObject.SetActive(false);
+
+            // 캐릭터 하이라이트 안되도록
+            foreach (GameObject o in setCidList.Values)
             {
-                if (PhotonNetwork.IsMasterClient)
-                {
-                    if (map.HasTile(position) && position.x < 0 && map.GetSprite(position).name == spawnableTileName)
-                    {
-                        deployPositionList.Add(position);
-                    }
-                }
-                else
-                {
-                    if (map.HasTile(position) && position.x > 0 && map.GetSprite(position).name == spawnableTileName)
-                    {
-                        deployPositionList.Add(position);
-                    }
-                }
-            }*/
+                o.GetComponent<PickCharacter>().Highlightable = false;
+            }
+
+            mouseInput.Mouse.MouseClick.performed -= OnClickRemoveCharacter;
         }
 
         public void OnCharaSelected(CID cid)
         {
+            // 이미 배치되어 있는 캐릭터의 좌표를 바꾸는 거는 ok
+            // 이미 최대 수의 캐릭터가 배치 되어 있을 경우, 배치된 캐릭터를 삭제하라는 문구 출력
+            if (!setCidList.ContainsKey(cid) && setCidList.Keys.Count >= SetableNum)
+            {
+                PanelBuilder.ShowFadeOutText(Canvas.transform, "Settable Number of characters is 3.  Remove other character first.");
+                return;
+            }
+
             selectedCid = (int)cid;
 
-            if (nowSelectable)
-            {
-                // 캐릭터 아이콘이 클릭되면 실행
-                StartControl();
-            }
+            // 캐릭터 아이콘이 클릭되면 실행
+            StartControlSet();
         }
 
         public void SelectedCharaClear()
@@ -239,7 +227,7 @@ namespace PickScene
             }
         }
 
-        public void OnClick(InputAction.CallbackContext context)
+        public void OnClickSetCharacter(InputAction.CallbackContext context)
         {
             if (selectedCid == NullCID)
             {
@@ -257,7 +245,7 @@ namespace PickScene
 
                 CID sCID = (CID)selectedCid;
                 Vector3Int cellV = map.WorldToCell(mousePosition);
-                Vector3 worldV = map.CellToWorld(cellV);
+                //Vector3 worldV = map.CellToWorld(cellV);
                 Sprite sprite = map.GetSprite(cellV);
 
                 if (!sprite)
@@ -273,19 +261,19 @@ namespace PickScene
                         if (setLocList.ContainsValue(cellV))
                         {
                             PanelBuilder.ShowFadeOutText(Canvas.transform, "Only one character can be set on one tile");
-                            StopControl();
+                            StopControlSet();
                             return;
                         }
 
                         SetCharacterOnTile(sCID, cellV);
 
-                        StopControl();
+                        StopControlSet();
                         SelectedCharaClear();
                     }
                     else
                     {
                         PanelBuilder.ShowFadeOutText(Canvas.transform, "it is not selectable tile on your side");
-                        StopControl();
+                        StopControlSet();
                         return;
                     }
                 }
@@ -296,23 +284,50 @@ namespace PickScene
                         if (setLocList.ContainsValue(cellV))
                         {
                             PanelBuilder.ShowFadeOutText(Canvas.transform, "Only one character can be set on one tile");
-                            StopControl();
+                            StopControlSet();
                             return;
                         }
 
                         SetCharacterOnTile(sCID, cellV);
 
-                        StopControl();
+                        StopControlSet();
                         SelectedCharaClear();
                     }
                     else
                     {
                         PanelBuilder.ShowFadeOutText(Canvas.transform, "it is not selectable tile on your side");
-                        StopControl();
+                        StopControlSet();
                         return;
                     }
                 }
             }
+        }
+
+        public void OnClickRemoveCharacter(InputAction.CallbackContext context)
+        {
+            Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
+            Ray ray = Camera.main.ScreenPointToRay(mousePosition);
+            RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
+
+            if (hit.collider != null) // Instantiate turns off Box Collider 2D option
+            {
+                if (hit.collider.gameObject.TryGetComponent<PickCharacter>(out var chara))
+                {
+                    // remove character
+                    RemoveCharacterOnTile(chara.Cb.cid);
+                }
+                else
+                {
+                    // 다른 곳 클릭시 canel
+                    
+                }
+            }
+            else
+            {
+                
+            }
+
+            StopControlRemove();
         }
 
         private void SetCharacterOnTile(CID cid, Vector3Int pos)
@@ -346,14 +361,73 @@ namespace PickScene
             nowSetableList.Remove(new Vector2Int(pos.x, pos.y));
         }
 
+        private void RemoveCharacterOnTile(CID cid)
+        {
+            // cid가 이미 배치되어 있는 캐릭터인지 확인 (반드시 true)
+            if(!setLocList.ContainsKey(cid) || !setCidList.ContainsKey(cid))
+            {
+                Debug.LogError("ERROR  at RemoveCharacterOnTile");
+                return;
+            }
+
+            // 게임 오브젝트 destroy
+            Destroy(setCidList[cid]);
+
+            // 해당 위치에 다시 배치가 가능해졌으므로 배치 가능한 타일 좌표에 다시 추가
+            nowSetableList.Add(new Vector2Int(setLocList[cid].x, setLocList[cid].y));
+
+            // 각 리스트에서 제거
+            setCidList.Remove(cid);
+            setLocList.Remove(cid);
+
+            // 배치 될 수 있는 cid 리스트에 추가
+            cidList.Add(cid);
+        }
+
+        private void CharacterBtnOnClicked(CID cid)
+        {
+            if (!nowSelectable)
+            {
+                return;
+            }
+
+            if (setCidList.ContainsKey(cid))
+            {
+                PanelBuilder.ShowFadeOutText(Canvas.transform, "Choose a new tile to change the position");
+            }
+            OnCharaSelected(cid);
+        }
+
+        private void RemoveCharacterBtnOnClicked()
+        {
+            // 배치되어 있는 캐릭터가 없으면 x
+            if(setCidList.Keys.Count == 0)
+            {
+                PanelBuilder.ShowFadeOutText(Canvas.transform, "Set the character at tile at least one first");
+                return;
+            }
+
+            selectedCid = NullCID;
+
+            mouseInput.Mouse.MouseClick.performed -= OnClickSetCharacter;
+            ClearHighlightedTile();
+
+            selectedCid = NullCID;
+
+            GameObject eventSystem = GameObject.Find("EventSystem");
+            eventSystem.GetComponent<EventSystem>().SetSelectedGameObject(null);
+
+            StartControlRemove();
+        }
+
         public void RandomDeployCharacter()
         {
             int needToSetNum = SetableNum - setCidList.Count;
 
             for (int i=0; i<needToSetNum; i++)
             {
-                CID cid = cidList[Random.Range(0, cidList.Count-1)];
-                Vector2Int loc = nowSetableList[Random.Range(0, nowSetableList.Count - 1)];
+                CID cid = cidList[Random.Range(0, cidList.Count)];
+                Vector2Int loc = nowSetableList[Random.Range(0, nowSetableList.Count)];
 
                 SetCharacterOnTile(cid, new Vector3Int(loc.x, loc.y, 0));
             }
@@ -363,7 +437,15 @@ namespace PickScene
         {
             selectedCid = NullCID;
 
-            mouseInput.Mouse.MouseClick.performed -= OnClick;
+            mouseInput.Mouse.MouseClick.performed -= OnClickSetCharacter;
+            mouseInput.Mouse.MouseClick.performed -= OnClickRemoveCharacter;
+
+            removeCharacterBtn.gameObject.SetActive(false);
+
+            foreach(Button o in characterBtnsParentObject.GetComponentsInChildren<Button>())
+            {
+                o.interactable = false;
+            }
 
             nowSelectable = false;
             ClearHighlightedTile();
@@ -406,12 +488,28 @@ namespace PickScene
         private void Start()
         {
             ClearHighlightedTile();
+            setCharacterLabel.gameObject.SetActive(false);
+            removeCharacterLabel.gameObject.SetActive(false);
 
             // 타일 좌표 알고 싶을 때 테스트 용
             //mouseInput.Mouse.MouseClick.performed += OnClickTest;
 
             SetSelectableCoords();
-            SetCidList();
+
+            foreach (CharacterBase cb in CharaList)
+            {
+                cidList.Add(cb.cid);
+            }
+
+            foreach (CharacterBase cb in CharaList)
+            {
+                GameObject o = Instantiate(btnPrefab);
+                o.GetComponent<CharacterBtn>().Init(cb.icon, cb.cid);
+                o.GetComponent<Button>().onClick.AddListener(delegate { CharacterBtnOnClicked(cb.cid); });
+                o.transform.SetParent(characterBtnsParentObject.transform);
+            }
+
+            removeCharacterBtn.onClick.AddListener(RemoveCharacterBtnOnClicked);
         }
     }
 
