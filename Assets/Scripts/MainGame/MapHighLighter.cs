@@ -16,6 +16,8 @@ namespace KWY
         [SerializeField]
         Color highlightColor;
 
+        private Dictionary<CID, List<Vector3Int>> Highlights = new Dictionary<CID, List<Vector3Int>>();
+
         private Color transparent = new Color(1, 1, 1, 0);
         private Vector3 lastPos;
         private List<Direction> allDirection = new List<Direction>();
@@ -70,12 +72,16 @@ namespace KWY
         }
 
         [PunRPC]
-        public void PhotonHighlightMap(Vector3 baseTilePos, List<Vector2Int> posList, Color? color = null)
+        public void PhotonHighlightMap(Vector3 baseTilePos, bool? c = null)
         {
             ClearHighlight();
 
-            if (color == null) color = highlightColor;
+            Color color;
+            if (c == null) color = highlightColor;
+            else color = Color.red;
 
+            List<Vector2Int> posList = baseTilePos.y % 2 == 0 ? MoveManager.MoveData.areaEvenY : MoveManager.MoveData.areaOddY;
+            posList.Add(Vector2Int.zero);
             foreach (Vector2 pos in posList)
             {
                 Vector3Int v = new Vector3Int((int)baseTilePos.x + (int)pos.x, (int)baseTilePos.y + (int)pos.y, 0);
@@ -88,8 +94,13 @@ namespace KWY
         }
 
         // raycast highlight
-        public void HighlightMap(Vector3 basePos, SkillBase sb, int overdir)
+        [PunRPC]
+        public void HighlightMap(Vector3 basePos, int sid/*SkillBase sb*/, int overdir, bool? c = null)
         {
+            SkillBase sb = SkillManager.GetData((SID)sid);
+            Color color;
+            if (c == null) color = highlightColor;
+            else color = Color.red;
             ClearHighlight();
             int dp;
             int rays = sb.directions.Count;
@@ -145,27 +156,27 @@ namespace KWY
                     {
                         case 0:
                             hlMap.SetTileFlags(hlMap.WorldToCell(lastPos + new Vector3(-0.5f * xCor, 0.5f * yCor) * j), TileFlags.None);
-                            hlMap.SetColor(hlMap.WorldToCell(lastPos + new Vector3(-0.5f * xCor, 0.5f * yCor) * j), highlightColor);
+                            hlMap.SetColor(hlMap.WorldToCell(lastPos + new Vector3(-0.5f * xCor, 0.5f * yCor) * j), (Color)color);
                             break;
                         case 1:
                             hlMap.SetTileFlags(hlMap.WorldToCell(lastPos + Vector3.left * xCor * j), TileFlags.None);
-                            hlMap.SetColor(hlMap.WorldToCell(lastPos + Vector3.left * xCor * j), highlightColor);
+                            hlMap.SetColor(hlMap.WorldToCell(lastPos + Vector3.left * xCor * j), (Color)color);
                             break;
                         case 2:
                             hlMap.SetTileFlags(hlMap.WorldToCell(lastPos + new Vector3(-0.5f * xCor, -0.5f * yCor) * j), TileFlags.None);
-                            hlMap.SetColor(hlMap.WorldToCell(lastPos + new Vector3(-0.5f * xCor, -0.5f * yCor) * j), highlightColor);
+                            hlMap.SetColor(hlMap.WorldToCell(lastPos + new Vector3(-0.5f * xCor, -0.5f * yCor) * j), (Color)color);
                             break;
                         case 3:
                             hlMap.SetTileFlags(hlMap.WorldToCell(lastPos + new Vector3(0.5f * xCor, -0.5f * yCor) * j), TileFlags.None);
-                            hlMap.SetColor(hlMap.WorldToCell(lastPos + new Vector3(0.5f * xCor, -0.5f * yCor) * j), highlightColor);
+                            hlMap.SetColor(hlMap.WorldToCell(lastPos + new Vector3(0.5f * xCor, -0.5f * yCor) * j), (Color)color);
                             break;
                         case 4:
                             hlMap.SetTileFlags(hlMap.WorldToCell(lastPos + Vector3.right * xCor * j), TileFlags.None);
-                            hlMap.SetColor(hlMap.WorldToCell(lastPos + Vector3.right * xCor * j), highlightColor);
+                            hlMap.SetColor(hlMap.WorldToCell(lastPos + Vector3.right * xCor * j), (Color)color);
                             break;
                         case 5:
                             hlMap.SetTileFlags(hlMap.WorldToCell(lastPos + new Vector3(0.5f * xCor, 0.5f * yCor) * j), TileFlags.None);
-                            hlMap.SetColor(hlMap.WorldToCell(lastPos + new Vector3(0.5f * xCor, 0.5f * yCor) * j), highlightColor);
+                            hlMap.SetColor(hlMap.WorldToCell(lastPos + new Vector3(0.5f * xCor, 0.5f * yCor) * j), (Color)color);
                             break;
                         case 6:
                             break;
@@ -198,70 +209,75 @@ namespace KWY
         }
 
         // area highlight
-        public void HighlightMap(Vector3 basePos, SkillBase sb)
+        [PunRPC]
+        public void HighlightMap(Vector3 basePos, int sid/*SkillBase sb*/, bool? c = null)
         {
+            SkillBase sb = SkillManager.GetData((SID)sid);
+            Color color;
+            if (c == null) color = highlightColor;
+            else color = Color.red;
             ClearHighlight();
             for (int i = 0; i <= sb.distance[0]; i++)
             {
                 if (i == 0)
                 {
                     hlMap.SetTileFlags(hlMap.WorldToCell(basePos), TileFlags.None);
-                    hlMap.SetColor(hlMap.WorldToCell(basePos), highlightColor);
+                    hlMap.SetColor(hlMap.WorldToCell(basePos), (Color)color);
                     continue;
                 }
 
                 hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(-0.5f * xCor, 0.5f * yCor) * i), TileFlags.None);
-                hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(-0.5f * xCor, 0.5f * yCor) * i), highlightColor);
+                hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(-0.5f * xCor, 0.5f * yCor) * i), (Color)color);
 
                 for (int j = 1; j <= i - 1; j++)
                 {
                     hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(-0.5f * xCor, 0.5f * yCor) * i + Vector3.right * xCor * j), TileFlags.None);
-                    hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(-0.5f * xCor, 0.5f * yCor) * i + Vector3.right * xCor * j), highlightColor);
+                    hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(-0.5f * xCor, 0.5f * yCor) * i + Vector3.right * xCor * j), (Color)color);
                 }
 
                 hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(0.5f * xCor, 0.5f * yCor) * i), TileFlags.None);
-                hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(0.5f * xCor, 0.5f * yCor) * i), highlightColor);
+                hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(0.5f * xCor, 0.5f * yCor) * i), (Color)color);
 
                 for (int j = 1; j <= i - 1; j++)
                 {
                     hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(0.5f * xCor, 0.5f * yCor) * i + new Vector3(0.5f * xCor, -0.5f * yCor) * j), TileFlags.None);
-                    hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(0.5f * xCor, 0.5f * yCor) * i + new Vector3(0.5f * xCor, -0.5f * yCor) * j), highlightColor);
+                    hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(0.5f * xCor, 0.5f * yCor) * i + new Vector3(0.5f * xCor, -0.5f * yCor) * j), (Color)color);
                 }
 
                 hlMap.SetTileFlags(hlMap.WorldToCell(basePos + Vector3.right * xCor * i), TileFlags.None);
-                hlMap.SetColor(hlMap.WorldToCell(basePos + Vector3.right * xCor * i), highlightColor);
+                hlMap.SetColor(hlMap.WorldToCell(basePos + Vector3.right * xCor * i), (Color)color);
 
                 for (int j = 1; j <= i - 1; j++)
                 {
                     hlMap.SetTileFlags(hlMap.WorldToCell(basePos + Vector3.right * xCor * i + new Vector3(-0.5f * xCor, -0.5f * yCor) * j), TileFlags.None);
-                    hlMap.SetColor(hlMap.WorldToCell(basePos + Vector3.right * xCor * i + new Vector3(-0.5f * xCor, -0.5f * yCor) * j), highlightColor);
+                    hlMap.SetColor(hlMap.WorldToCell(basePos + Vector3.right * xCor * i + new Vector3(-0.5f * xCor, -0.5f * yCor) * j), (Color)color);
                 }
 
                 hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(0.5f * xCor, -0.5f * yCor) * i), TileFlags.None);
-                hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(0.5f * xCor, -0.5f * yCor) * i), highlightColor);
+                hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(0.5f * xCor, -0.5f * yCor) * i), (Color)color);
 
                 for (int j = 1; j <= i - 1; j++)
                 {
                     hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(0.5f * xCor, -0.5f * yCor) * i + Vector3.left * xCor * j), TileFlags.None);
-                    hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(0.5f * xCor, -0.5f * yCor) * i + Vector3.left * xCor * j), highlightColor);
+                    hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(0.5f * xCor, -0.5f * yCor) * i + Vector3.left * xCor * j), (Color)color);
                 }
 
                 hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(-0.5f * xCor, -0.5f * yCor) * i), TileFlags.None);
-                hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(-0.5f * xCor, -0.5f * yCor) * i), highlightColor);
+                hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(-0.5f * xCor, -0.5f * yCor) * i), (Color)color);
 
                 for (int j = 1; j <= i - 1; j++)
                 {
                     hlMap.SetTileFlags(hlMap.WorldToCell(basePos + new Vector3(-0.5f * xCor, -0.5f * yCor) * i + new Vector3(-0.5f * xCor, 0.5f * yCor) * j), TileFlags.None);
-                    hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(-0.5f * xCor, -0.5f * yCor) * i + new Vector3(-0.5f * xCor, 0.5f * yCor) * j), highlightColor);
+                    hlMap.SetColor(hlMap.WorldToCell(basePos + new Vector3(-0.5f * xCor, -0.5f * yCor) * i + new Vector3(-0.5f * xCor, 0.5f * yCor) * j), (Color)color);
                 }
 
                 hlMap.SetTileFlags(hlMap.WorldToCell(basePos + Vector3.left * xCor * i), TileFlags.None);
-                hlMap.SetColor(hlMap.WorldToCell(basePos + Vector3.left * xCor * i), highlightColor);
+                hlMap.SetColor(hlMap.WorldToCell(basePos + Vector3.left * xCor * i), (Color)color);
 
                 for (int j = 1; j <= i - 1; j++)
                 {
                     hlMap.SetTileFlags(hlMap.WorldToCell(basePos + Vector3.left * xCor * i + new Vector3(0.5f * xCor, 0.5f * yCor) * j), TileFlags.None);
-                    hlMap.SetColor(hlMap.WorldToCell(basePos + Vector3.left * xCor * i + new Vector3(0.5f * xCor, 0.5f * yCor) * j), highlightColor);
+                    hlMap.SetColor(hlMap.WorldToCell(basePos + Vector3.left * xCor * i + new Vector3(0.5f * xCor, 0.5f * yCor) * j), (Color)color);
                 }
             }
         }

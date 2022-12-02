@@ -148,17 +148,17 @@ namespace KWY
 
             if (((SkillBase)SelAction).areaAttack)
             {
-                highLighter.HighlightMap(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction));
+                highLighter.HighlightMap(map.CellToWorld(SelChara.TempTilePos), (int)sb.sid/*(SkillBase)SelAction*/);
             }
             else
             {
                 if(SelChara.Pc.Team == 0)
                 {
-                    highLighter.HighlightMap(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), (int)Direction.Right);
+                    highLighter.HighlightMap(map.CellToWorld(SelChara.TempTilePos), (int)sb.sid/*(SkillBase)SelAction*/, (int)Direction.Right);
                 }
                 else
                 {
-                    highLighter.HighlightMap(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), (int)Direction.Left);
+                    highLighter.HighlightMap(map.CellToWorld(SelChara.TempTilePos), (int)sb.sid/*(SkillBase)SelAction*/, (int)Direction.Left);
                 }
             }
 
@@ -251,7 +251,7 @@ namespace KWY
             {
                 return;
             }
-
+            SkillBase sb = (SkillBase)SelAction;
             Vector2 mousePosition = mouseInput.Mouse.MousePosition.ReadValue<Vector2>();
             mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
             overVec = map.WorldToCell(mousePosition);
@@ -281,7 +281,7 @@ namespace KWY
 
                 if(dir != Direction.None)
                 {
-                    highLighter.HighlightMap(map.CellToWorld(new Vector3Int(overVec.x, overVec.y, 0)), ((SkillBase)SelAction));
+                    highLighter.HighlightMap(map.CellToWorld(new Vector3Int(overVec.x, overVec.y, 0)), (int)sb.sid/*(SkillBase)SelAction*/);
                 }
             }
             else
@@ -327,7 +327,7 @@ namespace KWY
 
                 if(dir != Direction.None)
                 {
-                    highLighter.HighlightMap(map.CellToWorld(SelChara.TempTilePos), ((SkillBase)SelAction), (int)dir);
+                    highLighter.HighlightMap(map.CellToWorld(SelChara.TempTilePos), (int)sb.sid/*(SkillBase)SelAction*/, (int)dir);
                 }
             }
         }

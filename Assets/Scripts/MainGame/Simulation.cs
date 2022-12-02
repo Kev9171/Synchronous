@@ -24,6 +24,9 @@ namespace KWY
         [SerializeField]
         private RectTransform characterPanel;
 
+        [SerializeField]
+        MapHighLighter mapHighLighter;
+
         #region Private Fields
         [Tooltip("Game data about player and characters")]
         [SerializeField]
@@ -178,7 +181,12 @@ namespace KWY
                     }
                     else if (type == ActionType.Skill)
                     {
+                        if(SkillManager.GetData((SID)d[2]).areaAttack)
+                            mapHighLighter.photonView.RPC("HighlightMap", RpcTarget.All, new Vector3((int)d[4], (int)d[5]), (int)d[2], true);
+                        else
+                            mapHighLighter.photonView.RPC("HighlightMap", RpcTarget.All, (Vector3)data.PCharacters[id].Chara.TilePos, (int)d[2], (int)d[3], true);
                         yield return new WaitForSeconds(SkillManager.GetData((SID)d[2]).castingTime);
+                        mapHighLighter.photonView.RPC("PhotonClearHighlight", RpcTarget.All);
                         StartCoroutine(DoCharaSkill(id, (SID)d[2], (Direction)d[3], new Vector2Int((int)d[4], (int)d[5])));
                         data.PCharacters[id].Chara.SetMoveIdx(1);
                         yield return new WaitForSeconds(SkillManager.GetData((SID)d[2]).triggerTime);
