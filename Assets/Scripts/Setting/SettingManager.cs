@@ -35,7 +35,7 @@ namespace KWY
             }
         }
 
-        public string SettingFileName = "game_settings.json";
+        public readonly string SettingFileName = "game_settings.json";
 
         private GamePlaySettingData _gameSettings;
         public GamePlaySettingData gameSettings
@@ -77,8 +77,14 @@ namespace KWY
             File.WriteAllText(filePath, data);
 
             // for test
-            Debug.Log("Game play setting is saved");
             Debug.Log(data);
+
+            // 데이터 적용
+            if (BackgroundMusic.Instance != null)
+            {
+                BackgroundMusic.Instance.ApplySettings();
+                Debug.Log("The setting values are applied");
+            }
         }
 
         /*// 게임 종료시 실행 되는 Callback Function

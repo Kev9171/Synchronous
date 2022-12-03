@@ -4279,7 +4279,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8105528a530854446a1fcce50fd41523, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hpBarPrefab: {fileID: 6266555229986107918, guid: 96e02d8273180134bb12cae5f4fc58ee, type: 3}
+  hpBarPrefabEnemy: {fileID: 6266555229986107918, guid: 96e02d8273180134bb12cae5f4fc58ee, type: 3}
+  hpBarPrefabMyTeam: {fileID: 6266555229986107918, guid: fa44b9a4688650d499608f9a9e60ff09, type: 3}
   canvasTransform: {fileID: 134885409}
 --- !u!4 &1038993394
 Transform:

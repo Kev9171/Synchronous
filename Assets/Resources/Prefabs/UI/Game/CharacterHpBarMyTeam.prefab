@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5538400377026565179}
   - component: {fileID: 8368665108648428635}
   m_Layer: 5
-  m_Name: CharacterHpBar
+  m_Name: CharacterHpBarMyTeam
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -147,7 +147,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.11764706, b: 0.11764706, a: 1}
+  m_Color: {r: 0.061995964, g: 0.7924528, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

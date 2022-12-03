@@ -83,6 +83,7 @@ namespace UI
             nameLabel.text = chara.Cb.characterName;
 
             charaImg.sprite = chara.Cb.icon;
+            charaImg.preserveAspect = true;
 
             LoadBuffs();
 
