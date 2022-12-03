@@ -310,7 +310,19 @@ namespace KWY
         {
             foreach(PlayableCharacter pc in _pCharacters.Values)
             {
-                CharacterHpBarController.Instance.AddBar(pc.Chara);
+                if (PhotonNetwork.IsMasterClient && pc.Team == Team.A)
+                {
+                    CharacterHpBarController.Instance.AddBarMyTeam(pc.Chara);
+
+                }
+                else if (!PhotonNetwork.IsMasterClient && pc.Team == Team.B)
+                {
+                    CharacterHpBarController.Instance.AddBarMyTeam(pc.Chara);
+                }
+                else
+                {
+                    CharacterHpBarController.Instance.AddBarEnemey(pc.Chara);
+                }
             }
         }
 

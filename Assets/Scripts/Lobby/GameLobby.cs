@@ -175,7 +175,7 @@ namespace Lobby
             // 상대 플레이어 입장 안했을 경우 레디 x
             if (PhotonNetwork.CurrentRoom.PlayerCount != 2)
             {
-                PanelBuilder.ShowFadeOutText(CanvasTransform, "Other player is not exist yet.");
+                PanelBuilder.ShowFadeOutText(CanvasTransform, "There is no other player yet.");
                 return;
             }
 
