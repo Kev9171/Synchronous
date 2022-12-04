@@ -1,3 +1,5 @@
+#define TEST
+
 using Photon.Pun;
 using Photon.Realtime;
 
@@ -90,8 +92,12 @@ namespace KWY
         {
             Debug.Log("Failed to connect to Photon: " + cause.ToString(), this);
 
+#if TEST
+
+#else
             // 로그아웃 요청
             StartCoroutine(LoginJoinAPI.Instance.LogoutPost(UserManager.AccountId));
+#endif
 
             // 연결 실패할 경우 오류 팝업 띄우기
             GameObject canvas = GameObject.Find("Canvas");
