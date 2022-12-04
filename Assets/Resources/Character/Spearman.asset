@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da4cd96c464fed146b6d56b4d7392abf, type: 3}
-  m_Name: Flappy 1
+  m_Name: Spearman
   m_EditorClassIdentifier: 
-  cid: 1
-  characterName: Flappy
+  cid: 4
+  characterName: Spearman
   characterEx: 
   hp: 100
   atk: 100
   spd: 5
-  icon: {fileID: 21300000, guid: 3368467e8b6c345a9820e0730a7bfc82, type: 3}
+  icon: {fileID: 389924197945611832, guid: 5104bc1189342bf419e0d7a514335355, type: 3}
   passiveIcon: {fileID: 0}
   passiveEx: 
   skills: 0300000001000000

@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 1417912235128003679}
   - component: {fileID: -6070446347343642895}
   m_Layer: 0
-  m_Name: Flappy 1
+  m_Name: Spearman
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -80,12 +80,12 @@ SpriteRenderer:
   m_SortingLayerID: 1807390041
   m_SortingLayer: 1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 3368467e8b6c345a9820e0730a7bfc82, type: 3}
+  m_Sprite: {fileID: 389924197945611832, guid: 5104bc1189342bf419e0d7a514335355, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.7975, y: 1.28}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -105,13 +105,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowLayerWeightsInspector: 1
   ShowParameterInspector: 1
-  m_SynchronizeParameters:
-  - Type: 4
-    SynchronizeType: 1
-    Name: idle
-  - Type: 9
-    SynchronizeType: 0
-    Name: IsAttacking
+  m_SynchronizeParameters: []
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0
@@ -141,7 +135,7 @@ Animator:
   m_GameObject: {fileID: 1445382690674112773}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 42f5751c97ec4aa4691e9354fd7c1944, type: 2}
+  m_Controller: {fileID: 9100000, guid: 38aa5baaacc92a94f960a56ce4899240, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -187,7 +181,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d538e2fa3278cf479f0d918139bf20d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _characterBase: {fileID: 11400000, guid: da6c8684341450244928e0a87054b797, type: 2}
+  _characterBase: {fileID: 11400000, guid: e630d0cb3400ee847bb434ecadb390fc, type: 2}
   HpBarRelativePosY: 0.5
   BreakDownNotice: 0
   currentTime: 0
@@ -208,9 +202,9 @@ BoxCollider2D:
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
+    pivot: {x: 0.25, y: 0}
+    oldSize: {x: 1.7975, y: 1.28}
+    newSize: {x: 1.7975, y: 1.28}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
