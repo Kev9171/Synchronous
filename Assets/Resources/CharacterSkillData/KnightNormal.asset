@@ -25,8 +25,8 @@ MonoBehaviour:
   - {x: 2, y: 0}
   sid: 3
   casters: 03000000
-  skillExplanation: lalalalalalalalalal
-  skillExImg: {fileID: 0}
+  skillExplanation: Normal Attack
+  skillExImg: {fileID: 21300000, guid: 8fdf9f26fdc56c94d8aef150c11e1412, type: 3}
   distance:
   - 2
   directions: 01000000

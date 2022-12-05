@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cid: 3
   characterName: Knight
-  characterEx: knight~~
+  characterEx: Brave and Nice Knight!
   hp: 150
   atk: 60
   spd: 3
   icon: {fileID: -8452333488610634688, guid: 23cd94724d37006429c71a0f2ff017ee, type: 3}
-  passiveIcon: {fileID: 0}
-  passiveEx: 
+  passiveIcon: {fileID: 21300000, guid: 8fdf9f26fdc56c94d8aef150c11e1412, type: 3}
+  passiveEx: No Passive
   skills: 0300000004000000

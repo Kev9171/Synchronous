@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cid: 4
   characterName: Spearman
-  characterEx: 
+  characterEx: Attacks with a long spear!
   hp: 100
   atk: 100
   spd: 5
   icon: {fileID: 389924197945611832, guid: 5104bc1189342bf419e0d7a514335355, type: 3}
-  passiveIcon: {fileID: 0}
-  passiveEx: 
+  passiveIcon: {fileID: 21300000, guid: 8fdf9f26fdc56c94d8aef150c11e1412, type: 3}
+  passiveEx: No Passive
   skills: 0300000006000000

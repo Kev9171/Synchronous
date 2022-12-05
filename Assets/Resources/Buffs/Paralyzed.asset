@@ -15,4 +15,4 @@ MonoBehaviour:
   bid: 2
   buffName: Paralyzed
   icon: {fileID: 0}
-  explanation: '!!!!'
+  explanation: Paralyzed. Can not move.

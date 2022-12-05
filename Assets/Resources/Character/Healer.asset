@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cid: 5
   characterName: Healer
-  characterEx: 
+  characterEx: Healer can cure your characters!
   hp: 100
   atk: 100
   spd: 5
   icon: {fileID: -532353461694774378, guid: 65a95a38eebceaa40bfac886099ec230, type: 3}
-  passiveIcon: {fileID: 0}
-  passiveEx: 
+  passiveIcon: {fileID: 21300000, guid: 8fdf9f26fdc56c94d8aef150c11e1412, type: 3}
+  passiveEx: No Passive
   skills: 0300000005000000
