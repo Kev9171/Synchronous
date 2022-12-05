@@ -479,6 +479,7 @@ MonoBehaviour:
   gameEvent: {fileID: 1896979066}
   characterPanel: {fileID: 183041436}
   mapHighLighter: {fileID: 1594926160}
+  hlMap: {fileID: 168218744}
   data: {fileID: 1447055416}
   timeAfterSimul: 3
 --- !u!1 &142737144

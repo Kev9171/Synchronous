@@ -3,6 +3,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 using Photon.Pun;
 
 namespace KWY
@@ -26,6 +27,9 @@ namespace KWY
 
         [SerializeField]
         MapHighLighter mapHighLighter;
+
+        [SerializeField]
+        Tilemap hlMap;
 
         #region Private Fields
         [Tooltip("Game data about player and characters")]
@@ -182,9 +186,9 @@ namespace KWY
                     else if (type == ActionType.Skill)
                     {
                         if(SkillManager.GetData((SID)d[2]).areaAttack)
-                            mapHighLighter.photonView.RPC("HighlightMap", RpcTarget.All, new Vector3((int)d[4], (int)d[5]), (int)d[2], id, true);
+                            mapHighLighter.photonView.RPC("HighlightMap", RpcTarget.All, hlMap.CellToWorld(new Vector3Int((int)d[4], (int)d[5], 0)), (int)d[2], id, true);
                         else
-                            mapHighLighter.photonView.RPC("HighlightMap", RpcTarget.All, (Vector3)data.PCharacters[id].Chara.TilePos, (int)d[2], (int)d[3], id, true);
+                            mapHighLighter.photonView.RPC("HighlightMap", RpcTarget.All, hlMap.CellToWorld(data.PCharacters[id].Chara.TilePos), (int)d[2], (int)d[3], id, true);
                         yield return new WaitForSeconds(SkillManager.GetData((SID)d[2]).castingTime);
                         mapHighLighter.photonView.RPC("PhotonClearHighlight", RpcTarget.All, id);
                         StartCoroutine(DoCharaSkill(id, (SID)d[2], (Direction)d[3], new Vector2Int((int)d[4], (int)d[5])));

@@ -231,6 +231,7 @@ namespace KWY
             List<Vector3Int> vec = new List<Vector3Int>();
             if (c == null) color = highlightColor;
             else color = Color.red;
+            if (c!= null && sb.value < 0) color = Color.green;
             ClearHighlight(cid);
             for (int i = 0; i <= sb.distance[0]; i++)
             {
