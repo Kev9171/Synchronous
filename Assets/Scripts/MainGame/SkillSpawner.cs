@@ -35,26 +35,63 @@ public class SkillSpawner : MonoBehaviour
 
         Debug.Log($"caster:{gameObject.tag}, collider.gameObject: {collision.gameObject.tag}");
 
-        // not my skill
-        if (gameObject.CompareTag("Enemy"))
+        if(sb.isDamage)
         {
-            // 자신의 캐릭터(마스터 캐릭터)가 피격 당했을때
-            if (collision.gameObject.CompareTag("Friendly"))
+            if(sb.value > 0)
             {
-                Debug.Log($"dmage: {damage}");
-                DataController.Instance.ModifyCharacterHp(
-                    collision.gameObject.GetComponent<Character>().Pc.Id, -damage);
+                Debug.Log("this is sb.value > 0: " + sb.value);
+                // not my skill
+                if (gameObject.CompareTag("Enemy"))
+                {
+                    // 자신의 캐릭터(마스터 캐릭터)가 피격 당했을때
+                    if (collision.gameObject.CompareTag("Friendly"))
+                    {
+                        Debug.Log($"dmage: {damage}");
+                        DataController.Instance.ModifyCharacterHp(
+                            collision.gameObject.GetComponent<Character>().Pc.Id, -damage);
+                    }
+                }
+
+                if (gameObject.CompareTag("Friendly"))
+                {
+                    if (collision.gameObject.CompareTag("Enemy"))
+                    {
+                        Debug.Log($"dmage: {damage}");
+                        DataController.Instance.ModifyCharacterHp(
+                            collision.gameObject.GetComponent<Character>().Pc.Id, -damage);
+                    }
+                }
+            }
+            else
+            {
+                Debug.Log("this is sb.value < 0: " + sb.value);
+                // 체력 회복
+                if (gameObject.CompareTag("Enemy"))
+                {
+                    // 상대방
+                    if (collision.gameObject.CompareTag("Enemy"))
+                    {
+                        Debug.Log($"dmage: {damage}");
+                        DataController.Instance.ModifyCharacterHp(
+                            collision.gameObject.GetComponent<Character>().Pc.Id, damage);
+                    }
+                }
+
+                if (gameObject.CompareTag("Friendly"))
+                {
+                    // 자신
+                    if (collision.gameObject.CompareTag("Friendly"))
+                    {
+                        Debug.Log($"dmage: {damage}");
+                        DataController.Instance.ModifyCharacterHp(
+                            collision.gameObject.GetComponent<Character>().Pc.Id, damage);
+                    }
+                }
             }
         }
-
-        if (gameObject.CompareTag("Friendly"))
+        else
         {
-            if (collision.gameObject.CompareTag("Enemy"))
-            {
-                Debug.Log($"dmage: {damage}");
-                DataController.Instance.ModifyCharacterHp(
-                    collision.gameObject.GetComponent<Character>().Pc.Id, -damage);
-            }
+            // 추후 버프 추가하면 사용
         }
     }
 

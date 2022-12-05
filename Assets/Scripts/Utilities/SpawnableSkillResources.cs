@@ -12,6 +12,8 @@ namespace KWY
         public static string KnightNormal = "Prefabs/SpawnableSkills/KnightNormal";
         public static string KnightSpecial = "Prefabs/SpawnableSkills/KnightSpecial";
         public static string LighteningVolt = "Prefabs/SpawnableSkills/LightningVolt";
+        public static string Heal = "Prefabs/SpawnableSkills/Heal";
+        public static string SpearAttack = "Prefabs/SpawnableSkills/SpearAttack";
 
         public static string GetPath(SID sid)
         {
@@ -21,6 +23,8 @@ namespace KWY
                 SID.LightingVolt => LighteningVolt,
                 SID.KnightNormal => KnightNormal,
                 SID.KnightSpecial => KnightSpecial,
+                SID.Heal => Heal,
+                SID.SpearAttack => SpearAttack,
                 _ => throw new System.NotImplementedException(),
             };
         }
