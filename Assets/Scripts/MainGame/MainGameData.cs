@@ -530,7 +530,8 @@ namespace KWY
                     CID.Flappy => PhotonNetwork.Instantiate(CharacterResources.Flappy_1, _tileMap.CellToWorld(loc), Quaternion.identity),
                     CID.Flappy2 => PhotonNetwork.Instantiate(CharacterResources.Flappy2_2, _tileMap.CellToWorld(loc), Quaternion.identity),
                     CID.Knight => PhotonNetwork.Instantiate(CharacterResources.Knight_3, _tileMap.CellToWorld(loc), Quaternion.identity),
-                    _ => throw new System.NotImplementedException(),
+                    CID.Spearman => PhotonNetwork.Instantiate(CharacterResources.Spearman_4, _tileMap.CellToWorld(loc), Quaternion.identity),
+                    _ => throw new System.NotImplementedException($"Can not find cid = {cid} at PhotonInstantiate."),
                 };
             }
             catch (Exception)
