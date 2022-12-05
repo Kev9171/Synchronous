@@ -197,17 +197,33 @@ namespace KWY
 
         IEnumerator DoCharaMove(int id, Vector2Int v)
         {
-            data.PCharacters[id].CharaObject.GetComponent<PhotonView>().RPC("MoveTo", RpcTarget.All, v.x, v.y);
-            //data.PCharacters[id].Chara.MoveTo(v.x, v.y);
-            showActions.ShowMoveLog(id);
-            yield return null;
+            if (MainGameData.Instance.PCharacters[id].Chara.BreakDown)
+            {
+                Debug.Log($"This character={id} is break down. Can not do actions ");
+                yield return null;
+            }
+            else
+            {
+                data.PCharacters[id].CharaObject.GetComponent<PhotonView>().RPC("MoveTo", RpcTarget.All, v.x, v.y);
+                //data.PCharacters[id].Chara.MoveTo(v.x, v.y);
+                showActions.ShowMoveLog(id);
+                yield return null;
+            }
         }
 
         IEnumerator DoCharaSkill(int id, SID sid, Direction dir, Vector2Int v)
         {
-            data.PCharacters[id].Chara.SpellSkill(sid, dir, v.x, v.y);
-            showActions.ShowSkillLog(id, sid);
-            yield return null;
+            if (MainGameData.Instance.PCharacters[id].Chara.BreakDown)
+            {
+                Debug.Log($"This character={id} is break down. Can not do actions ");
+                yield return null;
+            }
+            else
+            {
+                data.PCharacters[id].Chara.SpellSkill(sid, dir, v.x, v.y);
+                showActions.ShowSkillLog(id, sid);
+                yield return null;
+            }
         }
 
         public void ChangeAction(int id, int y)

@@ -15,13 +15,20 @@ namespace KWY
 
         public void SetData(Sprite icon, string userName)
         {
-            userIcon.sprite = icon;
+            if (icon)
+            {
+                userIcon.sprite = icon;
+            }
+            
             userNameText.text = userName;
         }
 
         public void LoadNowUser()
         {
-            userIcon.sprite = UserManager.UserIcon;
+            if (UserManager.UserIcon)
+            {
+                userIcon.sprite = UserManager.UserIcon;
+            }
             userNameText.text = UserManager.UserName;
         }
     }

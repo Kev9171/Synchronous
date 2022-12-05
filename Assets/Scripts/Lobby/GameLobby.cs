@@ -3,16 +3,12 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-using System.Collections;
-
 using TMPro;
 
 using Photon.Pun;
-using Photon.Realtime;
 
 using PhotonPlayer = Photon.Realtime.Player;
 
-using DebugUtil;
 using KWY;
 using UI;
 
