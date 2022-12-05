@@ -47,7 +47,12 @@ namespace KWY
         const string reallyQuitGameContent = "Do you want to quit game?";
         public void LoadUserInfo()
         {
-            UserIcon.sprite = UserManager.UserIcon;
+            var icon = UserManager.UserIcon;
+            if (icon)
+            {
+                UserIcon.sprite = UserManager.UserIcon;
+            }
+            
             UserName.text = UserManager.UserName;
         }
 
@@ -182,13 +187,13 @@ namespace KWY
     {
         public override void OnPointerEnter(PointerEventData eventData)
         {
-            //gameObject.GetComponent<RectTransform>().localScale = new Vector3(1.05f, 1.05f, 1.05f);
-            //base.OnPointerEnter(eventData);
+            gameObject.GetComponent<RectTransform>().localScale = new Vector3(1.05f, 1.05f, 1.05f);
+            base.OnPointerEnter(eventData);
         }
         public override void OnPointerExit(PointerEventData eventData)
         {
-            //gameObject.GetComponent<RectTransform>().localScale = new Vector3(1.0f, 1.0f, 1.0f);
-            //base.OnPointerExit(eventData);
+            gameObject.GetComponent<RectTransform>().localScale = new Vector3(1.0f, 1.0f, 1.0f);
+            base.OnPointerExit(eventData);
         }
     }
 }

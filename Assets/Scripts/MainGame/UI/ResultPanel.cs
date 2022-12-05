@@ -59,6 +59,8 @@ namespace KWY
         // юс╫ц╥н Object
         public void SetData(WINLOSE result, ResultData data)
         {
+            okBtn.interactable = false;
+
             this.data = data;
             this.result = result;
 
@@ -74,17 +76,11 @@ namespace KWY
 
             {
                 psScore = GetPlayerSkillCountScore(data.PlayerSkillCount);
-                GameObject t = Instantiate(
-                Resources.Load(
-                    "Prefabs/UI/Game/ScoreListPanel",
-                    typeof(GameObject)), scoreListBox.transform) as GameObject;
-                t.GetComponent<ScoreListPanel>().SetData("PlayerSkill", psScore);
                 totalScore += psScore;
             }
 
-            okBtn.interactable = false;
+            
             StartCoroutine(ShowResult());
-            okBtn.interactable = true;
         }
 
         public void Init()
@@ -201,6 +197,8 @@ namespace KWY
             yield return new WaitForSeconds(0.5f);
             scoreText.text = totalScore.ToString();
             totalScorePanel.SetActive(true);
+
+            okBtn.interactable = true;
         }
     }
 }

@@ -15,6 +15,7 @@ namespace PickScene
         public void Init(Sprite icon, CID cid)
         {
             GetComponent<Image>().sprite = icon;
+            GetComponent<Image>().preserveAspect = true;
             this.cid = cid;
         }
     }

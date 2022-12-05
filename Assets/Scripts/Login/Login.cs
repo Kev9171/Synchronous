@@ -45,7 +45,7 @@ namespace KWY
             ShowLoadingPanel();
 
 #if NO_LOGIN_SERVER
-            LoginCallback(new LoginResData((int)ResCode.TRUE, "OK", 111, "test-email", 1, "temp name", null));
+            LoginCallback(new LoginResData((int)ResCode.TRUE, "OK", 111, "test-email", 1, "player", null));
             return;
 #endif
             // original code

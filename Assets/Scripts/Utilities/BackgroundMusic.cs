@@ -10,6 +10,8 @@ public class BackgroundMusic : MonoBehaviour
 {
     public static BackgroundMusic Instance;
 
+    private string currentScene;
+
     new AudioSource audio;
 
     private struct MUSIC
@@ -32,11 +34,33 @@ public class BackgroundMusic : MonoBehaviour
         }
 
         audio = GetComponent<AudioSource>();
+
+        if (SettingManager.Instance != null)
+        {
+           Debug.Log("The setting file is loaded.");
+        }
     }
 
-    public void PlayMusicSceneChanged(Scene a, Scene b)
+    public void PlayMusicSceneChanged(Scene previousScene, Scene newActiveScene)
     {
-        PlayMusic();
+        // ¾À ¹Ù²ð¶§ previousScene.nameÀº null °ª
+        string prev = previousScene.name;
+        string now = newActiveScene.name;
+
+        if (prev == null)
+        {
+            prev = currentScene;
+        }
+
+        if (prev.Equals("StartScene") && now.Equals("GameLobby") || prev.Equals("GameLobby") && now.Equals("StartScene"))
+        {
+            ;
+        }
+        else
+        {
+            PlayMusic();
+        }
+        currentScene = now;
     }
 
     public void PlayMusic()
@@ -123,6 +147,7 @@ public class BackgroundMusic : MonoBehaviour
 
     private void Start()
     {
+        currentScene = SceneManager.GetActiveScene().name;
         SceneManager.activeSceneChanged += PlayMusicSceneChanged;
     }
 
