@@ -58,7 +58,7 @@ namespace KWY
                 {
                     GameObject damageTextInstance = PhotonNetwork.Instantiate("TextHolder", pc.Chara.transform.position, Quaternion.identity, 0);
                     damageTextInstance.transform.GetChild(0).GetComponent<TextMeshPro>().SetText(amount.ToString());
-                    damageTextInstance.transform.GetChild(0).GetComponent<TextMeshPro>().color = new Color32(16, 202, 0, 255);
+                    damageTextInstance.transform.GetChild(0).GetComponent<TextMeshPro>().color = new Color(0, 1, 0, 1);
                     damageTextInstance.transform.GetChild(0).GetComponent<TextMeshPro>().sortingOrder = 999;
                     pc.Chara.AddHp(amount);
                 }
@@ -66,6 +66,7 @@ namespace KWY
                 {
                     GameObject damageTextInstance = PhotonNetwork.Instantiate("TextHolder", pc.Chara.transform.position, Quaternion.identity, 0);
                     damageTextInstance.transform.GetChild(0).GetComponent<TextMeshPro>().SetText(amount.ToString());
+                    damageTextInstance.transform.GetChild(0).GetComponent<TextMeshPro>().color = new Color(1, 0, 0, 1);
                     damageTextInstance.transform.GetChild(0).GetComponent<TextMeshPro>().sortingOrder = 999;
                     pc.Chara.DamageHP(-amount);
                 }
