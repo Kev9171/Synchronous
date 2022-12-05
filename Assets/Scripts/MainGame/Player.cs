@@ -166,7 +166,7 @@ namespace KWY
             mapHighLighter.photonView.RPC("PhotonHighlightMap", RpcTarget.All, (Vector3)clickV, true);
             yield return new WaitForSeconds(time);
             //mapHighLighter.ClearHighlight();
-            mapHighLighter.photonView.RPC("PhotonClearHighlight", RpcTarget.All);
+            mapHighLighter.photonView.RPC("PhotonClearHighlight", RpcTarget.All, -1);
             foreach (Vector2Int vec in v)
             {
                 Vector2Int newVec = (Vector2Int)clickV + vec;
