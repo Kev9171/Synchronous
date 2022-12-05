@@ -177,7 +177,8 @@ namespace KWY
                     {
                         foreach (GameObject c in ch)
                         {
-                            DataController.Instance.ModifyCharacterHp(c.GetComponent<Character>().Pc.Id, -100);
+                            // original damage : -100
+                            DataController.Instance.ModifyCharacterHp(c.GetComponent<Character>().Pc.Id, -150);
                             Debug.Log(c.name + "hit by meteor");
                         }
                     }
