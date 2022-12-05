@@ -14579,7 +14579,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _characterBase: {fileID: 11400000, guid: f30847bdd2f685e47aed92d6b0c1b32d, type: 2}
-  HpBarRelativePosY: 1.4
+  HpBarRelativePosY: 1
   BreakDownNotice: 0
   currentTime: 0
   TilePos: {x: 0, y: 0, z: 0}
@@ -14599,7 +14599,7 @@ BoxCollider2D:
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0}
+    pivot: {x: 0.375, y: 0}
     oldSize: {x: 1.4175, y: 1.2025}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5

@@ -36,6 +36,8 @@ namespace KWY
         LightingVolt = 2,
         KnightNormal = 3,
         KnightSpecial = 4,
+        Heal = 5,
+        SpearAttack = 6
     }
 
     public enum BID : int

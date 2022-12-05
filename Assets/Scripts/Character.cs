@@ -160,7 +160,7 @@ namespace KWY
             {
                 Hp = MaxHp;
             }
-            else if (Hp - amount < 0)
+            else if (Hp + amount < 0)
             {
                 Hp = 0;
             }
