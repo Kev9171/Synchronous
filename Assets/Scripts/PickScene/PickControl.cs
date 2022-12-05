@@ -520,6 +520,7 @@ namespace PickScene
         public static string Flappy2_2 = "Prefabs/Characters/PickCharacters/PickFlappy2";
         public static string Knight_3 = "Prefabs/Characters/PickCharacters/PickKnight";
         public static string Spearman_4 = "Prefabs/Characters/PickCharacters/PickSpearman";
+        public static string Healer_5 = "Prefabs/Characters/PickCharacters/PickHealer";
 
         public static GameObject LoadCharacter(CID cid)
         {
@@ -529,6 +530,7 @@ namespace PickScene
                 CID.Flappy2 => Resources.Load<GameObject>(Flappy2_2),
                 CID.Knight => Resources.Load<GameObject>(Knight_3),
                 CID.Spearman => Resources.Load<GameObject>(Spearman_4),
+                CID.Healer => Resources.Load<GameObject>(Healer_5),
                 _ => null,
             };
         }
@@ -541,6 +543,7 @@ namespace PickScene
                 CID.Flappy2 => Flappy2_2,
                 CID.Knight => Knight_3,
                 CID.Spearman => Spearman_4,
+                CID.Healer => Healer_5,
                 _ => null,
             };
         }
