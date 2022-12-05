@@ -71,10 +71,10 @@ namespace KWY
 
         #region Constant Fields
 
-        const string IdCheckFailed = "Unavaiable Id, check again!";
-        const string WelcomeUser = "Join completed!\n\n Yout UID: ";
+        const string IdCheckFailed = "Unavailable Id, check again!";
+        const string WelcomeUser = "Join completed!\n\n Your UID: ";
         const string JoinFailed = "Joining is not available now.";
-        const string NameCheckFailed = "Unavaiable Name, check again!";
+        const string NameCheckFailed = "Unavailable name, check again!";
         const string NotEmailId = "Id should be email-format.";
         string inputFailedMsg = "Enter at least one word for id and password";
 
