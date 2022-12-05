@@ -35,19 +35,6 @@ namespace PickScene
 
         #region Public Methods
 
-        /*public void ClearHighlight()
-        {
-            foreach (var pos in hlMap.cellBounds.allPositionsWithin)
-            {
-                Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
-                if (hlMap.HasTile(localPlace))
-                {
-                    hlMap.SetTileFlags(localPlace, TileFlags.None);
-                    hlMap.SetColor(localPlace, transparent);
-                }
-            }
-        }*/
-
         [PunRPC]
         public void ReadyToStartRPC()
         {

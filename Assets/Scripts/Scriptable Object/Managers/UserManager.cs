@@ -32,7 +32,7 @@ namespace KWY
         private Sprite _userIcon;
         private int _userLevel;
         private ulong _userId;
-        private string _userName;
+        private string _userName = "player";
 
         public static string AccountId { get { return Instance._accountId; } }
         public static Sprite UserIcon { get { return Instance._userIcon; } }

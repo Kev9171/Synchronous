@@ -9,7 +9,10 @@ namespace KWY
     public class CharacterHpBarController : MonoBehaviour
     {
         [SerializeField]
-        GameObject hpBarPrefab;
+        GameObject hpBarPrefabEnemy;
+
+        [SerializeField]
+        GameObject hpBarPrefabMyTeam;
 
         [SerializeField]
         Transform canvasTransform;
@@ -22,9 +25,26 @@ namespace KWY
 
         new Camera camera;
 
-        public void AddBar(Character targetCharacter)
+        public void AddBarMyTeam(Character targetCharacter)
         {
-            GameObject g = Instantiate(hpBarPrefab, canvasTransform);
+            GameObject g = Instantiate(hpBarPrefabMyTeam, canvasTransform);
+            if (g.TryGetComponent(out Slider s))
+            {
+                s.maxValue = targetCharacter.MaxHp;
+                s.value = s.maxValue;
+            }
+            else
+            {
+                // error
+                Debug.Log($"Can not find component: Slider at character[{targetCharacter.Pc.Id}]");
+                return;
+            }
+            hpBars.Add(targetCharacter, g);
+        }
+
+        public void AddBarEnemey(Character targetCharacter)
+        {
+            GameObject g = Instantiate(hpBarPrefabEnemy, canvasTransform);
             if (g.TryGetComponent(out Slider s))
             {
                 s.maxValue = targetCharacter.MaxHp;
