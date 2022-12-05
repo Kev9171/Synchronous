@@ -33,5 +33,5 @@ MonoBehaviour:
   areaAttack: 0
   area: {fileID: 0}
   isDamage: 1
-  value: 10
+  value: 30
   dmgMultiplicand: 0
