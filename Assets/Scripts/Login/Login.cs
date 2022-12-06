@@ -1,4 +1,4 @@
-#define NO_LOGIN_SERVER
+//#define NO_LOGIN_SERVER
 
 using UnityEngine;
 using UnityEngine.UI;

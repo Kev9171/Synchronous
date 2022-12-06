@@ -1,4 +1,4 @@
-#define NO_LOGIN_SERVER
+//#define NO_LOGIN_SERVER
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -176,7 +176,6 @@ namespace KWY
         public void OnClickIdCheckBtn()
         {
             string id = IdInput.text.Trim();
-
             try
             {
                 MailAddress m = new MailAddress(id);
@@ -186,6 +185,12 @@ namespace KWY
                 // email ¾Æ´Ô
                 // ÆË¾÷Ã¢ ¶ç¿ì±â
                 PopupBuilder.ShowPopup(CanvasTransform, NotEmailId);
+                return;
+            }
+
+            if (id.Length >= 30)
+            {
+                PopupBuilder.ShowPopup(CanvasTransform, "The length of id should be less than 30.");
                 return;
             }
 
@@ -208,6 +213,11 @@ namespace KWY
                 PopupBuilder.ShowPopup(CanvasTransform, inputFailedMsg);
                 return;
             }
+            else if (name.Length >= 10)
+            {
+                PopupBuilder.ShowPopup(CanvasTransform, "The length of name should be less than 10.");
+                return;
+            }
 
             ShowLoadingPanel();
 
@@ -223,16 +233,14 @@ namespace KWY
         {
             ShowLoadingPanel();
 
-            // for test
-            JoinCallback(new JoinResData((int)ResCode.TRUE, "OK", 111));
-
             // original code
             string id = IdInput.text.Trim();
             string name = NameInput.text.Trim();
             string pw = PwInput.text.Trim();
 
 #if NO_LOGIN_SERVER
-            return;
+             // for test
+            JoinCallback(new JoinResData((int)ResCode.TRUE, "OK", 111));
 #endif
             StartCoroutine(LoginJoinAPI.Instance.JoinPost(id, name, pw, JoinCallback, ErrorCallback));
         }
