@@ -54,8 +54,8 @@ namespace KWY
         private void LoadAPIUrl()
         {
             // load json first
-            //TextAsset jsonText = Resources.Load("WebLoginAPI") as TextAsset;
-            TextAsset jsonText = Resources.Load("WebLoginAPI copy") as TextAsset;
+            TextAsset jsonText = Resources.Load("WebLoginAPI") as TextAsset;
+            //TextAsset jsonText = Resources.Load("WebLoginAPI copy") as TextAsset;
 
             if (jsonText == null)
             {

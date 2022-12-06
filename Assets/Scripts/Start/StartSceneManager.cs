@@ -1,4 +1,4 @@
-#define TEST
+#define NO_LOGIN_SERVER
 
 using System.Collections;
 using System.Collections.Generic;
@@ -151,9 +151,6 @@ namespace KWY
         {
             if (!PhotonNetwork.IsConnected)
             {
-#if TEST
-                ;
-#endif
                 // connect photon and 로비 진입
                 connectPhoton.ConnectPhotonServer();
             }

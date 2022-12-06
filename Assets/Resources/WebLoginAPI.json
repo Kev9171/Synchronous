@@ -1,8 +1,8 @@
 {
-    "ip_url": "",
-    "login_url": "",
-    "join_url": "",
-    "id_check_url": "",
-    "name_check_url": "",
-    "logout_url": ""
+    "ip_url": "http://13.125.227.167:8888",
+    "login_url": "synchronous/login",
+    "join_url": "synchronous/join",
+    "id_check_url": "synchronous/checkid",
+    "name_check_url": "synchronous/checkname",
+    "logout_url": "synchronous/logout"
 }

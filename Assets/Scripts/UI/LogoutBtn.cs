@@ -1,3 +1,5 @@
+//#define NO_LOGIN_SERVER
+
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -22,7 +24,11 @@ namespace KWY
         // ok 눌렀을 경우 로그아웃 실행
         public void LogoutOkCallback()
         {
+#if NO_LOGIN_SERVER
+            ;
+#else
             StartCoroutine(LoginJoinAPI.Instance.LogoutPost(UserManager.AccountId, ShowOkPopup, ErrorCallback));
+#endif
         }
 
         // 성공적으로 로그아웃 되었을 때
